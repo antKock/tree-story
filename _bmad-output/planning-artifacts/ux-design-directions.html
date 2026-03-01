@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tree-story — V2 Confirmed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #111;
+      color: #ccc;
+      font-family: Inter, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Navigation ── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #0a0a0a;
+      border-bottom: 1px solid #222;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+    }
+
+    .nav-logo {
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 1rem 1.25rem 1rem 0;
+      white-space: nowrap;
+      border-right: 1px solid #222;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: #555;
+      font-family: Inter, sans-serif;
+      font-size: 12.5px;
+      padding: 1rem 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.12s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .nav-btn:hover { color: #aaa; }
+    .nav-btn.active { color: #f0ece4; border-bottom-color: #c4834a; }
+
+    /* ── Decisions banner ── */
+    .banner {
+      background: #0d0d0d;
+      border-bottom: 1px solid #1a1a1a;
+      padding: 0.625rem 2rem;
+      display: flex;
+      gap: 1.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .banner-item { font-size: 11.5px; color: #777; }
+    .banner-item strong { color: #c4834a; }
+
+    /* ── Page layout ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1.5rem 5rem;
+      gap: 2rem;
+    }
+
+    /* Two-up layout for side-by-side phones */
+    .stage-duo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1.5rem 5rem;
+      gap: 2.5rem;
+    }
+
+    .duo-row {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .duo-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .duo-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #555;
+      text-align: center;
+    }
+
+    .info {
+      max-width: 620px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .info-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 0.4rem;
+    }
+
+    .info-name {
+      font-size: 22px;
+      font-weight: 500;
+      color: #f0ece4;
+      margin-bottom: 0.6rem;
+    }
+
+    .info-desc {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: #666;
+    }
+    .info-desc strong { color: #999; }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+      margin-top: 0.875rem;
+    }
+    .tag {
+      font-size: 11px;
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+      background: #1a1a1a;
+      border: 1px solid #272727;
+      color: #666;
+    }
+    .tag.hi { background: #1c1710; border-color: #35280f; color: #b07840; }
+
+    /* ── Phone frame ── */
+    .phone-frame {
+      width: 390px;
+      max-width: calc(100vw - 3rem);
+      border-radius: 44px;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px #2a2a2a, 0 28px 70px rgba(0,0,0,0.7);
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 780px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #0f0f0f;
+    }
+
+    /* ════════════════════════════════════════════
+       CONFIRMED GAUGE STRIP
+       Icon centered on top · Bar below · More height
+    ════════════════════════════════════════════ */
+
+    .gauge-strip {
+      flex-shrink: 0;
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem 1rem;
+      background: #0d0d0d;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    .gauge-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gauge-icon {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .gauge-track {
+      width: 100%;
+      height: 7px;
+      background: #1e1e1e;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .gauge-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* ════════════════════════════════════════════
+       SCROLL AREA — prose + choices flow together
+       Choices appear naturally at end of content
+    ════════════════════════════════════════════ */
+
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      /* Subtle scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a2a #0f0f0f;
+    }
+
+    .scroll-area::-webkit-scrollbar { width: 3px; }
+    .scroll-area::-webkit-scrollbar-track { background: #0f0f0f; }
+    .scroll-area::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+
+    .prose-block {
+      padding: 1.75rem 1.75rem 0.5rem;
+      font-family: Lora, serif;
+      font-size: 20px;
+      line-height: 1.72;
+      color: #f0ece4;
+    }
+
+    .prose-block p { margin-bottom: 1.25rem; }
+    .prose-block p:last-child { margin-bottom: 0; }
+    .prose-block em { font-style: italic; color: #6a6560; }
+    .prose-block strong { font-weight: 600; }
+
+    /* Separator between prose and choices */
+    .choice-sep {
+      height: 1px;
+      background: #1e1e1e;
+      margin: 1.25rem 1.5rem 0;
+    }
+
+    /* Choice cards */
+    .choices {
+      padding: 0.875rem 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .choice {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-radius: 10px;
+      border: 1px solid #252525;
+      background: #141414;
+      cursor: pointer;
+      transition: all 0.12s;
+      font-family: Lora, serif;
+      font-size: 17px;
+      color: #c8c3bc;
+      text-decoration: none;
+    }
+    .choice:hover { background: #1c1914; border-color: #c4834a; color: #f0ece4; }
+    .choice-icon { font-size: 18px; flex-shrink: 0; }
+
+    /* ── Scroll hint indicator ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, #0f0f0f);
+      pointer-events: none;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+    }
+
+    .scroll-hint-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #3a3a3a;
+      animation: bounce 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); opacity: 0.4; }
+      50% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* ── Scroll position label (for the long block demo) ── */
+    .scroll-label {
+      font-size: 11px;
+      color: #444;
+      font-family: Inter, sans-serif;
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    /* ── Wrapper for phones with scroll indicator ── */
+    .phone-wrapper {
+      position: relative;
+    }
+
+    /* ── Note box ── */
+    .note {
+      max-width: 780px;
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .note-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    .note-body { font-size: 13px; line-height: 1.6; color: #777; }
+    .note-body strong { color: #aaa; }
+
+    /* ── Compare table ── */
+    .compare {
+      max-width: 780px;
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .compare-head {
+      padding: 0.75rem 1.125rem;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #444;
+    }
+
+    .compare-row {
+      display: flex;
+      border-bottom: 1px solid #161616;
+    }
+    .compare-row:last-child { border-bottom: none; }
+
+    .compare-axis {
+      width: 140px;
+      flex-shrink: 0;
+      padding: 0.75rem 1.125rem;
+      font-size: 12px;
+      color: #555;
+      border-right: 1px solid #1a1a1a;
+    }
+
+    .compare-val {
+      padding: 0.75rem 1.125rem;
+      font-size: 13px;
+      color: #999;
+      line-height: 1.55;
+    }
+    .compare-val strong { color: #c4834a; }
+
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">tree-story</div>
+  <button class="nav-btn active" onclick="show(1)">Confirmed design</button>
+  <button class="nav-btn"        onclick="show(2)">Long story block</button>
+</nav>
+
+<div class="banner">
+  <span class="banner-item">✓ <strong>V2 confirmed</strong> — Large Left, 20px</span>
+  <span class="banner-item">✓ Gauge: <strong>icon above · bar below</strong></span>
+  <span class="banner-item">✓ <strong>4 gauges</strong> — Kiff hidden</span>
+  <span class="banner-item">✓ Choices appear <strong>at end of story block</strong></span>
+</div>
+
+
+<!-- ════════════════════════════════════════
+  TAB 1 — CONFIRMED DESIGN
+  Normal story block + updated gauge layout
+════════════════════════════════════════ -->
+<div class="page active" id="page-1">
+  <div class="stage">
+
+    <div class="info">
+      <div class="info-label">V2 — Confirmed</div>
+      <div class="info-name">Large Left · Gauges updated</div>
+      <div class="info-desc">
+        Gauge strip with <strong>icon centered above, bar below</strong> — taller strip, more presence.
+        Prose at 20px left-aligned. Choice cards below the prose block.
+        Short story block: choices visible without scrolling.
+      </div>
+      <div class="tags">
+        <span class="tag hi">20px Lora left-aligned</span>
+        <span class="tag hi">Icon above · bar below</span>
+        <span class="tag hi">Rounded choice cards</span>
+        <span class="tag">Kiff hidden</span>
+      </div>
+    </div>
+
+    <div class="phone-frame">
+      <div class="phone-screen">
+
+        <!-- ── Gauge strip: icon on top, bar below ── -->
+        <div class="gauge-strip">
+          <div class="gauge-item">
+            <span class="gauge-icon">⚡</span>
+            <div class="gauge-track">
+              <div class="gauge-fill" style="width:100%; background:#c4834a;"></div>
+            </div>
+          </div>
+          <div class="gauge-item">
+            <span class="gauge-icon">🍺</span>
+            <div class="gauge-track">
+              <div class="gauge-fill" style="width:0%; background:#e8622a;"></div>
+            </div>
+          </div>
+          <div class="gauge-item">
+            <span class="gauge-icon">🌿</span>
+            <div class="gauge-track">
+              <div class="gauge-fill" style="width:0%; background:#6aaa4a;"></div>
+            </div>
+          </div>
+          <div class="gauge-item">
+            <span class="gauge-icon">🍔</span>
+            <div class="gauge-track">
+              <div class="gauge-fill" style="width:50%; background:#e8c42a;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Scroll area: prose + choices ── -->
+        <div class="scroll-area">
+          <div class="prose-block">
+            <p>Le camping s'anime doucement. Des basses lointaines s'échappent déjà du site. Bastien a disparu « faire un tour » et Brian somnole à moitié dans son transat, bière à la main.</p>
+            <p><em>Qu'est-ce que tu fais ?</em></p>
+          </div>
+
+          <div class="choice-sep"></div>
+          <div class="choices">
+            <a class="choice" href="#"><span class="choice-icon">🏊</span> Tu vas te baigner au lac</a>
+            <a class="choice" href="#"><span class="choice-icon">🍕</span> Tu pars manger aux stands</a>
+            <a class="choice" href="#"><span class="choice-icon">😴</span> Tu t'allonges à l'ombre</a>
+            <a class="choice" href="#"><span class="choice-icon">🍺</span> Tu rejoins Brian dans son transat</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="compare-head">Gauge strip — design decisions</div>
+      <div class="compare-row">
+        <div class="compare-axis">Layout</div>
+        <div class="compare-val"><strong>Icon centered above, bar below.</strong> Each gauge reads as a unit — icon gives instant identity, bar shows state.</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-axis">Bar height</div>
+        <div class="compare-val">7px — substantial enough to read state changes clearly. Not decorative, genuinely informative.</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-axis">Strip height</div>
+        <div class="compare-val">~72px total with padding. Proportional presence at top without dominating the reading area.</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-axis">Colours</div>
+        <div class="compare-val">⚡ amber · 🍺 orange-red · 🌿 green · 🍔 yellow. Story-defined via CSS variables.</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-axis">Kiff hidden</div>
+        <div class="compare-val">Score gauge not shown during play — revealed only at end-of-game summary screen.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+  TAB 2 — LONG STORY BLOCK
+  Shows that choices appear only after scrolling
+  through the full story content
+════════════════════════════════════════ -->
+<div class="page" id="page-2">
+  <div class="stage-duo">
+
+    <div class="info">
+      <div class="info-label">Long story block</div>
+      <div class="info-name">Choices appear at end of scroll</div>
+      <div class="info-desc">
+        The story block can be any length. The player scrolls through the full prose before reaching the choices —
+        <strong>choices are always at the end of the content, never floating above unread text.</strong>
+        Shown here at two mid-game gauges states for context.
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="note-icon">↕</div>
+      <div class="note-body">
+        <strong>Scroll inside the phone.</strong> The story text requires scrolling to reach the choices below.
+        This is intentional — the player must read the full paragraph before the decision appears.
+        On short blocks (Tab 1), choices are immediately visible. On long blocks, they're at the bottom of the scroll.
+      </div>
+    </div>
+
+    <div class="duo-row">
+
+      <!-- Phone A: mid-game, longer block with paragraph prose -->
+      <div class="duo-col">
+        <div class="duo-label">Mid-game · §50 Dubkasm</div>
+
+        <div class="phone-frame">
+          <div class="phone-screen">
+
+            <!-- Gauge strip: mid-game values -->
+            <div class="gauge-strip">
+              <div class="gauge-item">
+                <span class="gauge-icon">⚡</span>
+                <div class="gauge-track">
+                  <div class="gauge-fill" style="width:62%; background:#c4834a;"></div>
+                </div>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-icon">🍺</span>
+                <div class="gauge-track">
+                  <div class="gauge-fill" style="width:38%; background:#e8622a;"></div>
+                </div>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-icon">🌿</span>
+                <div class="gauge-track">
+                  <div class="gauge-fill" style="width:22%; background:#6aaa4a;"></div>
+                </div>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-icon">🍔</span>
+                <div class="gauge-track">
+                  <div class="gauge-fill" style="width:28%; background:#e8c42a;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Long story block -->
+            <div class="scroll-area">
+              <div class="prose-block">
+                <p>La nuit est tombée mais l'air est encore lourd, chaud, dense de corps et de basses. La Dub Club Arena est pleine à craquer.</p>
+                <p>Dubkasm monte sur scène et les premières notes font taire tout le monde une seconde — puis la foule explose. C'est lourd, profond, hypnotique. Bastien est quelque part devant à sauter. Brian est à côté de toi, il sourit comme un gamin.</p>
+                <p>Au loin, derrière les scènes, les lumières du camping clignotent encore. Des silhouettes dansent autour d'un feu. L'odeur de l'herbe et de la poussière, mélangée aux fumées d'un barbecue tardif. Ça fait partie de la soirée, tout ça — les sons qui se superposent, les gens qui circulent, les hasards heureux.</p>
+                <p>Tu as bien géré jusqu'ici. Énergie correcte, la tête à peu près claire. Dans ces moments-là, les choix se font sentir plutôt que se réfléchir.</p>
+                <p><em>Comment tu vis ce concert ?</em></p>
+              </div>
+
+              <div class="choice-sep"></div>
+              <div class="choices">
+                <a class="choice" href="#"><span class="choice-icon">🕺</span> Tu plonges dans la foule, au maximum</a>
+                <a class="choice" href="#"><span class="choice-icon">🧍</span> Tu restes en retrait, tu savoures</a>
+                <a class="choice" href="#"><span class="choice-icon">🚪</span> T'as besoin d'air, tu sors un moment</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="scroll-label">↑ Scroll up to start reading</div>
+      </div>
+
+      <!-- Phone B: late game, very long block showing even more extreme case -->
+      <div class="duo-col">
+        <div class="duo-label">Late game · §60 La descente</div>
+
+        <div class="phone-frame">
+          <div class="phone-screen">
+
+            <!-- Gauge strip: late game values -->
+            <div class="gauge-strip">
+              <div class="gauge-item">
+                <span class="gauge-icon">⚡</span>
+                <div class="gauge-track">
+                  <div class="gauge-fill" style="width:35%; background:#c4834a;"></div>
+                </div>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-icon">🍺</span>
+                <div class="gauge-track">
+                  <div class="gauge-fill" style="width:58%; background:#e8622a;"></div>
+                </div>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-icon">🌿</span>
+                <div class="gauge-track">
+                  <div class="gauge-fill" style="width:42%; background:#6aaa4a;"></div>
+                </div>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-icon">🍔</span>
+                <div class="gauge-track">
+                  <div class="gauge-fill" style="width:15%; background:#e8c42a;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Very long story block -->
+            <div class="scroll-area">
+              <div class="prose-block">
+                <p>Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux. Brian a disparu — vous le retrouvez assis contre une barrière, la tête penchée en arrière.</p>
+                <p>« Les gars… j'crois que j'ai un peu trop bu. »</p>
+                <p>Il est 23h. Channel One passe à l'Outernational jusqu'à 1h du mat. C'est la légende — un sound system jamaïcain qui joue en France deux fois par an. Bastien t'attrape le bras. « Faut y aller. C'est maintenant ou jamais. »</p>
+                <p>Brian lève la main depuis sa barrière. « Allez-y, moi j'vais pas bouger. »</p>
+                <p>L'air de la nuit est plus frais maintenant. Tu sens la fatigue dans les jambes, mais il reste quelque chose — une réserve, une envie. Ou peut-être juste l'inertie de la soirée qui continue de te porter.</p>
+                <p>Brian sort machinalement son tabac. Par réflexe. <em>« Dernier petit truc ? »</em></p>
+              </div>
+
+              <div class="choice-sep"></div>
+              <div class="choices">
+                <a class="choice" href="#"><span class="choice-icon">🎵</span> Tu files voir Channel One</a>
+                <a class="choice" href="#"><span class="choice-icon">🍔</span> Tu manges un truc d'abord</a>
+                <a class="choice" href="#"><span class="choice-icon">🤝</span> Tu restes avec Brian</a>
+                <a class="choice" href="#"><span class="choice-icon">🛏️</span> T'en as eu assez, tu rentres</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="scroll-label">↑ Scroll up to start reading</div>
+      </div>
+
+    </div><!-- .duo-row -->
+
+    <div class="compare">
+      <div class="compare-head">Scroll behaviour — design intent</div>
+      <div class="compare-row">
+        <div class="compare-axis">Short blocks</div>
+        <div class="compare-val">Choices visible immediately below the prose — no scroll needed. Natural for simple decision moments.</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-axis">Long blocks</div>
+        <div class="compare-val"><strong>Player scrolls through the full story block before reaching choices.</strong> Choices are in the document flow — never floating above unread content.</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-axis">Implementation</div>
+        <div class="compare-val">Single scroll area: prose + separator + choice cards all in flow. Gauge strip is the only fixed element (top). No sticky choice footer.</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-axis">Gauge during scroll</div>
+        <div class="compare-val"><strong>Always visible</strong> at top, fixed. Player can check gauge state at any point while reading. Acts as a persistent status layer above the content.</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-axis">Bold / italic</div>
+        <div class="compare-val">Supported inline within the story block — sourced from JSON config. No block-level formatting (headings, lists). Prose only.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+  function show(n) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + n).classList.add('active');
+    document.querySelectorAll('.nav-btn')[n - 1].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>

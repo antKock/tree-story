@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tree-story — Example Screens</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ─── Page layout ─────────────────────────────────────────── */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1a1a;
+    font-family: Inter, sans-serif;
+    padding: 48px 32px 80px;
+    color: #f0ece4;
+  }
+  h1 {
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7a7672;
+    margin-bottom: 8px;
+  }
+  .page-title {
+    font-family: Lora, serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: #f0ece4;
+    margin-bottom: 8px;
+  }
+  .page-subtitle {
+    font-size: 14px;
+    color: #7a7672;
+    margin-bottom: 48px;
+    line-height: 1.6;
+    max-width: 560px;
+  }
+
+  /* ─── Section labels ─────────────────────────────────────── */
+  .section {
+    margin-bottom: 64px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7a7672;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .screens-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .screen-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .screen-caption {
+    font-size: 11px;
+    color: #7a7672;
+    letter-spacing: 0.06em;
+    text-align: center;
+    max-width: 200px;
+  }
+
+  /* ─── Phone frame ─────────────────────────────────────────── */
+  .phone {
+    width: 375px;
+    height: 812px;
+    border-radius: 44px;
+    border: 8px solid #2e2e2e;
+    background: #0f0f0f;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px #111,
+      0 32px 80px rgba(0,0,0,0.8),
+      inset 0 0 0 1px #3a3a3a;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Notch */
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 28px;
+    background: #2e2e2e;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    z-index: 100;
+  }
+  /* Home indicator */
+  .phone::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    z-index: 100;
+  }
+
+  /* Tall variant for scrolled content */
+  .phone.tall {
+    height: 900px;
+  }
+  .phone.short {
+    height: 680px;
+  }
+
+  /* ─── Gauge strip ─────────────────────────────────────────── */
+  .gauge-strip {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 36px 24px 10px; /* top pad accounts for notch */
+    gap: 8px;
+  }
+  .gauge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .gauge-icon {
+    font-size: 14px;
+    line-height: 1;
+  }
+  .gauge-track {
+    width: 100%;
+    height: 7px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .gauge-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  /* Gauge colours */
+  .g-energie  { background: #e8a42a; }
+  .g-alcool   { background: #e8622a; }
+  .g-fumette  { background: #7c9a3a; }
+  .g-nourr    { background: #d4935a; }
+  /* Night act */
+  .night .g-energie  { background: #7c5cbf; }
+  .night .g-alcool   { background: #5c7cbf; }
+  .night .g-fumette  { background: #4a8a5a; }
+  .night .g-nourr    { background: #7a5cbf; }
+
+  /* ─── Scroll area ─────────────────────────────────────────── */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 20px 48px;
+    scrollbar-width: none;
+  }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  /* ─── Prose ───────────────────────────────────────────────── */
+  .prose {
+    font-family: Lora, serif;
+    font-size: 20px;
+    line-height: 1.72;
+    color: #f0ece4;
+    max-width: 65ch;
+    margin-bottom: 32px;
+  }
+  .prose p { margin-bottom: 24px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose em { font-style: italic; color: #c8c4bc; }
+  .prose strong { font-weight: 600; }
+
+  /* ─── Chapter marker ─────────────────────────────────────── */
+  .chapter-marker {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7a7672;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  /* ─── Choice cards ────────────────────────────────────────── */
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .choice-card {
+    width: 100%;
+    min-height: 52px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    font-family: Lora, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    color: #f0ece4;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .choice-card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.15);
+  }
+  .choice-card.selected {
+    border-color: rgba(232,164,42,0.5);
+    background: rgba(232,164,42,0.08);
+  }
+  .choice-emoji {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* Night act choice selected */
+  .night .choice-card.selected {
+    border-color: rgba(124,92,191,0.5);
+    background: rgba(124,92,191,0.08);
+  }
+
+  /* ─── Act backgrounds ─────────────────────────────────────── */
+  .act-afternoon { background: #1a1208; }
+  .act-golden    { background: #160e0a; }
+  .act-night     { background: #080810; }
+  .act-latenight { background: #0a0c0e; }
+
+  /* accent colors per act */
+  .act-afternoon .accent { color: #e8a42a; }
+  .act-golden    .accent { color: #e8622a; }
+  .act-night     .accent { color: #7c5cbf; }
+
+  /* ─── Outcome block ───────────────────────────────────────── */
+  .outcome-block {
+    margin-top: 24px;
+    padding: 16px 18px;
+    border-radius: 8px;
+    border-left: 3px solid;
+    background: rgba(255,255,255,0.03);
+    font-family: Lora, serif;
+    font-size: 17px;
+    line-height: 1.6;
+    color: #c8c4bc;
+  }
+  .outcome-block.good { border-color: #4a8a4a; }
+  .outcome-block.bad  { border-color: #8a4a4a; }
+  .outcome-block em { font-style: italic; }
+
+  /* Gauge delta indicators */
+  .gauge-delta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .delta {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 3px 7px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.06);
+  }
+  .delta.pos { color: #6abf7a; }
+  .delta.neg { color: #bf6a6a; }
+
+  /* ─── Character sheet overlay ────────────────────────────── */
+  .sheet-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .sheet-panel {
+    background: #1a1a1a;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 48px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    margin: 0 auto 24px;
+  }
+  .sheet-title {
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7a7672;
+    margin-bottom: 20px;
+  }
+
+  /* Stat rows */
+  .stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-name {
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    color: #f0ece4;
+  }
+  .stat-dots {
+    display: flex;
+    gap: 5px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .dot.filled { background: #e8a42a; }
+  .dot.empty  { background: rgba(255,255,255,0.1); }
+
+  /* Gauge rows in sheet */
+  .gauge-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .gauge-row:last-child { border-bottom: none; }
+  .gauge-row-icon { font-size: 16px; flex-shrink: 0; width: 24px; text-align: center; }
+  .gauge-row-name {
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    color: #7a7672;
+    width: 80px;
+    flex-shrink: 0;
+  }
+  .gauge-row-track {
+    flex: 1;
+    height: 7px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .gauge-row-fill {
+    height: 100%;
+    border-radius: 4px;
+  }
+
+  /* ─── Character creation screen ─────────────────────────── */
+  .creation-screen {
+    flex: 1;
+    overflow-y: auto;
+    padding: 48px 20px 48px;
+    scrollbar-width: none;
+  }
+  .creation-intro {
+    font-family: Lora, serif;
+    font-size: 17px;
+    line-height: 1.68;
+    color: #c8c4bc;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+  .creation-title {
+    font-family: Lora, serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: #f0ece4;
+    margin-bottom: 4px;
+  }
+  .creation-subtitle {
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    color: #7a7672;
+    letter-spacing: 0.06em;
+    margin-bottom: 28px;
+  }
+  .points-badge {
+    display: inline-block;
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #e8a42a;
+    border: 1px solid rgba(232,164,42,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 24px;
+  }
+  .stat-alloc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    gap: 12px;
+  }
+  .stat-alloc-label {
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    color: #f0ece4;
+    flex: 1;
+  }
+  .stat-alloc-desc {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    color: #7a7672;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .stat-alloc-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .stat-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    color: #f0ece4;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: Inter, sans-serif;
+    font-weight: 400;
+  }
+  .stat-value {
+    font-family: Inter, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #e8a42a;
+    width: 18px;
+    text-align: center;
+  }
+  .profile-examples {
+    margin-top: 28px;
+    padding: 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .profile-example-title {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7a7672;
+    margin-bottom: 10px;
+  }
+  .profile-chip {
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    color: #c8c4bc;
+    padding: 5px 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 5px;
+    display: inline-block;
+    margin: 3px 4px 3px 0;
+    cursor: pointer;
+  }
+  .cta-btn {
+    display: block;
+    width: 100%;
+    margin-top: 28px;
+    padding: 16px;
+    background: #e8a42a;
+    color: #0f0f0f;
+    font-family: Inter, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  /* ─── Game over screen ───────────────────────────────────── */
+  .gameover-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 48px 20px 48px;
+    justify-content: center;
+  }
+  .gameover-icon {
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+  .gameover-title {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #c0392b;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .gameover-prose {
+    font-family: Lora, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #c8c4bc;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .gameover-reason {
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    color: #7a7672;
+    text-align: center;
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+  .replay-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: rgba(255,255,255,0.06);
+    color: #f0ece4;
+    font-family: Inter, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  /* ─── Results screen ─────────────────────────────────────── */
+  .results-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 48px 20px 48px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .results-act-label {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7a7672;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .results-score-big {
+    font-family: Lora, serif;
+    font-size: 72px;
+    font-weight: 500;
+    color: #e8a42a;
+    text-align: center;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .results-score-unit {
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    color: #7a7672;
+    text-align: center;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .results-tier {
+    font-family: Lora, serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: #f0ece4;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .results-prose {
+    font-family: Lora, serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: #c8c4bc;
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 36px;
+    padding: 0 8px;
+  }
+  .results-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 0 0 24px;
+  }
+  .results-summary-title {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7a7672;
+    margin-bottom: 16px;
+  }
+  .results-gauge-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .results-gauge-icon { font-size: 14px; width: 20px; text-align: center; }
+  .results-gauge-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .results-gauge-fill { height: 100%; border-radius: 3px; }
+  .results-gauge-val {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    color: #7a7672;
+    width: 28px;
+    text-align: right;
+  }
+  .replay-btn-amber {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: rgba(232,164,42,0.12);
+    color: #e8a42a;
+    font-family: Inter, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    border: 1px solid rgba(232,164,42,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h1>tree-story</h1>
+<p class="page-title">Example Screens — Dub Camp</p>
+<p class="page-subtitle">Interactive story mockups based on the UX design specification and the Dub Camp v0.8 story. These represent the key states of the app across session stages and story acts.</p>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: ONBOARDING                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Session Start — Character Creation</div>
+  <div class="screens-row">
+
+    <!-- Screen 1: Character creation -->
+    <div class="screen-wrap">
+      <div class="phone act-afternoon">
+        <div class="creation-screen">
+          <p class="creation-intro">Le soleil tape déjà fort quand vous posez les sacs. Trois tentes, un carré d'herbe pas trop mal placé, et devant vous : le Dub Camp.</p>
+          <div class="creation-title">Ton profil</div>
+          <div class="creation-subtitle">8 POINTS À RÉPARTIR — MAX 4 PAR STAT</div>
+          <div class="points-badge">3 points restants</div>
+
+          <div class="stat-alloc-row">
+            <div>
+              <div class="stat-alloc-label">💪 Endurance</div>
+              <div class="stat-alloc-desc">Chaque activité coûte moins d'énergie</div>
+            </div>
+            <div class="stat-alloc-controls">
+              <div class="stat-btn">−</div>
+              <div class="stat-value">3</div>
+              <div class="stat-btn">+</div>
+            </div>
+          </div>
+
+          <div class="stat-alloc-row">
+            <div>
+              <div class="stat-alloc-label">🍔 Estomac</div>
+              <div class="stat-alloc-desc">Tu as moins faim, manger remonte plus</div>
+            </div>
+            <div class="stat-alloc-controls">
+              <div class="stat-btn">−</div>
+              <div class="stat-value">1</div>
+              <div class="stat-btn">+</div>
+            </div>
+          </div>
+
+          <div class="stat-alloc-row">
+            <div>
+              <div class="stat-alloc-label">🍺 Résistance alcool</div>
+              <div class="stat-alloc-desc">Tu supportes plus avant les mauvais effets</div>
+            </div>
+            <div class="stat-alloc-controls">
+              <div class="stat-btn">−</div>
+              <div class="stat-value">1</div>
+              <div class="stat-btn">+</div>
+            </div>
+          </div>
+
+          <div class="stat-alloc-row">
+            <div>
+              <div class="stat-alloc-label">🌿 Résistance fumette</div>
+              <div class="stat-alloc-desc">Idem pour la fumette</div>
+            </div>
+            <div class="stat-alloc-controls">
+              <div class="stat-btn">−</div>
+              <div class="stat-value" style="color:#7a7672;">0</div>
+              <div class="stat-btn">+</div>
+            </div>
+          </div>
+
+          <div class="profile-examples">
+            <div class="profile-example-title">Exemples</div>
+            <span class="profile-chip">Le Bastien 4/0/2/2</span>
+            <span class="profile-chip">Le Brian 1/1/3/3</span>
+            <span class="profile-chip">L'équilibré 2/2/2/2</span>
+          </div>
+
+          <button class="cta-btn">Commencer la soirée →</button>
+        </div>
+      </div>
+      <div class="screen-caption">§1 — Allocation des stats avant le début</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: READING + CHOICE                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Act I — Après-midi (13h–16h) · Amber theme</div>
+  <div class="screens-row">
+
+    <!-- Screen 2: Reading, prose visible, choices below fold -->
+    <div class="screen-wrap">
+      <div class="phone act-afternoon">
+        <!-- Gauge strip -->
+        <div class="gauge-strip">
+          <div class="gauge-item">
+            <div class="gauge-icon">⚡</div>
+            <div class="gauge-track"><div class="gauge-fill g-energie" style="width:100%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍺</div>
+            <div class="gauge-track"><div class="gauge-fill g-alcool" style="width:0%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🌿</div>
+            <div class="gauge-track"><div class="gauge-fill g-fumette" style="width:0%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍔</div>
+            <div class="gauge-track"><div class="gauge-fill g-nourr" style="width:50%"></div></div>
+          </div>
+        </div>
+        <!-- Scroll area -->
+        <div class="scroll-area">
+          <div class="prose">
+            <p>Le camping s'anime doucement. Des basses lointaines s'échappent déjà du site. Bastien a disparu "faire un tour" et Brian somnole à moitié dans son transat, bière à la main.</p>
+            <p><em>Qu'est-ce que tu fais ?</em></p>
+          </div>
+          <div class="choices">
+            <div class="choice-card"><span class="choice-emoji">🏊</span> Tu vas te baigner au lac</div>
+            <div class="choice-card"><span class="choice-emoji">🍕</span> Tu pars manger un truc aux stands</div>
+            <div class="choice-card"><span class="choice-emoji">😴</span> Tu t'allonges à l'ombre</div>
+            <div class="choice-card"><span class="choice-emoji">🍺</span> Tu rejoins Brian dans son transat</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-caption">§10 — Premier choix de la soirée</div>
+    </div>
+
+    <!-- Screen 3: After a choice — outcome with gauge shifts -->
+    <div class="screen-wrap">
+      <div class="phone act-afternoon">
+        <div class="gauge-strip">
+          <div class="gauge-item">
+            <div class="gauge-icon">⚡</div>
+            <div class="gauge-track"><div class="gauge-fill g-energie" style="width:85%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍺</div>
+            <div class="gauge-track"><div class="gauge-fill g-alcool" style="width:0%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🌿</div>
+            <div class="gauge-track"><div class="gauge-fill g-fumette" style="width:0%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍔</div>
+            <div class="gauge-track"><div class="gauge-fill g-nourr" style="width:35%"></div></div>
+          </div>
+        </div>
+        <div class="scroll-area">
+          <div class="prose">
+            <p>Cinq minutes de marche et te voilà au bord du lac. L'eau est fraîche, les gens sont détendus, quelqu'un a sorti une enceinte qui crache du roots tranquille.</p>
+          </div>
+          <div class="outcome-block good">
+            <p>L'eau est parfaite. Tu passes une heure à flotter sur le dos en regardant les nuages. Tu rentres requinqué, la tête claire.</p>
+            <div class="gauge-delta">
+              <span class="delta pos">⚡ +15</span>
+              <span class="delta neg">🍔 −10</span>
+              <span class="delta pos">🎉 +7</span>
+            </div>
+          </div>
+          <div style="margin-top: 24px;">
+            <div class="prose">
+              <p>Il est 16h. Bastien regarde son téléphone. "Les premiers concerts commencent à 17h." Brian sort son paquet de tabac et te regarde avec un sourire. "On se roule un petit truc avant ?"</p>
+              <p><em>Tu dis quoi ?</em></p>
+            </div>
+            <div class="choices">
+              <div class="choice-card selected"><span class="choice-emoji">🌿</span> "Ouais, allez"</div>
+              <div class="choice-card"><span class="choice-emoji">😇</span> "Non merci, je préfère être frais"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-caption">§11→§15 — Résultat du tirage + prochain choix</div>
+    </div>
+
+    <!-- Screen 4: After transat (drinking+smoking) — bad outcome warning -->
+    <div class="screen-wrap">
+      <div class="phone act-afternoon">
+        <div class="gauge-strip">
+          <div class="gauge-item">
+            <div class="gauge-icon">⚡</div>
+            <div class="gauge-track"><div class="gauge-fill g-energie" style="width:72%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍺</div>
+            <div class="gauge-track"><div class="gauge-fill g-alcool" style="width:20%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🌿</div>
+            <div class="gauge-track"><div class="gauge-fill g-fumette" style="width:55%; background: #c8a030;"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍔</div>
+            <div class="gauge-track"><div class="gauge-fill g-nourr" style="width:30%"></div></div>
+          </div>
+        </div>
+        <div class="scroll-area">
+          <div class="prose">
+            <p>Vous vous posez cinq minutes. Brian roule, vous allumez.</p>
+          </div>
+          <div class="outcome-block bad">
+            <p>Le mélange chaleur + joint te monte plus que prévu. T'es un peu dans le coton en arrivant sur le site.</p>
+            <div class="gauge-delta">
+              <span class="delta neg">🌿 +45</span>
+              <span class="delta neg">⚡ −10</span>
+              <span class="delta pos">🎉 +4</span>
+            </div>
+          </div>
+          <div style="margin-top: 24px;">
+            <div class="prose">
+              <p>Il reste une heure avant les premiers concerts. L'ambiance sur le camping monte sérieusement.</p>
+              <p><em>Qu'est-ce que tu fais ?</em></p>
+            </div>
+            <div class="choices">
+              <div class="choice-card"><span class="choice-emoji">🍗</span> Tu manges un truc solide</div>
+              <div class="choice-card"><span class="choice-emoji">🚿</span> Tu passes par les douches</div>
+              <div class="choice-card"><span class="choice-emoji">🎲</span> Partie de Skull avec les potes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-caption">§15A — Mauvais tirage, jauge 🌿 haute</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: NIGHT ACT                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Act III — Nuit (21h30) · Purple/electric theme</div>
+  <div class="screens-row">
+
+    <!-- Screen 5: Dubkasm concert -->
+    <div class="screen-wrap">
+      <div class="phone act-night night">
+        <div class="gauge-strip">
+          <div class="gauge-item">
+            <div class="gauge-icon">⚡</div>
+            <div class="gauge-track"><div class="gauge-fill g-energie" style="width:58%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍺</div>
+            <div class="gauge-track"><div class="gauge-fill g-alcool" style="width:38%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🌿</div>
+            <div class="gauge-track"><div class="gauge-fill g-fumette" style="width:42%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍔</div>
+            <div class="gauge-track"><div class="gauge-fill g-nourr" style="width:20%; background: #7a5cbf;"></div></div>
+          </div>
+        </div>
+        <div class="scroll-area">
+          <div class="prose">
+            <p>La nuit est tombée mais l'air est encore lourd, chaud, dense de corps et de basses. La Dub Club Arena est pleine à craquer. Dubkasm monte sur scène et les premières notes font taire tout le monde une seconde — puis la foule explose. C'est lourd, profond, hypnotique. Bastien est quelque part devant à sauter. Brian est à côté de toi, il sourit comme un gamin.</p>
+            <p><em>Comment tu vis ce concert ?</em></p>
+          </div>
+          <div class="choices">
+            <div class="choice-card" style="border-color: rgba(124,92,191,0.2)"><span class="choice-emoji">🕺</span> Tu plonges dans la foule, au maximum</div>
+            <div class="choice-card" style="border-color: rgba(124,92,191,0.2)"><span class="choice-emoji">🧍</span> Tu restes en retrait, tu savoures sans te cramer</div>
+            <div class="choice-card" style="border-color: rgba(124,92,191,0.2)"><span class="choice-emoji">🚪</span> T'as besoin d'air, tu sors un moment</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-caption">§50 — Dubkasm, le concert du soir</div>
+    </div>
+
+    <!-- Screen 6: Night outcome — perfect moment -->
+    <div class="screen-wrap">
+      <div class="phone act-night night">
+        <div class="gauge-strip">
+          <div class="gauge-item">
+            <div class="gauge-icon">⚡</div>
+            <div class="gauge-track"><div class="gauge-fill g-energie" style="width:34%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍺</div>
+            <div class="gauge-track"><div class="gauge-fill g-alcool" style="width:35%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🌿</div>
+            <div class="gauge-track"><div class="gauge-fill g-fumette" style="width:40%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍔</div>
+            <div class="gauge-track"><div class="gauge-fill g-nourr" style="width:18%; background: #7a5cbf;"></div></div>
+          </div>
+        </div>
+        <div class="scroll-area">
+          <div class="outcome-block good" style="border-color: #5c7cbf; margin-bottom: 24px;">
+            <p>La foule te porte, les basses te traversent, t'es en transe complète. Un de ces moments dont tu te souviendras longtemps.</p>
+            <div class="gauge-delta">
+              <span class="delta neg">⚡ −28</span>
+              <span class="delta pos">🎉 +28</span>
+            </div>
+          </div>
+          <div class="prose">
+            <p>Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux. Brian a disparu — vous le retrouvez assis contre une barrière. "Les gars, j'crois que j'ai un peu trop bu."</p>
+            <p>Il est 23h. Channel One passe à l'Outernational jusqu'à 1h du mat.</p>
+            <p>Brian sort machinalement son tabac, par réflexe. "Dernier petit truc ?"</p>
+            <p><em>Brian et son joint :</em></p>
+          </div>
+          <div class="choices">
+            <div class="choice-card" style="border-color: rgba(124,92,191,0.2)"><span class="choice-emoji">🌿</span> "Ouais, dernier un"</div>
+            <div class="choice-card" style="border-color: rgba(124,92,191,0.2)"><span class="choice-emoji">😇</span> "Non, j'arrête là pour ce soir"</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-caption">§51→§60 — Transe + Brian à plat</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: CHARACTER SHEET OVERLAY                         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Character Sheet — Overlay on demand</div>
+  <div class="screens-row">
+
+    <div class="screen-wrap">
+      <div class="phone act-night night" style="position:relative;">
+        <!-- Background reading screen -->
+        <div class="gauge-strip">
+          <div class="gauge-item">
+            <div class="gauge-icon">⚡</div>
+            <div class="gauge-track"><div class="gauge-fill g-energie" style="width:34%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍺</div>
+            <div class="gauge-track"><div class="gauge-fill g-alcool" style="width:35%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🌿</div>
+            <div class="gauge-track"><div class="gauge-fill g-fumette" style="width:40%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-icon">🍔</div>
+            <div class="gauge-track"><div class="gauge-fill g-nourr" style="width:18%; background: #7a5cbf;"></div></div>
+          </div>
+        </div>
+        <div class="scroll-area" style="filter: blur(1px)">
+          <div class="prose">
+            <p>La nuit est tombée mais l'air est encore lourd...</p>
+          </div>
+        </div>
+        <!-- Sheet overlay -->
+        <div class="sheet-overlay">
+          <div class="sheet-panel">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Ton profil</div>
+
+            <!-- Stats section -->
+            <div style="font-family:Inter;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#7a7672;margin-bottom:12px;">Stats</div>
+            <div class="stat-row">
+              <span class="stat-name">💪 Endurance</span>
+              <div class="stat-dots">
+                <div class="dot filled"></div>
+                <div class="dot filled"></div>
+                <div class="dot filled"></div>
+                <div class="dot empty"></div>
+              </div>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">🍔 Estomac</span>
+              <div class="stat-dots">
+                <div class="dot filled"></div>
+                <div class="dot empty"></div>
+                <div class="dot empty"></div>
+                <div class="dot empty"></div>
+              </div>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">🍺 Résist. alcool</span>
+              <div class="stat-dots">
+                <div class="dot filled"></div>
+                <div class="dot empty"></div>
+                <div class="dot empty"></div>
+                <div class="dot empty"></div>
+              </div>
+            </div>
+            <div class="stat-row" style="border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:20px;">
+              <span class="stat-name">🌿 Résist. fumette</span>
+              <div class="stat-dots">
+                <div class="dot empty"></div>
+                <div class="dot empty"></div>
+                <div class="dot empty"></div>
+                <div class="dot empty"></div>
+              </div>
+            </div>
+
+            <!-- Gauges section -->
+            <div style="font-family:Inter;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#7a7672;margin-bottom:12px;">Jauges</div>
+            <div class="gauge-row">
+              <div class="gauge-row-icon">⚡</div>
+              <div class="gauge-row-name" style="font-size:12px;color:#c8c4bc;">Énergie</div>
+              <div class="gauge-row-track"><div class="gauge-row-fill" style="width:34%;background:#7c5cbf;"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-row-icon">🍺</div>
+              <div class="gauge-row-name" style="font-size:12px;color:#c8c4bc;">Alcool</div>
+              <div class="gauge-row-track"><div class="gauge-row-fill" style="width:35%;background:#5c7cbf;"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-row-icon">🌿</div>
+              <div class="gauge-row-name" style="font-size:12px;color:#c8c4bc;">Fumette</div>
+              <div class="gauge-row-track"><div class="gauge-row-fill" style="width:40%;background:#4a8a5a;"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-row-icon">🍔</div>
+              <div class="gauge-row-name" style="font-size:12px;color:#c8c4bc;">Nourriture</div>
+              <div class="gauge-row-track"><div class="gauge-row-fill" style="width:18%;background:#7a5cbf;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-caption">Fiche personnage — slide-up panel</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: GAME OVER                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Game Over States</div>
+  <div class="screens-row">
+
+    <!-- Game Over: Dans le gaz (§202) -->
+    <div class="screen-wrap">
+      <div class="phone act-night short">
+        <div class="gameover-screen">
+          <div class="gameover-icon">💀</div>
+          <div class="gameover-title">Fin de partie</div>
+          <div class="gameover-prose">
+            Le festival autour de toi devient une succession d'images déconnectées. Les sons sont bizarres. Tu t'assieds par terre et tu décides de ne plus bouger.
+          </div>
+          <div class="gameover-reason">Trop fumé.</div>
+          <button class="replay-btn">Rejouer depuis le début →</button>
+        </div>
+      </div>
+      <div class="screen-caption">§202 — Dans le gaz</div>
+    </div>
+
+    <!-- Game Over: Épuisement (§204) -->
+    <div class="screen-wrap">
+      <div class="phone act-night short">
+        <div class="gameover-screen">
+          <div class="gameover-icon">💀</div>
+          <div class="gameover-title">Fin de partie</div>
+          <div class="gameover-prose">
+            T'as pas vu venir. T'étais tellement dans la musique que t'as pas senti ton corps lâcher. En sortant du concert, tes jambes te portent plus vraiment.
+          </div>
+          <div class="gameover-reason">Épuisement.</div>
+          <button class="replay-btn">Rejouer depuis le début →</button>
+        </div>
+      </div>
+      <div class="screen-caption">§204 — Épuisement</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: END SCREEN — KIFF REVEAL                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">End of Session — Score Reveal</div>
+  <div class="screens-row">
+
+    <!-- Results: Belle soirée -->
+    <div class="screen-wrap">
+      <div class="phone act-latenight" style="background:#0a0c0e;">
+        <div class="results-screen">
+          <div class="results-act-label">Dub Camp · Soirée terminée</div>
+          <div class="results-score-big" style="color:#4a7a8a;">87</div>
+          <div class="results-score-unit" style="color:#4a7a8a;">pts kiff</div>
+          <div class="results-tier">Belle soirée</div>
+          <div class="results-prose">
+            Quelques choix pas optimaux ou un tirage de merde au mauvais moment, mais l'essentiel était là. Tu repenses à deux ou trois moments forts en t'endormant.
+          </div>
+          <div class="results-divider"></div>
+          <div class="results-summary-title">Jauges finales</div>
+          <div class="results-gauge-row">
+            <div class="results-gauge-icon">⚡</div>
+            <div class="results-gauge-bar"><div class="results-gauge-fill" style="width:22%;background:#4a7a8a;"></div></div>
+            <div class="results-gauge-val" style="color:#4a7a8a;">22%</div>
+          </div>
+          <div class="results-gauge-row">
+            <div class="results-gauge-icon">🍺</div>
+            <div class="results-gauge-bar"><div class="results-gauge-fill" style="width:18%;background:#4a7a8a;"></div></div>
+            <div class="results-gauge-val" style="color:#4a7a8a;">18%</div>
+          </div>
+          <div class="results-gauge-row">
+            <div class="results-gauge-icon">🌿</div>
+            <div class="results-gauge-bar"><div class="results-gauge-fill" style="width:24%;background:#4a7a8a;"></div></div>
+            <div class="results-gauge-val" style="color:#4a7a8a;">24%</div>
+          </div>
+          <div class="results-gauge-row">
+            <div class="results-gauge-icon">🍔</div>
+            <div class="results-gauge-bar"><div class="results-gauge-fill" style="width:35%;background:#4a7a8a;"></div></div>
+            <div class="results-gauge-val" style="color:#4a7a8a;">35%</div>
+          </div>
+          <button class="replay-btn-amber" style="border-color:rgba(74,122,138,0.3);color:#4a7a8a;background:rgba(74,122,138,0.1);">Rejouer →</button>
+        </div>
+      </div>
+      <div class="screen-caption">Résultats — Belle soirée (70–99 pts)</div>
+    </div>
+
+    <!-- Results: La soirée parfaite -->
+    <div class="screen-wrap">
+      <div class="phone act-latenight" style="background:#0a0c0e;">
+        <div class="results-screen">
+          <div class="results-act-label">Dub Camp · Soirée terminée</div>
+          <div class="results-score-big">112</div>
+          <div class="results-score-unit">pts kiff</div>
+          <div class="results-tier">La soirée parfaite</div>
+          <div class="results-prose">
+            T'as tout géré. Les bons concerts, les bonnes pauses, le bon niveau en permanence. Bastien est impressionné. Brian te doit un café — ou deux.
+          </div>
+          <div class="results-divider"></div>
+          <div class="results-summary-title">Jauges finales</div>
+          <div class="results-gauge-row">
+            <div class="results-gauge-icon">⚡</div>
+            <div class="results-gauge-bar"><div class="results-gauge-fill" style="width:41%;background:#e8a42a;"></div></div>
+            <div class="results-gauge-val">41%</div>
+          </div>
+          <div class="results-gauge-row">
+            <div class="results-gauge-icon">🍺</div>
+            <div class="results-gauge-bar"><div class="results-gauge-fill" style="width:28%;background:#e8a42a;"></div></div>
+            <div class="results-gauge-val">28%</div>
+          </div>
+          <div class="results-gauge-row">
+            <div class="results-gauge-icon">🌿</div>
+            <div class="results-gauge-bar"><div class="results-gauge-fill" style="width:22%;background:#e8a42a;"></div></div>
+            <div class="results-gauge-val">22%</div>
+          </div>
+          <div class="results-gauge-row">
+            <div class="results-gauge-icon">🍔</div>
+            <div class="results-gauge-bar"><div class="results-gauge-fill" style="width:55%;background:#e8a42a;"></div></div>
+            <div class="results-gauge-val">55%</div>
+          </div>
+          <button class="replay-btn-amber">Rejouer →</button>
+        </div>
+      </div>
+      <div class="screen-caption">Résultats — La soirée parfaite (100+ pts)</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
