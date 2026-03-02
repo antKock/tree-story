@@ -5,7 +5,6 @@ import type { StoryConfig } from '@/engine/types'
 import { useStoryEngine } from '@/hooks/useStoryEngine'
 import GaugeStrip from './GaugeStrip'
 import ParagraphDisplay from './ParagraphDisplay'
-import ResultBlock from './ResultBlock'
 import ChoiceCards from './ChoiceCards'
 import CharacterSheet from './CharacterSheet'
 import EndScreen from './EndScreen'
@@ -97,9 +96,9 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
       />
 
       <main style={{ flex: 1, paddingTop: '1.5rem' }}>
-        <ParagraphDisplay content={currentParagraph.content} />
-        <ResultBlock
-          text={engineState.lastOutcomeText}
+        <ParagraphDisplay
+          content={currentParagraph.content}
+          outcomeText={engineState.lastOutcomeText}
           gaugeDeltas={engineState.lastGaugeDeltas}
           gauges={config.gauges}
         />

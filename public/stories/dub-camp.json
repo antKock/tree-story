@@ -241,7 +241,7 @@
   "paragraphs": {
     "s1": {
       "id": "s1",
-      "content": "Le soleil tape déjà fort quand vous posez les sacs. Trois tentes, un carré d'herbe pas trop mal placé, et devant vous : le Dub Camp.\n\nÀ ta gauche, Bastien est déjà debout sur la glacière à scanner le site comme un général. « Les gars, j'ai regardé le programme, ce soir c'est chargé, faut être en forme à 19h. » À ta droite, Brian ouvre tranquillement sa première bière en souriant. « On a le temps… »\n\nTrois jours devant vous. L'objectif : kiffer un maximum. Sans se planter.\n\n*Il est 13h. L'après-midi commence.*",
+      "content": "Le soleil tape déjà fort quand vous posez les sacs. Trois tentes, un carré d'herbe pas trop mal placé, et devant vous : le Dub Camp.\n\nÀ ta gauche, Bastien est déjà debout sur la glacière à scanner le site comme un général de brigade. « Les gars, j'ai regardé le programme, ce soir c'est chargé, faut être en forme à 19h. » À ta droite, Brian ouvre tranquillement sa première bière en souriant. « On a le temps… »\n\nC'est la même scène depuis cinq ans. Bastien planifie. Brian boit. Toi tu décides.\n\n*Il est 13h. L'après-midi commence.*",
       "choices": [
         {
           "id": "s1-a",
@@ -252,7 +252,7 @@
     },
     "s10": {
       "id": "s10",
-      "content": "Le camping s'anime doucement. Des basses lointaines s'échappent déjà du site. Bastien a disparu « faire un tour » et Brian somnole à moitié dans son transat, bière à la main.\n\n*Qu'est-ce que tu fais ?*",
+      "content": "Le camping s'anime doucement. Des basses lointaines s'échappent déjà du site — quelqu'un a commencé sans attendre. Bastien a disparu « faire un tour de reconnaissance » et Brian somnole à moitié dans son transat, bière à la main, casquette sur le visage.\n\n*Qu'est-ce que tu fais ?*",
       "choices": [
         {
           "id": "s10-a",
@@ -323,7 +323,7 @@
     },
     "s11": {
       "id": "s11",
-      "content": "Cinq minutes de marche et te voilà au bord du lac. L'eau est fraîche, les gens sont détendus, quelqu'un a sorti une enceinte qui crache du roots tranquille.",
+      "content": "Cinq minutes de marche et te voilà au bord du lac. L'eau est fraîche, les gens sont détendus, quelqu'un a sorti une enceinte qui crache du roots tranquille. Deux gamins construisent un château de sable à côté d'un sound system. C'est le Dub Camp.",
       "choices": [
         {
           "id": "s11-a",
@@ -334,7 +334,7 @@
     },
     "s12": {
       "id": "s12",
-      "content": "Les odeurs te guident directement vers la zone food. Burger végé, frites, une limonade fraîche. Tu t'installes à côté d'un groupe qui parle du programme du soir — t'attrapes quelques bons plans sur les horaires.\n\nTu reviens au camping le ventre plein et bien calé.",
+      "content": "Les odeurs te guident directement vers la zone food. Burger végé, frites, une limonade fraîche. Tu t'installes à côté d'un groupe qui parle du programme du soir — t'attrapes quelques bons plans sur les horaires. Et aussi un mauvais plan de quelqu'un qui veut « juste faire un petit feu de camp ». Tu l'ignores.\n\nTu reviens au camping le ventre plein et bien calé.",
       "choices": [
         {
           "id": "s12-a",
@@ -363,7 +363,7 @@
     },
     "s13": {
       "id": "s13",
-      "content": "Tu trouves un coin d'ombre sous un arbre, tu poses ta casquette sur le visage et tu somnoles. Autour de toi le festival commence à vivre — des rires, des basses, des gens qui montent leurs tentes.\n\nUne heure plus tard tu te lèves frais comme une rose.",
+      "content": "Tu trouves un coin d'ombre sous un arbre, tu poses ta casquette sur le visage et tu somnoles. Autour de toi le festival commence à vivre — des rires, des basses, des gens qui montent leurs tentes en jurant contre les sardines.\n\nUne heure plus tard tu te lèves frais comme une rose.",
       "choices": [
         {
           "id": "s13-a",
@@ -413,7 +413,7 @@
     },
     "s15": {
       "id": "s15",
-      "content": "Il est 16h. Bastien regarde son téléphone. « Les premiers concerts commencent à 17h. » Brian sort son paquet de tabac et te regarde avec un sourire. « On se roule un petit truc avant ? »\n\n*Tu dis quoi ?*",
+      "content": "Il est 16h. Bastien regarde son téléphone. « Les premiers concerts commencent à 17h. » Brian sort son matos et te regarde avec un sourire. « On se roule un petit truc avant ? »\n\n*Tu dis quoi ?*",
       "choices": [
         {
           "id": "s15-a",
@@ -474,7 +474,7 @@
     },
     "s15a": {
       "id": "s15a",
-      "content": "Vous vous posez cinq minutes. Brian roule, vous allumez.",
+      "content": "Vous vous posez cinq minutes à l'écart. Brian roule proprement, avec la concentration d'un chirurgien. Vous allumez. L'odeur se mélange à celle de l'herbe sèche et des basses qui commencent à monter au loin.",
       "choices": [
         {
           "id": "s15a-a",
@@ -485,7 +485,7 @@
     },
     "s15b": {
       "id": "s15b",
-      "content": "« Pas de souci » dit Brian en haussant les épaules. Tu te lèves, tu t'étires, t'es prêt.",
+      "content": "« Pas de souci » dit Brian en haussant les épaules. Il range son matos sans insister. Tu te lèves, tu t'étires, t'es prêt. Bastien t'approuve du regard comme si tu venais de faire un choix stratégique majeur.",
       "choices": [
         {
           "id": "s15b-a",
@@ -523,7 +523,7 @@
     },
     "s16a": {
       "id": "s16a",
-      "content": "Bonne idée. Tu trouves un truc solide — riz, légumes, quelque chose qui tient au corps. Les serveurs du stand t'expliquent qu'il y aura une rupture de stock vers 23h.\n\nTu reviens au camping le ventre plein et l'esprit tranquille.",
+      "content": "Bonne idée. Tu trouves un truc solide — riz, légumes, quelque chose qui tient au corps. Les serveurs du stand t'expliquent qu'il y aura une rupture de stock vers 23h, l'air légèrement coupable, comme s'ils allaient fermer à Noël.\n\nTu reviens au camping le ventre plein et l'esprit tranquille.",
       "choices": [
         {
           "id": "s16a-a",
@@ -552,7 +552,7 @@
     },
     "s16b": {
       "id": "s16b",
-      "content": "Cinq minutes sous l'eau froide et tu ressors comme neuf. Bastien t'attend à la sortie. « Les vrais professionnels du festival. »",
+      "content": "Cinq minutes sous l'eau froide et tu ressors comme neuf. Bastien t'attend à la sortie avec l'expression de quelqu'un qui n'a pas pris de douche depuis ce matin et s'en félicite. « Les vrais professionnels du festival. »",
       "choices": [
         {
           "id": "s16b-a",
@@ -573,7 +573,7 @@
     },
     "s16c": {
       "id": "s16c",
-      "content": "Trois manches endiablées. Bastien perd à chaque fois et prétend que les règles sont nulles. Brian gagne la dernière en bluffant comme un chef. Vous partez vers les scènes en riant.",
+      "content": "Trois manches endiablées. Bastien perd à chaque fois et prétend que les règles sont nulles, puis que le jeu est nul, puis que Brian triche. Brian gagne la dernière en bluffant comme un chef avec une main objectivement catastrophique.\n\nVous partez vers les scènes en riant, Bastien encore en train de plaider sa cause.",
       "choices": [
         {
           "id": "s16c-a",
@@ -594,7 +594,7 @@
     },
     "s20": {
       "id": "s20",
-      "content": "Vous arrivez sur le site. L'air vibre déjà. À droite la **Dub Club Arena** — grande scène ouverte, les basses font trembler le sol. À gauche l'**Outernational Arena** — plus petite, plus intime, une sono roots qui réchauffe doucement.\n\nBastien pointe la Dub Club : « NOFA Sound System dans dix minutes, faut y aller. » Brian hausse les épaules. « Moi je vais voir l'Outernational. »\n\n*Tu vas où ?*",
+      "content": "Vous arrivez sur le site. L'air vibre déjà. À droite la **Dub Club Arena** — grande scène ouverte, les basses font trembler le sol sous tes pieds. À gauche l'**Outernational Arena** — plus petite, plus intime, une sono roots qui réchauffe doucement.\n\nBastien pointe la Dub Club : « NOFA Sound System dans dix minutes, faut y aller. » Brian hausse les épaules. « Moi je vais voir l'Outernational. »\n\n*Tu vas où ?*",
       "choices": [
         {
           "id": "s20-a",
@@ -660,7 +660,7 @@
     },
     "s31": {
       "id": "s31",
-      "content": "Le son te prend aux tripes dès l'entrée. NOFA balance des riddims lourds, la foule est dense.",
+      "content": "Le son te prend aux tripes dès l'entrée. NOFA balance des riddims lourds, la foule est dense et chaude. Quelqu'un a perdu une sandale. Quelqu'un d'autre l'a retrouvée et la brandit comme un trophée. C'est ça un festival.",
       "choices": [
         {
           "id": "s31-a",
@@ -696,7 +696,7 @@
     },
     "s33": {
       "id": "s33",
-      "content": "Tu fais un rapide aller-retour aux stands. En revenant tu entends les basses qui montent — ça commence pour de vrai.",
+      "content": "Tu fais un rapide aller-retour aux stands. Le stand du milieu te regarde comme si tu commandais au mauvais endroit, mais tu trouves ce que tu cherches. En revenant tu entends les basses qui montent — ça commence pour de vrai.",
       "choices": [
         {
           "id": "s33-a",
@@ -721,7 +721,7 @@
     },
     "s40": {
       "id": "s40",
-      "content": "Vous vous retrouvez tous les trois entre les deux scènes. Bastien est euphorique. « Dubkasm à 21h30, c'est LE concert du soir. » Brian sort déjà son tabac.\n\n*D'abord : tu bois quoi ?*",
+      "content": "Vous vous retrouvez tous les trois entre les deux scènes. Bastien est euphorique. « Dubkasm à 21h30, c'est LE concert du soir. Faut pas arriver cramés. » Brian acquiesce avec l'expression de quelqu'un qui ne compte pas vraiment respecter cette consigne.\n\n*D'abord : tu bois quoi ?*",
       "choices": [
         {
           "id": "s40-a",
@@ -785,7 +785,7 @@
     },
     "s40a": {
       "id": "s40a",
-      "content": "Tu prends une pression au bar.",
+      "content": "Tu prends une pression au bar. Le verre est froid, la mousse est parfaite. Le barman a l'efficacité tranquille de quelqu'un qui en a servi trois cents aujourd'hui et en servira encore trois cents demain.",
       "choices": [
         {
           "id": "s40a-a",
@@ -800,7 +800,7 @@
     },
     "s40b": {
       "id": "s40b",
-      "content": "Bonne décision stratégique. Les autres te regardent bizarrement. T'as un plan.",
+      "content": "Bonne décision stratégique. Les autres te regardent comme si tu avais commandé du lait chaud. T'as un plan. Eux non.",
       "choices": [
         {
           "id": "s40b-a",
@@ -914,13 +914,13 @@
     },
     "s41": {
       "id": "s41",
-      "content": "Tu annonces la couleur. « Les gars, j'suis bien là, je vais pas gâcher ça. À demain. »\n\nBastien lève les yeux au ciel. Brian sourit — il comprend.\n\nTu rentres au camping pendant que le festival commence à chauffer. Tu t'allonges dans la tente, tu entends les premières basses de NOFA au loin. C'est pas si mal, en fait. T'as passé une bonne après-midi, tu l'as su arrêter au bon moment. Demain t'es frais.",
+      "content": "Tu annonces la couleur. « Les gars, j'suis bien là, je vais pas gâcher ça. À demain. »\n\nBastien lève les yeux au ciel avec l'énergie de quelqu'un qui ne comprendra jamais cette décision. Brian sourit — lui il comprend.\n\nTu rentres au camping pendant que le festival commence à chauffer. Tu t'allonges dans la tente, tu entends les premières basses de NOFA au loin. C'est pas si mal, en fait. Il y a une vraie sagesse dans ce choix. Ou alors t'es juste fatigué. Les deux peuvent être vrais en même temps.",
       "choices": [],
       "isComplete": true
     },
     "sEVT1": {
       "id": "sEVT1",
-      "content": "En passant entre les deux scènes, vous entendez une sono qui s'allume côté camping. Un sound system s'est installé en dehors du programme officiel — juste trois mecs, une caisse de bières et des vinyles.",
+      "content": "En passant entre les deux scènes, vous entendez une sono qui s'allume côté camping. Un sound system s'est installé en dehors du programme officiel — juste trois mecs, une caisse de bières et des vinyles. Pas de scène. Pas de lumières. Juste le son.",
       "choices": [
         {
           "id": "sEVT1-a",
@@ -964,7 +964,7 @@
     },
     "s50": {
       "id": "s50",
-      "content": "La nuit est tombée mais l'air est encore lourd, chaud, dense de corps et de basses. La Dub Club Arena est pleine à craquer. Dubkasm monte sur scène et les premières notes font taire tout le monde une seconde — puis la foule explose. C'est lourd, profond, hypnotique. Bastien est quelque part devant à sauter. Brian est à côté de toi, il sourit comme un gamin.\n\n*Comment tu vis ce concert ?*",
+      "content": "La nuit est tombée mais l'air est encore lourd, dense, chaud comme une couverture mouillée. La Dub Club Arena est pleine à craquer — t'as jamais vu autant de monde dans un espace aussi petit. Dubkasm monte sur scène et les premières notes font taire tout le monde une seconde — puis la foule explose. C'est lourd, profond, hypnotique. Bastien est quelque part devant à sauter. Brian est à côté de toi, il sourit comme un gamin.\n\n*La chaleur te coûte déjà de l'énergie. Comment tu vis ce concert ?*",
       "choices": [
         {
           "id": "s50-a",
@@ -1048,7 +1048,7 @@
     },
     "s51": {
       "id": "s51",
-      "content": "Tu te laisses emporter.",
+      "content": "Tu te laisses emporter. La foule t'absorbe, les basses te remontent dans la poitrine. T'as perdu Bastien depuis dix minutes et tu t'en fous complètement. Il est là quelque part, en train de vivre la même chose.",
       "choices": [
         {
           "id": "s51-a",
@@ -1059,7 +1059,7 @@
     },
     "s52": {
       "id": "s52",
-      "content": "Tu trouves un bon spot légèrement surélevé sur le côté. Tu vois tout, t'entends tout. Dubkasm envoie du lourd, tu profites sans te détruire. Une heure plus tard tu ressors avec le sourire et encore de l'énergie.",
+      "content": "Tu trouves un bon spot légèrement surélevé sur le côté — une palette posée là par miracle ou par génie. Tu vois tout, t'entends tout, et personne te marche dessus. Dubkasm envoie du lourd, tu profites sans te détruire. Une heure plus tard tu ressors avec le sourire et encore de l'énergie.",
       "choices": [
         {
           "id": "s52-a",
@@ -1105,7 +1105,7 @@
     },
     "s60": {
       "id": "s60",
-      "content": "Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux. Brian a disparu — vous le retrouvez assis contre une barrière. « Les gars, j'crois que j'ai un peu trop bu. »\n\nIl est 23h. Channel One passe à l'Outernational jusqu'à 1h du mat.\n\nBrian sort machinalement son tabac, par réflexe. « Dernier petit truc ? »",
+      "content": "Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux — le genre de regard qui fixe un point à six kilomètres de distance. Brian a disparu — vous le retrouvez assis contre une barrière, un gobelet vide à la main. « Les gars, j'crois que j'ai un peu trop bu. »\n\nIl est 23h. Channel One passe à l'Outernational jusqu'à 1h du mat.\n\nBrian sort machinalement son matos, par réflexe. « Dernier petit truc ? »",
       "choices": [
         {
           "id": "s60-a",
@@ -1158,7 +1158,7 @@
     },
     "s60a": {
       "id": "s60a",
-      "content": "Vous l'allumez ensemble.",
+      "content": "Vous vous éloignez un peu de la foule. Brian roule, vous allumez. Autour de vous le festival continue de tourner à plein régime — des silhouettes qui courent, quelqu'un qui crie le nom d'un pote, des basses qui se superposent au loin.",
       "choices": [
         {
           "id": "s60a-a",
@@ -1169,7 +1169,7 @@
     },
     "s60b": {
       "id": "s60b",
-      "content": "« Sage » dit Bastien. Brian range son tabac sans insister.",
+      "content": "« Sage » dit Bastien, ce qui dans sa bouche veut dire à la fois bravo et dommage pour toi. Brian range son matos sans insister. Il a l'air presque soulagé qu'il reste du stock pour lui.",
       "choices": [
         {
           "id": "s60b-a",
@@ -1251,7 +1251,7 @@
     },
     "s61": {
       "id": "s61",
-      "content": "Tu files à l'Outernational. Channel One est déjà lancé. Le son est cristallin, les sélections impeccables.",
+      "content": "Tu files à l'Outernational. Channel One est déjà lancé depuis dix minutes — t'as raté l'intro mais le set est en feu. Le son est cristallin, les sélections impeccables. Quelqu'un à côté de toi murmure « putain » à chaque transition. C'est un compliment.",
       "choices": [
         {
           "id": "s61-a",
@@ -1262,7 +1262,7 @@
     },
     "s62": {
       "id": "s62",
-      "content": "Tu accompagnes Brian jusqu'au camping. Il s'effondre sur son sac de couchage en marmonnant un « merci mec ». Tu restes assis dehors sous les étoiles, les basses du festival en fond. C'est beau aussi, ce calme.\n\n*T'as encore de l'énergie. Tu repars ?*",
+      "content": "Tu accompagnes Brian jusqu'au camping. Il s'effondre sur son sac de couchage en marmonnant un « merci mec » sincère. Tu restes assis dehors sous les étoiles, les basses du festival en fond sonore. Quelqu'un au loin joue une flûte. Personne lui a rien demandé mais c'est pas déplaisant.\n\n*T'as encore de l'énergie. Tu repars ?*",
       "choices": [
         {
           "id": "s62-a",
@@ -1335,7 +1335,7 @@
     },
     "s63": {
       "id": "s63",
-      "content": "Les stands sont encore ouverts. Frites, sauce — le genre de truc qui goûte trop bon à minuit dans un festival. Ça te redonne un coup de boost.\n\n*Et maintenant ?*",
+      "content": "Les stands sont encore ouverts. Frites, sauce — le genre de truc qui goûte trop bon à minuit dans un festival, c'est-à-dire objectivement meilleur que dans n'importe quel restaurant. T'es pas sûr si c'est la faim, la fatigue, ou les basses au loin, mais c'est parfait.\n\n*Et maintenant ?*",
       "choices": [
         {
           "id": "s63-a",
@@ -1424,7 +1424,7 @@
             },
             {
               "gaugeId": "kiff",
-              "delta": 12
+              "delta": 5
             }
           ]
         }
@@ -1432,31 +1432,31 @@
     },
     "s70": {
       "id": "s70",
-      "content": "Tu rentres au camping. Les étoiles sont là. Au loin le festival continue — des basses sourdes, des rires, quelqu'un qui chante faux. T'enlèves tes chaussures et tu t'allonges.\n\nC'était bien. Vraiment bien.",
+      "content": "Tu rentres au camping. Les étoiles sont là — on les voit vraiment, loin des villes. Au loin le festival continue sans toi : des basses sourdes, des rires, quelqu'un qui chante faux sur un morceau qu'il connaît à moitié.\n\nT'enlèves tes chaussures. Tu t'allonges. La toile de la tente est tiède.\n\nC'était bien. Vraiment bien.",
       "choices": [],
       "isComplete": true
     },
     "s201": {
       "id": "s201",
-      "content": "Il est 17h et t'as déjà du mal à marcher droit. Bastien te regarde avec un mélange d'amusement et d'inquiétude. « Mec… on vient d'arriver. » Brian essaie de t'expliquer que c'est les mojitos.\n\nLes pompiers du festival sont très sympas. Ils te posent sur un brancard, te mettent sous sérum, et t'expliquent que tu pourras reprendre demain matin.\n\nLa nuit, tu l'entends de loin. Dubkasm, Channel One — à travers la toile de la tente médicale.\n\n**FIN DE PARTIE** — Trop bu trop tôt.",
+      "content": "Il est 17h et t'as déjà du mal à marcher droit. Bastien te regarde avec un mélange d'amusement et d'inquiétude sincère. « Mec… on vient d'arriver. » Brian essaie de t'expliquer que c'est les mojitos. Il a peut-être raison. Il a probablement tort.\n\nLes pompiers du festival sont très sympas — ils t'ont vu d'autres, et ça se voit. Ils te posent sur un brancard, te mettent sous sérum, et t'expliquent que tu pourras reprendre demain matin avec un sourire professionnel qui ne dit pas tout.\n\nLa nuit, tu l'entends de loin. Dubkasm, Channel One — à travers la toile de la tente médicale.\n\n**FIN DE PARTIE** — Trop bu trop tôt.",
       "choices": [],
       "isGameOver": true
     },
     "s202": {
       "id": "s202",
-      "content": "Le festival autour de toi devient une succession d'images déconnectées. Les sons sont bizarres. Tu t'assieds par terre et tu décides de ne plus bouger.\n\nBrian essaie de t'expliquer quelque chose mais les mots arrivent pas dans le bon ordre. Bastien finit par appeler les secours, juste pour être sûr.\n\nLes pompiers sont bienveillants. Ils t'ont vu d'autres. Beaucoup d'autres.\n\n**FIN DE PARTIE** — Trop fumé.",
+      "content": "Le festival autour de toi devient une succession d'images déconnectées. Les sons sont bizarres — pas désagréables, juste... pas dans le bon ordre. Tu t'assieds par terre et tu décides que c'est la meilleure idée que t'as eue de la journée.\n\nBrian essaie de t'expliquer quelque chose mais les mots arrivent pas dans le bon ordre non plus. Ou peut-être que si. Bastien finit par appeler les secours, juste pour être sûr.\n\nLes pompiers sont bienveillants. Ils t'ont vu d'autres. Beaucoup d'autres. L'un d'eux dit « encore un » à voix basse mais avec une indéniable tendresse.\n\n**FIN DE PARTIE** — Trop fumé.",
       "choices": [],
       "isGameOver": true
     },
     "s203": {
       "id": "s203",
-      "content": "Ça arrive vite quand on boit sur un estomac pas bien rempli, avec la chaleur. Tu es en train de danser quand le sol décide de ne plus être horizontal.\n\nBastien te rattrape de justesse. Direction le poste de secours.\n\nLes infirmiers te connaissent pas, mais ils ont le sourire quand même. Professionnels.\n\n**FIN DE PARTIE** — Trop d'alcool, pas assez de bouffe.",
+      "content": "Ça arrive vite quand on boit sur un estomac pas bien rempli, avec la chaleur. La physique est une science exacte et elle vient de te le démontrer.\n\nTu es en train de danser — enfin, tu croyais danser — quand le sol décide de ne plus être horizontal. Bastien te rattrape de justesse. Direction le poste de secours.\n\nLes infirmiers te connaissent pas, mais ils ont le sourire professionnel de gens qui savent exactement ce qui s'est passé rien qu'en te regardant arriver.\n\n**FIN DE PARTIE** — Trop d'alcool, pas assez de bouffe.",
       "choices": [],
       "isGameOver": true
     },
     "s204": {
       "id": "s204",
-      "content": "T'as pas vu venir. T'étais tellement dans la musique que t'as pas senti ton corps lâcher. En sortant du concert, tes jambes te portent plus vraiment. Tu t'assieds par terre, les yeux mi-clos.\n\nUn bénévole s'approche. « Ça va ? » Non, ça va pas très bien.\n\nTu passes la fin de nuit à récupérer au poste médical pendant que Bastien envoie des photos depuis la Dub Club.\n\n**FIN DE PARTIE** — Épuisement.",
+      "content": "T'as pas vu venir. T'étais tellement dans la musique que t'as pas senti ton corps négocier en coulisses depuis une heure. En sortant du concert, tes jambes ont une opinion différente de la tienne sur la suite des événements.\n\nTu t'assieds par terre, les yeux mi-clos. Un bénévole s'approche. « Ça va ? » La question est rhétorique mais il la pose quand même, sympa.\n\nTu passes la fin de nuit à récupérer au poste médical pendant que Bastien envoie des photos depuis la Dub Club. Il en envoie sept. Dont trois floues.\n\n**FIN DE PARTIE** — Épuisement.",
       "choices": [],
       "isGameOver": true
     }
