@@ -1,6 +1,6 @@
 # Story 2.1: Story Config Loader & Validator
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -21,43 +21,42 @@ so that malformed configs or broken paragraph references surface a clear develop
 
 ## Tasks / Subtasks
 
-- [ ] Create `engine/storyValidator.ts` — structural validation (AC: 1, 5, 8)
-  - [ ] Import types from `engine/types.ts` only
-  - [ ] Export function `validateStoryConfig(data: unknown): StoryConfig` — takes raw parsed JSON, returns typed `StoryConfig` or throws
-  - [ ] Check top-level required fields exist: `id`, `version`, `meta`, `stats`, `gauges`, `acts`, `decayNodes`, `decayRules`, `paragraphs`, `endStateTiers`, `statPointBudget`
-  - [ ] Check field types (string, number, array, object as appropriate)
-  - [ ] Validate `meta.exampleProfiles` is array (can be empty)
-  - [ ] Check `stats` array has at least 1 entry, each with required `id`, `name`, `maxPerStat`
-  - [ ] Check `gauges` array has at least 1 entry, each with required `id`, `name`, `icon`, `initialValue`, `isScore`, `isHidden`
-  - [ ] Validate exactly one gauge has `isScore: true` (the score/kiff gauge)
-  - [ ] On any failure, throw `new StoryValidationError(\`Invalid story config: <specific message>\`)`
+- [x] Create `engine/storyValidator.ts` — structural validation (AC: 1, 5, 8)
+  - [x] Import types from `engine/types.ts` only
+  - [x] Export function `validateStoryConfig(data: unknown): StoryConfig` — takes raw parsed JSON, returns typed `StoryConfig` or throws
+  - [x] Check top-level required fields exist: `id`, `version`, `meta`, `stats`, `gauges`, `acts`, `decayNodes`, `decayRules`, `paragraphs`, `endStateTiers`, `statPointBudget`
+  - [x] Check field types (string, number, array, object as appropriate)
+  - [x] Validate `meta.exampleProfiles` is array (can be empty)
+  - [x] Check `stats` array has at least 1 entry, each with required `id`, `name`, `maxPerStat`
+  - [x] Check `gauges` array has at least 1 entry, each with required `id`, `name`, `icon`, `initialValue`, `isScore`, `isHidden`
+  - [x] Validate exactly one gauge has `isScore: true` (the score/kiff gauge)
+  - [x] On any failure, throw `new StoryValidationError(\`Invalid story config: <specific message>\`)`
 
-- [ ] Add referential integrity validation (AC: 2, 3, 4, 5)
-  - [ ] Build a Set of all paragraph IDs from `paragraphs` object keys
-  - [ ] For each paragraph, for each choice: verify `choice.targetParagraphId` exists in Set — throw with message identifying which paragraph + choice ID if not
-  - [ ] For each ID in `decayNodes[]`: verify it exists in paragraph ID Set — throw with message if not
-  - [ ] For each act in `acts[]`: for each ID in `act.paragraphIds[]`: verify it exists in paragraph ID Set — throw with message if not
-  - [ ] For each gauge with `gameOverThreshold` defined: verify `gameOverCondition` is also defined (and vice versa)
+- [x] Add referential integrity validation (AC: 2, 3, 4, 5)
+  - [x] Build a Set of all paragraph IDs from `paragraphs` object keys
+  - [x] For each paragraph, for each choice: verify `choice.targetParagraphId` exists in Set — throw with message identifying which paragraph + choice ID if not
+  - [x] For each ID in `decayNodes[]`: verify it exists in paragraph ID Set — throw with message if not
+  - [x] For each act in `acts[]`: for each ID in `act.paragraphIds[]`: verify it exists in paragraph ID Set — throw with message if not
+  - [x] For each gauge with `gameOverThreshold` defined: verify `gameOverCondition` is also defined (and vice versa)
 
-- [ ] Create `components/DevErrorScreen.tsx` (AC: 7)
-  - [ ] Simple client component displaying the error message
-  - [ ] Props: `{ error: Error }`
-  - [ ] Display error message prominently (use `--color-danger` for styling)
-  - [ ] Add label: "Story Configuration Error — Developer Only" to make clear this is never player-facing
-  - [ ] Style: dark background, monospace font for error message, no game UI elements
+- [x] Create `components/DevErrorScreen.tsx` (AC: 7)
+  - [x] Simple client component displaying the error message
+  - [x] Props: `{ error: Error }`
+  - [x] Display error message prominently (use `--color-danger` for styling)
+  - [x] Add label: "Story Configuration Error — Developer Only" to make clear this is never player-facing
+  - [x] Style: dark background, monospace font for error message, no game UI elements
 
-- [ ] Update `app/page.tsx` to load and validate (AC: 6)
-  - [ ] Make the page an async server component (default in Next.js app router)
-  - [ ] Fetch story config: `const res = await fetch('/stories/dub-camp.json', { cache: 'no-store' })` — Note: in server component, use absolute URL or relative path for fetch
-  - [ ] Parse JSON: `const data = await res.json()`
-  - [ ] Call `validateStoryConfig(data)` — wrap in try/catch for `StoryValidationError`
-  - [ ] If `StoryValidationError` caught: return `<DevErrorScreen error={e} />`
-  - [ ] If valid: render the story reader UI (placeholder `<div>Story loads here</div>` is acceptable for this story — StoryReader is built in Epic 3)
-  - [ ] Pass validated `storyConfig` as prop to the story reader component when it exists
+- [x] Update `app/page.tsx` to load and validate (AC: 6)
+  - [x] Make the page an async server component (default in Next.js app router)
+  - [x] Load story config via `fs.readFile` (server-side, avoids URL issues) — parses JSON, calls `validateStoryConfig`
+  - [x] Call `validateStoryConfig(data)` — wrap in try/catch for `StoryValidationError`
+  - [x] If `StoryValidationError` caught: return `<DevErrorScreen error={e} />`
+  - [x] If valid: render the story reader UI (placeholder `<div>Story loads here</div>` is acceptable for this story — StoryReader is built in Epic 3)
+  - [x] Pass validated `storyConfig` as prop to the story reader component when it exists
 
-- [ ] Verify no circular imports (AC: 8)
-  - [ ] Confirm `engine/storyValidator.ts` only imports from `engine/types.ts`
-  - [ ] Run `npm run build` or `npx tsc --noEmit` — confirm zero errors
+- [x] Verify no circular imports (AC: 8)
+  - [x] Confirmed `engine/storyValidator.ts` only imports from `engine/types.ts`
+  - [x] `npx tsc --noEmit` — zero errors
 
 ## Dev Notes
 
@@ -97,6 +96,24 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None — clean implementation, zero type errors on first pass.
+
 ### Completion Notes List
 
+- Implemented `validateStoryConfig(data: unknown): StoryConfig` using exhaustive type guards and explicit field checking (no `any`, no casting)
+- All 11 top-level required fields validated with type-specific checks
+- Nested validation covers: meta/exampleProfiles, stats[], gauges[], acts[], decayRules[], paragraphs{}, endStateTiers[], choices[], gaugeEffects[], weightedOutcomes[]
+- Exactly-one-score-gauge invariant enforced
+- `gameOverThreshold`/`gameOverCondition` co-presence enforced on each gauge
+- Referential integrity: choice targets, decayNodes entries, and act paragraphIds all checked against `Set<string>` of paragraph keys
+- Error messages identify specific field path + value (e.g. `choice 'x' in paragraph 'y' references non-existent targetParagraphId 'z'`) — satisfies NFR12
+- `app/page.tsx` uses `fs.readFile` (server-side) to avoid URL issues in Next.js App Router server components; handles ENOENT gracefully (story JSON not yet available in Epic 2)
+- `DevErrorScreen.tsx` uses CSS custom properties (`--color-danger`, `--color-surface`) so it inherits design tokens without hardcoded colors
+- Import boundary confirmed: `engine/storyValidator.ts` → `./types` only; `app/page.tsx` → `@/engine/storyValidator` + `@/engine/types` + `@/components/DevErrorScreen`
+- `npx tsc --noEmit` passes with zero errors; `npx vitest run` exits cleanly (0 tests expected — test suite is Story 2.6)
+
 ### File List
+
+- `engine/storyValidator.ts` — new, pure TypeScript validator
+- `components/DevErrorScreen.tsx` — new, developer-only error display
+- `app/page.tsx` — modified, now async server component with story loading + validation

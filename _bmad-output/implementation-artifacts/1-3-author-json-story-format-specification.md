@@ -1,6 +1,6 @@
 # Story 1.3: Author JSON Story Format Specification (FR35)
 
-Status: ready-for-dev
+Status: complete
 
 ## Story
 
@@ -20,93 +20,93 @@ so that I can translate `dubcamp-histoire-v08.md` into a valid `dub-camp.json` u
 
 ## Tasks / Subtasks
 
-- [ ] Create `docs/story-format-spec.md` with document header and introduction (AC: 1, 7)
-  - [ ] Add title, purpose, and usage instructions (describe that this doc + a story source = LLM can produce valid JSON)
-  - [ ] Include a quick-start section explaining the overall JSON structure
+- [x] Create `docs/story-format-spec.md` with document header and introduction (AC: 1, 7)
+  - [x] Add title, purpose, and usage instructions (describe that this doc + a story source = LLM can produce valid JSON)
+  - [x] Include a quick-start section explaining the overall JSON structure
 
-- [ ] Document top-level `StoryConfig` fields (AC: 1)
-  - [ ] `id` (string, required) — machine-readable story identifier, kebab-case, e.g. `"dub-camp"`
-  - [ ] `version` (number, required) — schema version, currently `1`
-  - [ ] `meta` (StoryMeta, required) — story metadata object
-  - [ ] `statPointBudget` (number, required) — total points player distributes, e.g. `8`
-  - [ ] `stats` (StatDefinition[], required) — player character stats array
-  - [ ] `gauges` (GaugeDefinition[], required) — story gauges array
-  - [ ] `acts` (ActDefinition[], required) — story acts with theme overrides
-  - [ ] `decayNodes` (string[], required) — paragraph IDs where natural decay fires
-  - [ ] `decayRules` (DecayRule[], required) — per-gauge decay amounts
-  - [ ] `paragraphs` (Record<string, Paragraph>, required) — all story paragraphs keyed by ID
-  - [ ] `endStateTiers` (EndStateTier[], required) — score ranges to outcome narratives
+- [x] Document top-level `StoryConfig` fields (AC: 1)
+  - [x] `id` (string, required) — machine-readable story identifier, kebab-case, e.g. `"dub-camp"`
+  - [x] `version` (number, required) — schema version, currently `1`
+  - [x] `meta` (StoryMeta, required) — story metadata object
+  - [x] `statPointBudget` (number, required) — total points player distributes, e.g. `8`
+  - [x] `stats` (StatDefinition[], required) — player character stats array
+  - [x] `gauges` (GaugeDefinition[], required) — story gauges array
+  - [x] `acts` (ActDefinition[], required) — story acts with theme overrides
+  - [x] `decayNodes` (string[], required) — paragraph IDs where natural decay fires
+  - [x] `decayRules` (DecayRule[], required) — per-gauge decay amounts
+  - [x] `paragraphs` (Record<string, Paragraph>, required) — all story paragraphs keyed by ID
+  - [x] `endStateTiers` (EndStateTier[], required) — score ranges to outcome narratives
 
-- [ ] Document `StoryMeta` and `StatDefinition` fields (AC: 1)
-  - [ ] `StoryMeta`: `title`, `author`, `version` (string), `description?`, `exampleProfiles`
-  - [ ] `ExampleProfile`: `name`, `description`, `stats` (Record<statId, number>)
-  - [ ] `StatDefinition`: `id` (camelCase), `name` (display), `description?`, `maxPerStat`
-  - [ ] Dub Camp stat examples: `endurance`, `estomac`, `resistanceAlcool`, `resistanceFumette`
+- [x] Document `StoryMeta` and `StatDefinition` fields (AC: 1)
+  - [x] `StoryMeta`: `title`, `author`, `version` (string), `description?`, `exampleProfiles`
+  - [x] `ExampleProfile`: `name`, `description`, `stats` (Record<statId, number>)
+  - [x] `StatDefinition`: `id` (camelCase), `name` (display), `description?`, `maxPerStat`
+  - [x] Dub Camp stat examples: `endurance`, `estomac`, `resistanceAlcool`, `resistanceFumette`
 
-- [ ] Document `GaugeDefinition` fields (AC: 1, 5)
-  - [ ] All fields: `id`, `name`, `icon` (emoji), `initialValue`, `isScore`, `isHidden`
-  - [ ] Game Over fields: `gameOverThreshold?`, `gameOverCondition?: 'above' | 'below'`
-  - [ ] Explain: `isHidden: true` = excluded from GaugeStrip display during play (but shown in CharacterSheet)
-  - [ ] Explain: `isScore: true` = the hidden score gauge (Kiff); its value revealed only at end/game over
-  - [ ] Dub Camp examples: energie (initial 100, threshold < 10), alcool (initial 0, threshold > 85), kiff (isScore: true, isHidden: true)
+- [x] Document `GaugeDefinition` fields (AC: 1, 5)
+  - [x] All fields: `id`, `name`, `icon` (emoji), `initialValue`, `isScore`, `isHidden`
+  - [x] Game Over fields: `gameOverThreshold?`, `gameOverCondition?: 'above' | 'below'`
+  - [x] Explain: `isHidden: true` = excluded from GaugeStrip display during play (but shown in CharacterSheet)
+  - [x] Explain: `isScore: true` = the hidden score gauge (Kiff); its value revealed only at end/game over
+  - [x] Dub Camp examples: energie (initial 100, threshold < 10), alcool (initial 0, threshold > 85), kiff (isScore: true, isHidden: true)
 
-- [ ] Document `ActDefinition` and theme system (AC: 4)
-  - [ ] `id` (string), `name` (string), `paragraphIds` (string[]) — paragraph IDs that trigger this act when reached
-  - [ ] `theme` (Record<string, string>) — CSS custom property overrides applied to `:root`
-  - [ ] Explain: When player reaches any paragraph in `paragraphIds`, the act transitions and `theme` is applied
-  - [ ] Document valid CSS custom property keys: `--color-bg`, `--color-surface`, `--color-text-primary`, `--color-text-muted`, `--color-accent`, `--color-danger`
-  - [ ] Dub Camp act palette examples:
+- [x] Document `ActDefinition` and theme system (AC: 4)
+  - [x] `id` (string), `name` (string), `paragraphIds` (string[]) — paragraph IDs that trigger this act when reached
+  - [x] `theme` (Record<string, string>) — CSS custom property overrides applied to `:root`
+  - [x] Explain: When player reaches any paragraph in `paragraphIds`, the act transitions and `theme` is applied
+  - [x] Document valid CSS custom property keys: `--color-bg`, `--color-surface`, `--color-text-primary`, `--color-text-muted`, `--color-accent`, `--color-danger`
+  - [x] Dub Camp act palette examples:
     - Afternoon: `{ "--color-bg": "#1a1208", "--color-accent": "#e8a42a" }`
     - Golden hour: `{ "--color-bg": "#160e0a", "--color-accent": "#e8622a" }`
     - Night: `{ "--color-bg": "#080810", "--color-accent": "#7c5cbf" }`
     - Late night: `{ "--color-bg": "#0a0c0e", "--color-accent": "#4a7a8a" }`
 
-- [ ] Document natural decay system (AC: 3)
-  - [ ] `decayNodes` array: list of paragraph IDs where decay fires (Dub Camp: `["s20","s40","s50","s60","s70"]`)
-  - [ ] `DecayRule` fields: `gaugeId`, `amount` (negative delta), `statReductionId?`, `statReductionFormula?`
-  - [ ] Document Dub Camp decay amounts:
+- [x] Document natural decay system (AC: 3)
+  - [x] `decayNodes` array: list of paragraph IDs where decay fires (Dub Camp: `["s20","s40","s50","s60","s70"]`)
+  - [x] `DecayRule` fields: `gaugeId`, `amount` (negative delta), `statReductionId?`, `statReductionFormula?`
+  - [x] Document Dub Camp decay amounts:
     - Énergie: `-7`
     - Alcool: `-12`
     - Fumette: `-8`
     - Nourriture: formula `max(3, 10 − Estomac × 1.5)` (stat reduction reduces decay)
     - Passive ⚡ risk: 6% chance of `-8` energie (encoded as probabilistic decay rule)
-  - [ ] Explain: Decay fires AFTER choice effects at the same node — never before
+  - [x] Explain: Decay fires AFTER choice effects at the same node — never before
 
-- [ ] Document weighted outcome resolution (AC: 2)
-  - [ ] `WeightedOutcome` fields: `gaugeId` (gauge to assess risk against), `statId` (stat that reduces risk), `goodEffects` (GaugeEffect[]), `badEffects` (GaugeEffect[])
-  - [ ] Risk formula: `Risk = gaugeLevel − (associatedStat × 15) + hungerModifier`
-  - [ ] Hunger modifier: `+0` if Nourriture > 50, `+10` if 25–50, `+25` if < 25
-  - [ ] Probability table: Risk < 30 → 90% good; 30–55 → 60%; 55–75 → 40%; > 75 → 20%
-  - [ ] Clarify: These probabilities and risk values are NEVER shown to the player
+- [x] Document weighted outcome resolution (AC: 2)
+  - [x] `WeightedOutcome` fields: `gaugeId` (gauge to assess risk against), `statId` (stat that reduces risk), `goodEffects` (GaugeEffect[]), `badEffects` (GaugeEffect[])
+  - [x] Risk formula: `Risk = gaugeLevel − (associatedStat × 15) + hungerModifier`
+  - [x] Hunger modifier: `+0` if Nourriture > 50, `+10` if 25–50, `+25` if < 25
+  - [x] Probability table: Risk < 30 → 90% good; 30–55 → 60%; 55–75 → 40%; > 75 → 20%
+  - [x] Clarify: These probabilities and risk values are NEVER shown to the player
 
-- [ ] Document `Paragraph` and `Choice` fields (AC: 1)
-  - [ ] `Paragraph`: `id` (string, matches key), `content` (prose text, supports `**bold**` and `*italic*`), `choices` (Choice[]), `isGameOver?`, `isComplete?`
-  - [ ] `Choice`: `id`, `text`, `targetParagraphId`, `gaugeEffects?`, `weightedOutcome?`, `inventoryAdd?`, `inventoryRemove?`
-  - [ ] `GaugeEffect`: `gaugeId`, `delta` (positive or negative number), `statInfluence?`
-  - [ ] Note: `targetParagraphId` must reference an existing key in `paragraphs` — validator will catch mismatches
-  - [ ] Paragraph ID convention for Dub Camp: use `s` prefix + section number (e.g., `"s1"`, `"s15a"`, `"sEVT1"`, `"s201"`)
+- [x] Document `Paragraph` and `Choice` fields (AC: 1)
+  - [x] `Paragraph`: `id` (string, matches key), `content` (prose text, supports `**bold**` and `*italic*`), `choices` (Choice[]), `isGameOver?`, `isComplete?`
+  - [x] `Choice`: `id`, `text`, `targetParagraphId`, `gaugeEffects?`, `weightedOutcome?`, `inventoryAdd?`, `inventoryRemove?`
+  - [x] `GaugeEffect`: `gaugeId`, `delta` (positive or negative number), `statInfluence?`
+  - [x] Note: `targetParagraphId` must reference an existing key in `paragraphs` — validator will catch mismatches
+  - [x] Paragraph ID convention for Dub Camp: use `s` prefix + section number (e.g., `"s1"`, `"s15a"`, `"sEVT1"`, `"s201"`)
 
-- [ ] Document `EndStateTier` fields (AC: 1)
-  - [ ] `minScore`, `maxScore`, `text` (narrative prose displayed at story end)
-  - [ ] Explain: Player's `score` gauge value (Kiff) is matched against tiers at story completion
-  - [ ] Dub Camp tiers: 100+ pts, 70–99, 40–69, < 40
+- [x] Document `EndStateTier` fields (AC: 1)
+  - [x] `minScore`, `maxScore`, `text` (narrative prose displayed at story end)
+  - [x] Explain: Player's `score` gauge value (Kiff) is matched against tiers at story completion
+  - [x] Dub Camp tiers: 100+ pts, 70–99, 40–69, < 40
 
-- [ ] Add complete worked example (AC: 6)
-  - [ ] Create a 3-paragraph mini-story JSON with:
+- [x] Add complete worked example (AC: 6)
+  - [x] Create a 3-paragraph mini-story JSON with:
     - 1 gauge (e.g., `energy`, initial 100, Game Over if < 10)
     - 1 stat (e.g., `endurance`, max 4)
     - 1 weighted outcome on a choice
     - 1 Game Over paragraph
     - 1 complete ending paragraph
     - 1 act transition
-  - [ ] Show complete valid JSON from `id` through `endStateTiers`
-  - [ ] Annotate each section with brief comments (use `// comment` notation in the worked example prose, not in actual JSON)
+  - [x] Show complete valid JSON from `id` through `endStateTiers`
+  - [x] Annotate each section with brief comments (use `// comment` notation in the worked example prose, not in actual JSON)
 
-- [ ] Final review: LLM readability test (AC: 7)
-  - [ ] Re-read the spec imagining you are an LLM that has never seen this codebase
-  - [ ] Verify every field mentioned in `engine/types.ts` is documented
-  - [ ] Verify Dub Camp paragraph ID format is clear (§1 → `"s1"`, §15A → `"s15a"`, §EVT1 → `"sEVT1"`)
-  - [ ] Verify the probabilistic event encoding (§EVT1, 1-in-3 probability) is documented
+- [x] Final review: LLM readability test (AC: 7)
+  - [x] Re-read the spec imagining you are an LLM that has never seen this codebase
+  - [x] Verify every field mentioned in `engine/types.ts` is documented
+  - [x] Verify Dub Camp paragraph ID format is clear (§1 → `"s1"`, §15A → `"s15a"`, §EVT1 → `"sEVT1"`)
+  - [x] Verify the probabilistic event encoding (§EVT1, 1-in-3 probability) is documented
 
 ## Dev Notes
 
@@ -139,6 +139,20 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None.
+
 ### Completion Notes List
 
+- Complete spec document at `docs/story-format-spec.md` covering all StoryConfig fields
+- Risk formula, probability table, hunger modifier all documented with concrete examples
+- Natural decay system documented including probabilistic 6% passive energy drain
+- Act definition with theme CSS custom property override system documented
+- Game Over conditions documented for all 4 Dub Camp paths
+- Complete worked example: 3-paragraph mini-story with valid JSON (energy gauge, endurance stat, weighted outcome, game over, act transition)
+- Dub Camp paragraph ID translation table (§1→"s1", §15A→"s15a", §EVT1→"sEVT1")
+- Special cases documented: §41 voluntary exit, §50 heat penalty, §EVT1 random event, all 4 Game Over paragraphs
+- Probabilistic decay rule with `probabilityChance` field documented (extends base DecayRule)
+
 ### File List
+
+- `docs/story-format-spec.md` — new, FR35 JSON schema reference for story authors

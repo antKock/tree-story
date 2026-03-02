@@ -1,6 +1,6 @@
 # Story 2.4: Core Story Engine
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -22,21 +22,21 @@ so that all game mechanics — choice resolution, decay, Game Over evaluation, a
 
 ## Tasks / Subtasks
 
-- [ ] Create `engine/storyEngine.ts` class/module structure (AC: 9)
-  - [ ] Import from `engine/types.ts`, `engine/gaugeSystem.ts`, `engine/weightedOutcome.ts` only
-  - [ ] Export a factory function `createEngine(config: StoryConfig, savedState?: SaveState): Engine` or a class `StoryEngine`
-  - [ ] Internal state: keep `_state: EngineState` as private mutable reference
-  - [ ] Internal `_config: StoryConfig` — set at init, never changes
+- [x] Create `engine/storyEngine.ts` class/module structure (AC: 9)
+  - [x] Import from `engine/types.ts`, `engine/gaugeSystem.ts`, `engine/weightedOutcome.ts` only
+  - [x] Export a factory function `createEngine(config: StoryConfig, savedState?: SaveState): Engine` or a class `StoryEngine`
+  - [x] Internal state: keep `_state: EngineState` as private mutable reference
+  - [x] Internal `_config: StoryConfig` — set at init, never changes
 
-- [ ] Implement `initEngine` / constructor (AC: 1)
-  - [ ] Accept `config: StoryConfig` and optional `savedState?: SaveState`
-  - [ ] Validate saved state before restoring:
+- [x] Implement `initEngine` / constructor (AC: 1)
+  - [x] Accept `config: StoryConfig` and optional `savedState?: SaveState`
+  - [x] Validate saved state before restoring:
     - `savedState.version === 1` ✓
     - `savedState.storyId === config.id` ✓
     - `savedState.engineState.paragraphId` exists in `config.paragraphs` ✓
     - All required `EngineState` fields present and correct type ✓
-  - [ ] If all checks pass: initialize from `savedState.engineState`
-  - [ ] If any check fails (or no savedState): initialize fresh:
+  - [x] If all checks pass: initialize from `savedState.engineState`
+  - [x] If any check fails (or no savedState): initialize fresh:
     - `paragraphId`: first key of `config.paragraphs` or first act's first paragraphId
     - `gauges`: `Record<id, initialValue>` from each `GaugeDefinition`
     - `stats`: set from saved state (stats are set during ProfileCreation, not auto-initialized)
@@ -44,62 +44,62 @@ so that all game mechanics — choice resolution, decay, Game Over evaluation, a
     - `inventory: []`
     - `score: 0`
     - `isGameOver: false`, `gameOverParagraphId: null`, `isComplete: false`
-  - [ ] Note: Fresh init without stats means ProfileCreation must call a method to set stats before play begins. Add `setStats(stats: Record<string, number>): void` method.
+  - [x] Note: Fresh init without stats means ProfileCreation must call a method to set stats before play begins. Add `setStats(stats: Record<string, number>): void` method.
 
-- [ ] Implement `getState()` (AC: 2)
-  - [ ] Return a deep copy (or structurally cloned) snapshot of `_state`
-  - [ ] Use `structuredClone(_state)` or spread: `{ ..._state, gauges: { ..._state.gauges }, stats: { ..._state.stats }, inventory: [..._state.inventory] }`
-  - [ ] NEVER return the internal `_state` reference directly
+- [x] Implement `getState()` (AC: 2)
+  - [x] Return a deep copy (or structurally cloned) snapshot of `_state`
+  - [x] Use `structuredClone(_state)` or spread: `{ ..._state, gauges: { ..._state.gauges }, stats: { ..._state.stats }, inventory: [..._state.inventory] }`
+  - [x] NEVER return the internal `_state` reference directly
 
-- [ ] Implement `resolveChoice(choiceId: string): EngineState` (AC: 3–6)
-  - [ ] Find the choice: `const choice = config.paragraphs[_state.paragraphId].choices.find(c => c.id === choiceId)`
-  - [ ] Throw `EngineError` if choice not found
-  - [ ] **Step 1: Apply choice gauge effects** — call `gaugeSystem.applyGaugeEffects(_state.gauges, choice.gaugeEffects ?? [], _state.stats, _config)`
-  - [ ] **Step 2: Apply weighted outcome** — if `choice.weightedOutcome` exists, call `weightedOutcome.resolveOutcome(...)` to get `'good'|'bad'`, then apply `choice.weightedOutcome.goodEffects` or `badEffects` via `gaugeSystem.applyGaugeEffects`
-  - [ ] **Step 3: Clamp all gauges** — already handled by `applyGaugeEffects` (which calls `clamp`), but verify
-  - [ ] **Step 4: Apply inventory changes** — process `choice.inventoryAdd` and `choice.inventoryRemove` before Game Over check (AC: 5)
-  - [ ] **Step 5: Evaluate Game Over** — call `_evaluateGameOver()` — if triggered, update `_state.isGameOver = true`, `_state.gameOverParagraphId`, and RETURN immediately (do not proceed to act transition or paragraph advance)
-  - [ ] **Step 6: Evaluate act transition** — call `_evaluateActTransition()` to check if `choice.targetParagraphId` triggers an act change
-  - [ ] **Step 7: Advance paragraph** — `_state.paragraphId = choice.targetParagraphId`
-  - [ ] Check if new paragraph `isComplete === true` — if so set `_state.isComplete = true`
-  - [ ] Return `getState()`
+- [x] Implement `resolveChoice(choiceId: string): EngineState` (AC: 3–6)
+  - [x] Find the choice: `const choice = config.paragraphs[_state.paragraphId].choices.find(c => c.id === choiceId)`
+  - [x] Throw `EngineError` if choice not found
+  - [x] **Step 1: Apply choice gauge effects** — call `gaugeSystem.applyGaugeEffects(_state.gauges, choice.gaugeEffects ?? [], _state.stats, _config)`
+  - [x] **Step 2: Apply weighted outcome** — if `choice.weightedOutcome` exists, call `weightedOutcome.resolveOutcome(...)` to get `'good'|'bad'`, then apply `choice.weightedOutcome.goodEffects` or `badEffects` via `gaugeSystem.applyGaugeEffects`
+  - [x] **Step 3: Clamp all gauges** — already handled by `applyGaugeEffects` (which calls `clamp`), but verify
+  - [x] **Step 4: Apply inventory changes** — process `choice.inventoryAdd` and `choice.inventoryRemove` before Game Over check (AC: 5)
+  - [x] **Step 5: Evaluate Game Over** — call `_evaluateGameOver()` — if triggered, update `_state.isGameOver = true`, `_state.gameOverParagraphId`, and RETURN immediately (do not proceed to act transition or paragraph advance)
+  - [x] **Step 6: Evaluate act transition** — call `_evaluateActTransition()` to check if `choice.targetParagraphId` triggers an act change
+  - [x] **Step 7: Advance paragraph** — `_state.paragraphId = choice.targetParagraphId`
+  - [x] Check if new paragraph `isComplete === true` — if so set `_state.isComplete = true`
+  - [x] Return `getState()`
 
-- [ ] Implement `applyDecay(): EngineState` (AC: 7)
-  - [ ] Only call this when `_state.paragraphId` is in `_config.decayNodes` (caller's responsibility to check, but engine can also guard)
-  - [ ] **Step 1: Apply decay** — call `gaugeSystem.applyDecay(_state.gauges, _config.decayRules, _state.stats, _config)`
-  - [ ] **Step 2: Clamp** — handled by `gaugeSystem.applyDecay`
-  - [ ] **Step 3: Evaluate Game Over** — call `_evaluateGameOver()` — if triggered STOP
-  - [ ] **Step 4: Evaluate act transition** — call `_evaluateActTransition()` with current `_state.paragraphId`
-  - [ ] Return `getState()`
+- [x] Implement `applyDecay(): EngineState` (AC: 7)
+  - [x] Only call this when `_state.paragraphId` is in `_config.decayNodes` (caller's responsibility to check, but engine can also guard)
+  - [x] **Step 1: Apply decay** — call `gaugeSystem.applyDecay(_state.gauges, _config.decayRules, _state.stats, _config)`
+  - [x] **Step 2: Clamp** — handled by `gaugeSystem.applyDecay`
+  - [x] **Step 3: Evaluate Game Over** — call `_evaluateGameOver()` — if triggered STOP
+  - [x] **Step 4: Evaluate act transition** — call `_evaluateActTransition()` with current `_state.paragraphId`
+  - [x] Return `getState()`
 
-- [ ] Implement `_evaluateGameOver()` private helper
-  - [ ] For each gauge in `_config.gauges` that has `gameOverThreshold` defined:
+- [x] Implement `_evaluateGameOver()` private helper
+  - [x] For each gauge in `_config.gauges` that has `gameOverThreshold` defined:
     - If `gameOverCondition === 'above'` and `_state.gauges[gauge.id] > gauge.gameOverThreshold`: trigger
     - If `gameOverCondition === 'below'` and `_state.gauges[gauge.id] < gauge.gameOverThreshold`: trigger
-  - [ ] On trigger: set `_state.isGameOver = true`, find the Game Over paragraph ID from config (or use a default), set `_state.gameOverParagraphId`
-  - [ ] Note: Dub Camp has 4 Game Over paragraphs: §201–§204 — each triggered by different gauge conditions. The mapping from gauge threshold → Game Over paragraph ID must be encoded in story config (e.g., on `GaugeDefinition` or as a separate `gameOverParagraphId` field)
-  - [ ] Return boolean: `true` if game over triggered
+  - [x] On trigger: set `_state.isGameOver = true`, find the Game Over paragraph ID from config (or use a default), set `_state.gameOverParagraphId`
+  - [x] Note: Dub Camp has 4 Game Over paragraphs: §201–§204 — each triggered by different gauge conditions. The mapping from gauge threshold → Game Over paragraph ID must be encoded in story config (e.g., on `GaugeDefinition` or as a separate `gameOverParagraphId` field)
+  - [x] Return boolean: `true` if game over triggered
 
-- [ ] Implement `_evaluateActTransition(paragraphId: string)` private helper
-  - [ ] Check if `paragraphId` appears in any `act.paragraphIds[]` for an act different from current `_state.act`
-  - [ ] If found: update `_state.act = newAct.id`
-  - [ ] First act's paragraphIds may overlap with initial state — handle without re-triggering
+- [x] Implement `_evaluateActTransition(paragraphId: string)` private helper
+  - [x] Check if `paragraphId` appears in any `act.paragraphIds[]` for an act different from current `_state.act`
+  - [x] If found: update `_state.act = newAct.id`
+  - [x] First act's paragraphIds may overlap with initial state — handle without re-triggering
 
-- [ ] Implement `reset(): void` (AC: 8)
-  - [ ] Reset all state to initial values (same as fresh init)
-  - [ ] `_state.isGameOver = false`, `_state.isComplete = false`
-  - [ ] Reset all gauges to `initialValue` from `_config.gauges`
-  - [ ] Reset `paragraphId` to first paragraph, `act` to first act
-  - [ ] Clear `inventory: []`, `score: 0`, `gameOverParagraphId: null`
-  - [ ] Note: `reset()` does NOT clear localStorage — that's the caller's responsibility (`persistence.clear()` called from `useStoryEngine` hook)
+- [x] Implement `reset(): void` (AC: 8)
+  - [x] Reset all state to initial values (same as fresh init)
+  - [x] `_state.isGameOver = false`, `_state.isComplete = false`
+  - [x] Reset all gauges to `initialValue` from `_config.gauges`
+  - [x] Reset `paragraphId` to first paragraph, `act` to first act
+  - [x] Clear `inventory: []`, `score: 0`, `gameOverParagraphId: null`
+  - [x] Note: `reset()` does NOT clear localStorage — that's the caller's responsibility (`persistence.clear()` called from `useStoryEngine` hook)
 
-- [ ] Implement `serialize(): SaveState`
-  - [ ] Return: `{ storyId: _config.id, version: 1, savedAt: Date.now(), engineState: getState() }`
+- [x] Implement `serialize(): SaveState`
+  - [x] Return: `{ storyId: _config.id, version: 1, savedAt: Date.now(), engineState: getState() }`
 
-- [ ] Handle the score gauge separately
-  - [ ] The score gauge (`isScore: true`) is tracked internally just like any other gauge
-  - [ ] `_state.score` should mirror the score gauge's value in `_state.gauges[scoreGaugeId]`
-  - [ ] Or: `score` IS the value in `_state.gauges` — keep them in sync
+- [x] Handle the score gauge separately
+  - [x] The score gauge (`isScore: true`) is tracked internally just like any other gauge
+  - [x] `_state.score` should mirror the score gauge's value in `_state.gauges[scoreGaugeId]`
+  - [x] Or: `score` IS the value in `_state.gauges` — keep them in sync
 
 ## Dev Notes
 
@@ -138,6 +138,20 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None — clean implementation.
+
 ### Completion Notes List
 
+- Factory function `createEngine(config, savedState?)` returns `Engine` interface with `getState`, `resolveChoice`, `applyDecay`, `reset`, `setStats`, `serialize`
+- Saved state validation: checks version === 1, storyId match, paragraphId existence, all EngineState fields
+- `resolveChoice` follows strict evaluation order: gauge effects → weighted outcome → inventory → score sync → Game Over → act transition → advance
+- Game Over uses `>=`/`<=` (intentional: strict inequality unreachable at clamped boundaries — documented in code)
+- Decay node guard added during code review: `applyDecay()` is a no-op if current paragraph is not in `config.decayNodes`
+- `getState()` returns deep copy via spread operators — never exposes internal reference
+- `reset()` restores all state to fresh initial values from config
+- Score gauge synced with `_state.score` after every gauge mutation
+- `setStats()` exposed for ProfileCreation to set stats before play begins
+
 ### File List
+
+- `engine/storyEngine.ts` — new, core engine module with `createEngine` factory

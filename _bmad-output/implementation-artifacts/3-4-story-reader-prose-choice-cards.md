@@ -1,6 +1,6 @@
 # Story 3.4: Story Reader — Prose & Choice Cards
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -21,25 +21,25 @@ so that the experience feels like reading a well-designed article that forks —
 
 ## Tasks / Subtasks
 
-- [ ] Create `components/ParagraphDisplay.tsx` (AC: 1–3)
-  - [ ] Props: `{ content: string }`
-  - [ ] Render in a `<div>` with class `.prose` (Lora, 20px, 1.72 line-height) from globals.css
-  - [ ] Apply markdown-lite rendering for `**bold**` → `<strong>` and `*italic*` → `<em>`:
+- [x] Create `components/ParagraphDisplay.tsx` (AC: 1–3)
+  - [x] Props: `{ content: string }`
+  - [x] Render in a `<div>` with class `.prose` (Lora, 20px, 1.72 line-height) from globals.css
+  - [x] Apply markdown-lite rendering for `**bold**` → `<strong>` and `*italic*` → `<em>`:
     ```typescript
     function renderMarkdownLite(text: string): React.ReactNode[] {
       // Split on **bold** and *italic* patterns
       // Return array of React nodes: strings, <strong>, <em>
     }
     ```
-  - [ ] Simple regex approach (no markdown library needed):
+  - [x] Simple regex approach (no markdown library needed):
     - Replace `**text**` with `<strong>text</strong>`
     - Replace `*text*` with `<em>text</em>` (careful: don't match `**` as italic)
-  - [ ] No paragraph IDs, section numbers, or metadata visible to player
-  - [ ] `max-width: 65ch; padding: 0 1.5rem` for reading column
+  - [x] No paragraph IDs, section numbers, or metadata visible to player
+  - [x] `max-width: 65ch; padding: 0 1.5rem` for reading column
 
-- [ ] Create `components/ChoiceCards.tsx` (AC: 4–6)
-  - [ ] Props: `{ choices: Choice[]; onChoiceSelect: (choiceId: string) => void }`
-  - [ ] Map over `choices` to render each as a `<button>`:
+- [x] Create `components/ChoiceCards.tsx` (AC: 4–6)
+  - [x] Props: `{ choices: Choice[]; onChoiceSelect: (choiceId: string) => void }`
+  - [x] Map over `choices` to render each as a `<button>`:
     ```css
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -51,17 +51,17 @@ so that the experience feels like reading a well-designed article that forks —
     color: var(--color-text-primary);
     font-family: var(--font-lora); /* prose-like for choice text */
     ```
-  - [ ] `onClick={() => onChoiceSelect(choice.id)}`
-  - [ ] No confirmation dialog — immediate action on tap
-  - [ ] Stack vertically with `gap: 8px` between cards
-  - [ ] 200ms render target: since `resolveChoice` is synchronous in the engine, React re-render should happen immediately after state update (well under 200ms)
+  - [x] `onClick={() => onChoiceSelect(choice.id)}`
+  - [x] No confirmation dialog — immediate action on tap
+  - [x] Stack vertically with `gap: 8px` between cards
+  - [x] 200ms render target: since `resolveChoice` is synchronous in the engine, React re-render should happen immediately after state update (well under 200ms)
 
-- [ ] Create `components/StoryReader.tsx` — the root client component (AC: 7, 8)
-  - [ ] `"use client"` directive — this component manages engine state
-  - [ ] Props: `{ config: StoryConfig }`
-  - [ ] **Sole consumer of `useStoryEngine`**: `const { engineState, resolveChoice, applyDecay } = useStoryEngine(config)`
-  - [ ] Local state: `const [charSheetOpen, setCharSheetOpen] = useState(false)`
-  - [ ] Layout structure:
+- [x] Create `components/StoryReader.tsx` — the root client component (AC: 7, 8)
+  - [x] `"use client"` directive — this component manages engine state
+  - [x] Props: `{ config: StoryConfig }`
+  - [x] **Sole consumer of `useStoryEngine`**: `const { engineState, resolveChoice, applyDecay } = useStoryEngine(config)`
+  - [x] Local state: `const [charSheetOpen, setCharSheetOpen] = useState(false)`
+  - [x] Layout structure:
     ```tsx
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <GaugeStrip
@@ -91,21 +91,21 @@ so that the experience feels like reading a well-designed article that forks —
       )}
     </div>
     ```
-  - [ ] Apply `applyDecay` at decay nodes: check if `engineState.paragraphId` is in `config.decayNodes` — if so, call `applyDecay()` in a `useEffect` when `paragraphId` changes
-  - [ ] Handle the decay timing: call `applyDecay()` AFTER the choice resolves and new paragraph renders
+  - [x] Apply `applyDecay` at decay nodes: check if `engineState.paragraphId` is in `config.decayNodes` — if so, call `applyDecay()` in a `useEffect` when `paragraphId` changes
+  - [x] Handle the decay timing: call `applyDecay()` AFTER the choice resolves and new paragraph renders
 
-- [ ] Handle decay node side effect (AC: — from architecture)
-  - [ ] `useEffect(() => { if (config.decayNodes.includes(engineState.paragraphId)) { applyDecay() } }, [engineState.paragraphId])`
-  - [ ] Note: This fires after rendering the new paragraph at a decay node. The decay effects will cause another state update and re-render with updated gauges.
+- [x] Handle decay node side effect (AC: — from architecture)
+  - [x] `useEffect(() => { if (config.decayNodes.includes(engineState.paragraphId)) { applyDecay() } }, [engineState.paragraphId])`
+  - [x] Note: This fires after rendering the new paragraph at a decay node. The decay effects will cause another state update and re-render with updated gauges.
 
-- [ ] Wire StoryReader into app flow
-  - [ ] In `app/page.tsx`: render `<StoryReader config={storyConfig} />` when phase === 'story'
-  - [ ] Pass validated `storyConfig` from the fetch + validate step
+- [x] Wire StoryReader into app flow
+  - [x] In `app/page.tsx`: render `<StoryReader config={storyConfig} />` when phase === 'story'
+  - [x] Pass validated `storyConfig` from the fetch + validate step
 
-- [ ] Ensure scroll behavior (AC: 7)
-  - [ ] Prose + choice cards are in the same `<main>` scroll container
-  - [ ] GaugeStrip is sticky at top (separate from scroll area)
-  - [ ] No split-scroll, no floating elements other than the gauge strip
+- [x] Ensure scroll behavior (AC: 7)
+  - [x] Prose + choice cards are in the same `<main>` scroll container
+  - [x] GaugeStrip is sticky at top (separate from scroll area)
+  - [x] No split-scroll, no floating elements other than the gauge strip
 
 ## Dev Notes
 
@@ -144,9 +144,21 @@ Prerequisites:
 ### Agent Model Used
 
 claude-sonnet-4-6
+Code Review: claude-opus-4-6
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- StoryReader: sole consumer of useStoryEngine, manages charSheetOpen state
+- ParagraphDisplay: Lora prose, markdown-lite (**bold** and *italic*), reading-column layout
+- ChoiceCards: full-width cards with 48px min-height, 8px border-radius, Lora font
+- Decay applied via useEffect when arriving at decay nodes (checks prevParagraphId ref)
+- Game over / complete states conditionally render EndScreen instead of ChoiceCards
+- Code review (2026-03-02): Fixed ChoiceCards font (now --font-prose), markdown regex, CSS variables
+
 ### File List
+
+- `components/StoryReader.tsx` — root client component, sole useStoryEngine consumer
+- `components/ParagraphDisplay.tsx` — prose rendering with markdown-lite
+- `components/ChoiceCards.tsx` — choice card buttons

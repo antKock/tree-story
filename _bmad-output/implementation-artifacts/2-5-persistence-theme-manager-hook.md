@@ -1,6 +1,6 @@
 # Story 2.5: Persistence, Theme Manager & useStoryEngine Hook
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -22,13 +22,13 @@ so that every engine state mutation is immediately persisted to localStorage, CS
 
 ## Tasks / Subtasks
 
-- [ ] Create `engine/persistence.ts` (AC: 1–3)
-  - [ ] Import from `engine/types.ts` only
-  - [ ] Export `const SAVE_KEY = 'tree-story:save'`
-  - [ ] Export `function save(engineState: EngineState, storyId: string): void`
+- [x] Create `engine/persistence.ts` (AC: 1–3)
+  - [x] Import from `engine/types.ts` only
+  - [x] Export `const SAVE_KEY = 'tree-story:save'`
+  - [x] Export `function save(engineState: EngineState, storyId: string): void`
     - Build `SaveState`: `{ storyId, version: 1, savedAt: Date.now(), engineState }`
     - Call `localStorage.setItem(SAVE_KEY, JSON.stringify(saveState))`
-  - [ ] Export `function load(): SaveState | null`
+  - [x] Export `function load(): SaveState | null`
     - Try `localStorage.getItem(SAVE_KEY)` — if null/undefined return `null`
     - Try `JSON.parse(item)` — if throws return `null`
     - Validate: `parsed.version === 1` — if not return `null`
@@ -36,25 +36,25 @@ so that every engine state mutation is immediately persisted to localStorage, CS
     - Validate: `parsed.engineState` exists and has required shape (storyId, paragraphId, gauges, stats, act, inventory, score, isGameOver, gameOverParagraphId, isComplete) — if any missing return `null`
     - Return validated `SaveState`
     - Never throw — all errors return `null` silently
-  - [ ] Export `function clear(): void`
+  - [x] Export `function clear(): void`
     - Call `localStorage.removeItem(SAVE_KEY)`
 
-- [ ] Create `engine/themeManager.ts` (AC: 4, 5)
-  - [ ] Import from `engine/types.ts` only
-  - [ ] This file is the ONLY place in the codebase with `document.documentElement.style.setProperty` calls
-  - [ ] Export `function apply(actId: string, config: StoryConfig): void`
+- [x] Create `engine/themeManager.ts` (AC: 4, 5)
+  - [x] Import from `engine/types.ts` only
+  - [x] This file is the ONLY place in the codebase with `document.documentElement.style.setProperty` calls
+  - [x] Export `function apply(actId: string, config: StoryConfig): void`
     - Find `act = config.acts.find(a => a.id === actId)`
     - If act not found: no-op (silently handle missing act)
     - For each entry in `act.theme` (a `Record<string, string>`): call `document.documentElement.style.setProperty(propertyName, value)`
     - CSS property names are the exact strings from the story config (e.g., `"--color-bg"`, `"--color-accent"`)
-  - [ ] Guard against SSR: `if (typeof document === 'undefined') return` — Next.js server components don't have `document`
+  - [x] Guard against SSR: `if (typeof document === 'undefined') return` — Next.js server components don't have `document`
 
-- [ ] Create `hooks/useStoryEngine.ts` (AC: 6–9)
-  - [ ] `"use client"` directive at top (this is a React hook — client-only)
-  - [ ] Import from `engine/storyEngine.ts`, `engine/persistence.ts`, `engine/themeManager.ts`, `engine/types.ts`
-  - [ ] Export `function useStoryEngine(config: StoryConfig)`
+- [x] Create `hooks/useStoryEngine.ts` (AC: 6–9)
+  - [x] `"use client"` directive at top (this is a React hook — client-only)
+  - [x] Import from `engine/storyEngine.ts`, `engine/persistence.ts`, `engine/themeManager.ts`, `engine/types.ts`
+  - [x] Export `function useStoryEngine(config: StoryConfig)`
 
-  - [ ] Engine instantiation (AC: 6):
+  - [x] Engine instantiation (AC: 6):
     ```typescript
     const engineRef = useRef<StoryEngine | null>(null)
     if (engineRef.current === null) {
@@ -64,20 +64,20 @@ so that every engine state mutation is immediately persisted to localStorage, CS
     ```
     - Engine created exactly once — `useRef` guarantees no recreation on re-render
 
-  - [ ] State initialization (AC: 7):
+  - [x] State initialization (AC: 7):
     ```typescript
     const [engineState, setEngineState] = useState<EngineState>(() => engineRef.current!.getState())
     ```
     - `useState` with initializer function — reads state once on mount
 
-  - [ ] `useEffect` for initial theme application:
+  - [x] `useEffect` for initial theme application:
     ```typescript
     useEffect(() => {
       themeManager.apply(engineState.act, config)
     }, []) // run once on mount
     ```
 
-  - [ ] After-mutation pattern (AC: 8) — create a helper:
+  - [x] After-mutation pattern (AC: 8) — create a helper:
     ```typescript
     const commitState = useCallback(() => {
       const newState = engineRef.current!.getState()
@@ -87,7 +87,7 @@ so that every engine state mutation is immediately persisted to localStorage, CS
     }, [config])
     ```
 
-  - [ ] Expose `resolveChoice` (AC: 9):
+  - [x] Expose `resolveChoice` (AC: 9):
     ```typescript
     const resolveChoice = useCallback((choiceId: string) => {
       engineRef.current!.resolveChoice(choiceId)
@@ -95,7 +95,7 @@ so that every engine state mutation is immediately persisted to localStorage, CS
     }, [commitState])
     ```
 
-  - [ ] Expose `applyDecay` (AC: 9):
+  - [x] Expose `applyDecay` (AC: 9):
     ```typescript
     const applyDecay = useCallback(() => {
       engineRef.current!.applyDecay()
@@ -103,7 +103,7 @@ so that every engine state mutation is immediately persisted to localStorage, CS
     }, [commitState])
     ```
 
-  - [ ] Expose `resetEngine` (AC: 9):
+  - [x] Expose `resetEngine` (AC: 9):
     ```typescript
     const resetEngine = useCallback(() => {
       persistence.clear()        // clear localStorage FIRST
@@ -112,7 +112,7 @@ so that every engine state mutation is immediately persisted to localStorage, CS
     }, [commitState])
     ```
 
-  - [ ] Expose `setStats` (for ProfileCreation):
+  - [x] Expose `setStats` (for ProfileCreation):
     ```typescript
     const setStats = useCallback((stats: Record<string, number>) => {
       engineRef.current!.setStats(stats)
@@ -120,12 +120,12 @@ so that every engine state mutation is immediately persisted to localStorage, CS
     }, [commitState])
     ```
 
-  - [ ] Return: `{ engineState, resolveChoice, applyDecay, resetEngine, setStats }`
+  - [x] Return: `{ engineState, resolveChoice, applyDecay, resetEngine, setStats }`
 
-- [ ] Verify SSR safety
-  - [ ] `engine/persistence.ts` uses `localStorage` — guard with `typeof window !== 'undefined'` check (or it's called from `useEffect`/event handlers which are client-only)
-  - [ ] `engine/themeManager.ts` uses `document` — guard with `typeof document !== 'undefined'`
-  - [ ] `hooks/useStoryEngine.ts` has `"use client"` — only runs in browser
+- [x] Verify SSR safety
+  - [x] `engine/persistence.ts` uses `localStorage` — guard with `typeof window !== 'undefined'` check (or it's called from `useEffect`/event handlers which are client-only)
+  - [x] `engine/themeManager.ts` uses `document` — guard with `typeof document !== 'undefined'`
+  - [x] `hooks/useStoryEngine.ts` has `"use client"` — only runs in browser
 
 ## Dev Notes
 
@@ -165,6 +165,19 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None — clean implementation.
+
 ### Completion Notes List
 
+- `persistence.ts`: SSR-safe with `typeof globalThis.localStorage === 'undefined'` guard; validates version, storyId, savedAt, and all EngineState fields on load; returns `null` silently for any corruption
+- `themeManager.ts`: SSR-safe with `typeof document === 'undefined'` guard; iterates `act.theme` entries calling `document.documentElement.style.setProperty`; confirmed as sole DOM accessor in codebase
+- `useStoryEngine.ts`: `"use client"` directive; engine instantiated once via `useRef`; `commitState()` helper calls `setEngineState → persistence.save → themeManager.apply` after every mutation
+- Exposes `{ engineState, resolveChoice, applyDecay, resetEngine, setStats }` — components never call engine directly
+- `resetEngine` clears localStorage before resetting engine to prevent stale restore on page reload
+- Initial theme applied via `useEffect([], ...)` on mount
+
 ### File List
+
+- `engine/persistence.ts` — new, localStorage save/load/clear with validation
+- `engine/themeManager.ts` — new, CSS custom property updates on `:root`
+- `hooks/useStoryEngine.ts` — new, React hook wrapping engine with reactive state

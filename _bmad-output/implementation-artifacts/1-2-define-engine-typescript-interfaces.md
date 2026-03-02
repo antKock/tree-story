@@ -1,6 +1,6 @@
 # Story 1.2: Define Engine TypeScript Interfaces
 
-Status: ready-for-dev
+Status: complete
 
 ## Story
 
@@ -20,35 +20,35 @@ so that every subsequent engine implementation story works against a single, aut
 
 ## Tasks / Subtasks
 
-- [ ] Create `engine/` directory and `engine/types.ts` file (AC: 1, 6)
-  - [ ] Create directory `engine/` at project root
-  - [ ] Create `engine/types.ts` with zero imports (pure type definitions only)
+- [x] Create `engine/` directory and `engine/types.ts` file (AC: 1, 6)
+  - [x] Create directory `engine/` at project root
+  - [x] Create `engine/types.ts` with zero imports (pure type definitions only)
 
-- [ ] Define error classes (AC: 1)
-  - [ ] Export `class StoryValidationError extends Error` — used for story JSON config errors at startup
-  - [ ] Export `class EngineError extends Error` — used for runtime engine errors mid-story
-  - [ ] Note: These are distinct — never conflate them (StoryValidationError = config, EngineError = runtime)
+- [x] Define error classes (AC: 1)
+  - [x] Export `class StoryValidationError extends Error` — used for story JSON config errors at startup
+  - [x] Export `class EngineError extends Error` — used for runtime engine errors mid-story
+  - [x] Note: These are distinct — never conflate them (StoryValidationError = config, EngineError = runtime)
 
-- [ ] Define stat and gauge types (AC: 1, 4, 5)
-  - [ ] Export `interface StatDefinition`: `{ id: string; name: string; description?: string; maxPerStat: number }`
-  - [ ] Export `interface GaugeDefinition`: `{ id: string; name: string; icon: string; initialValue: number; isScore: boolean; isHidden: boolean; gameOverThreshold?: number; gameOverCondition?: 'above' | 'below' }`
-  - [ ] Export `interface GaugeEffect`: `{ gaugeId: string; delta: number; statInfluence?: { statId: string; multiplier: number } }`
-  - [ ] Export `interface DecayRule`: `{ gaugeId: string; amount: number; statReductionId?: string; statReductionFormula?: string }`
+- [x] Define stat and gauge types (AC: 1, 4, 5)
+  - [x] Export `interface StatDefinition`: `{ id: string; name: string; description?: string; maxPerStat: number }`
+  - [x] Export `interface GaugeDefinition`: `{ id: string; name: string; icon: string; initialValue: number; isScore: boolean; isHidden: boolean; gameOverThreshold?: number; gameOverCondition?: 'above' | 'below' }`
+  - [x] Export `interface GaugeEffect`: `{ gaugeId: string; delta: number; statInfluence?: { statId: string; multiplier: number } }`
+  - [x] Export `interface DecayRule`: `{ gaugeId: string; amount: number; statReductionId?: string; statReductionFormula?: string }`
 
-- [ ] Define story structure types (AC: 1)
-  - [ ] Export `interface WeightedOutcome`: `{ gaugeId: string; statId: string; goodEffects: GaugeEffect[]; badEffects: GaugeEffect[] }`
-  - [ ] Export `interface Choice`: `{ id: string; text: string; targetParagraphId: string; gaugeEffects?: GaugeEffect[]; weightedOutcome?: WeightedOutcome; inventoryAdd?: string[]; inventoryRemove?: string[] }`
-  - [ ] Export `interface Paragraph`: `{ id: string; content: string; choices: Choice[]; isGameOver?: boolean; isComplete?: boolean }`
-  - [ ] Export `interface ActDefinition`: `{ id: string; name: string; paragraphIds: string[]; theme: Record<string, string> }`
-  - [ ] Export `interface EndStateTier`: `{ minScore: number; maxScore: number; text: string }`
+- [x] Define story structure types (AC: 1)
+  - [x] Export `interface WeightedOutcome`: `{ gaugeId: string; statId: string; goodEffects: GaugeEffect[]; badEffects: GaugeEffect[] }`
+  - [x] Export `interface Choice`: `{ id: string; text: string; targetParagraphId: string; gaugeEffects?: GaugeEffect[]; weightedOutcome?: WeightedOutcome; inventoryAdd?: string[]; inventoryRemove?: string[] }`
+  - [x] Export `interface Paragraph`: `{ id: string; content: string; choices: Choice[]; isGameOver?: boolean; isComplete?: boolean }`
+  - [x] Export `interface ActDefinition`: `{ id: string; name: string; paragraphIds: string[]; theme: Record<string, string> }`
+  - [x] Export `interface EndStateTier`: `{ minScore: number; maxScore: number; text: string }`
 
-- [ ] Define story meta and config types (AC: 1)
-  - [ ] Export `interface ExampleProfile`: `{ name: string; stats: Record<string, number>; description: string }`
-  - [ ] Export `interface StoryMeta`: `{ title: string; author: string; version: string; description?: string; exampleProfiles: ExampleProfile[] }`
-  - [ ] Export `interface StoryConfig`: `{ id: string; version: number; meta: StoryMeta; stats: StatDefinition[]; gauges: GaugeDefinition[]; acts: ActDefinition[]; decayNodes: string[]; decayRules: DecayRule[]; paragraphs: Record<string, Paragraph>; endStateTiers: EndStateTier[]; statPointBudget: number }`
+- [x] Define story meta and config types (AC: 1)
+  - [x] Export `interface ExampleProfile`: `{ name: string; stats: Record<string, number>; description: string }`
+  - [x] Export `interface StoryMeta`: `{ title: string; author: string; version: string; description?: string; exampleProfiles: ExampleProfile[] }`
+  - [x] Export `interface StoryConfig`: `{ id: string; version: number; meta: StoryMeta; stats: StatDefinition[]; gauges: GaugeDefinition[]; acts: ActDefinition[]; decayNodes: string[]; decayRules: DecayRule[]; paragraphs: Record<string, Paragraph>; endStateTiers: EndStateTier[]; statPointBudget: number }`
 
-- [ ] Define engine state types (AC: 2, 3)
-  - [ ] Export `interface EngineState` with canonical shape:
+- [x] Define engine state types (AC: 2, 3)
+  - [x] Export `interface EngineState` with canonical shape:
     ```typescript
     interface EngineState {
       storyId: string
@@ -63,11 +63,11 @@ so that every subsequent engine implementation story works against a single, aut
       isComplete: boolean
     }
     ```
-  - [ ] Export `interface SaveState`: `{ storyId: string; version: number; savedAt: number; engineState: EngineState }`
+  - [x] Export `interface SaveState`: `{ storyId: string; version: number; savedAt: number; engineState: EngineState }`
 
-- [ ] Verify type correctness (AC: 7)
-  - [ ] Run `npx tsc --noEmit` — confirm zero type errors
-  - [ ] Verify no imports exist in `engine/types.ts` from `components/`, `hooks/`, `app/`, or `lib/`
+- [x] Verify type correctness (AC: 7)
+  - [x] Run `npx tsc --noEmit` — confirm zero type errors
+  - [x] Verify no imports exist in `engine/types.ts` from `components/`, `hooks/`, `app/`, or `lib/`
 
 ## Dev Notes
 
@@ -102,6 +102,18 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None.
+
 ### Completion Notes List
 
+- All 15 type exports implemented: StoryConfig, StoryMeta, StatDefinition, GaugeDefinition, ActDefinition, DecayRule, Paragraph, Choice, WeightedOutcome, GaugeEffect, EndStateTier, ExampleProfile, EngineState, SaveState, StoryValidationError, EngineError
+- EngineState matches canonical shape exactly per architecture spec
+- SaveState wraps EngineState with storyId, version, savedAt
+- GaugeDefinition includes optional gameOverThreshold/gameOverCondition pair
+- All boolean flags use is/has prefix convention
+- Zero imports — pure type definition file
+- `npx tsc --noEmit` passes clean
+
 ### File List
+
+- `engine/types.ts` — new, all shared TypeScript interfaces and error classes

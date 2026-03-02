@@ -1,6 +1,6 @@
 # Story 3.6: End Screen & Replay Flow
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -17,55 +17,55 @@ so that reaching a Game Over or story completion feels like a complete experienc
 
 ## Tasks / Subtasks
 
-- [ ] Create `components/EndScreen.tsx` (AC: 1–4)
-  - [ ] `"use client"` directive
-  - [ ] Props: `{ engineState: EngineState; config: StoryConfig; onReplay: () => void }`
+- [x] Create `components/EndScreen.tsx` (AC: 1–4)
+  - [x] `"use client"` directive
+  - [x] Props: `{ engineState: EngineState; config: StoryConfig; onReplay: () => void }`
 
-- [ ] Handle Game Over rendering (AC: 1)
-  - [ ] If `engineState.isGameOver === true`:
+- [x] Handle Game Over rendering (AC: 1)
+  - [x] If `engineState.isGameOver === true`:
     - Look up paragraph: `const paragraph = config.paragraphs[engineState.gameOverParagraphId!]`
     - Render paragraph content as prose (using `ParagraphDisplay` or the same Lora prose styles)
     - Show Kiff score: `const kiffGauge = config.gauges.find(g => g.isScore); const kiffValue = engineState.gauges[kiffGauge!.id]`
     - Display: e.g. "Kiff: {kiffValue}" or render the score gauge as a fill bar with its value revealed
-  - [ ] Use `ParagraphDisplay` component for prose rendering consistency
+  - [x] Use `ParagraphDisplay` component for prose rendering consistency
 
-- [ ] Handle Story Complete rendering (AC: 2)
-  - [ ] If `engineState.isComplete === true`:
+- [x] Handle Story Complete rendering (AC: 2)
+  - [x] If `engineState.isComplete === true`:
     - Find matching tier: `const tier = config.endStateTiers.find(t => engineState.score >= t.minScore && engineState.score <= t.maxScore)`
     - Render `tier.text` as prose via `ParagraphDisplay`
     - Show Kiff score value (same pattern as Game Over above)
-  - [ ] Handle edge case: if no tier matches (score out of range), show a fallback message
+  - [x] Handle edge case: if no tier matches (score out of range), show a fallback message
 
-- [ ] Render score reveal (AC: 1, 2 — FR16)
-  - [ ] This is the FIRST time Kiff/score is shown to the player during the session
-  - [ ] Display clearly: score gauge name + value
-  - [ ] Style the score reveal prominently — use `--color-accent` for emphasis
-  - [ ] Consider showing as a fill bar (consistent with GaugeStrip aesthetic) plus the numeric value (this is the special score reveal moment)
+- [x] Render score reveal (AC: 1, 2 — FR16)
+  - [x] This is the FIRST time Kiff/score is shown to the player during the session
+  - [x] Display clearly: score gauge name + value
+  - [x] Style the score reveal prominently — use `--color-accent` for emphasis
+  - [x] Consider showing as a fill bar (consistent with GaugeStrip aesthetic) plus the numeric value (this is the special score reveal moment)
 
-- [ ] Render Replay CTA (AC: 3, 4)
-  - [ ] Single button: "Rejouer" or "Play Again"
-  - [ ] Full-width, min-height 44px, styled with `--color-accent` background
-  - [ ] `onClick={handleReplay}`
-  - [ ] `handleReplay`:
+- [x] Render Replay CTA (AC: 3, 4)
+  - [x] Single button: "Rejouer" or "Play Again"
+  - [x] Full-width, min-height 44px, styled with `--color-accent` background
+  - [x] `onClick={handleReplay}`
+  - [x] `handleReplay`:
     ```typescript
     const handleReplay = () => {
       onReplay()  // calls resetEngine() which: (1) persistence.clear(), (2) engine.reset()
       // navigation to ProfileCreation is handled by the parent (StoryReader/page.tsx)
     }
     ```
-  - [ ] After `onReplay()`: the engine state resets, `isGameOver` and `isComplete` become false, and the parent re-renders ProfileCreation
-  - [ ] Verify: navigation to ProfileCreation only after reset resolves (synchronous reset means this is immediate)
+  - [x] After `onReplay()`: the engine state resets, `isGameOver` and `isComplete` become false, and the parent re-renders ProfileCreation
+  - [x] Verify: navigation to ProfileCreation only after reset resolves (synchronous reset means this is immediate)
 
-- [ ] Wire EndScreen into StoryReader (AC: 3, 4)
-  - [ ] In `StoryReader.tsx`: when `isGameOver || isComplete`, render `<EndScreen>`
-  - [ ] Pass `onReplay={() => { resetEngine(); setPhase('profile') }}` or equivalent
-  - [ ] The reset sets engine state to fresh init → React re-renders → parent shows ProfileCreation
-  - [ ] If phase state is in `app/page.tsx`: emit an event/callback that resets phase to 'profile'
+- [x] Wire EndScreen into StoryReader (AC: 3, 4)
+  - [x] In `StoryReader.tsx`: when `isGameOver || isComplete`, render `<EndScreen>`
+  - [x] Pass `onReplay={() => { resetEngine(); setPhase('profile') }}` or equivalent
+  - [x] The reset sets engine state to fresh init → React re-renders → parent shows ProfileCreation
+  - [x] If phase state is in `app/page.tsx`: emit an event/callback that resets phase to 'profile'
 
-- [ ] Ensure no game chrome during EndScreen
-  - [ ] GaugeStrip: consider hiding or keeping visible during end screen (UX call — keep it if it shows the final state, but it's acceptable either way)
-  - [ ] ChoiceCards: must NOT render during Game Over or Complete state
-  - [ ] No navigation chrome — just the narrative outcome and the replay button
+- [x] Ensure no game chrome during EndScreen
+  - [x] GaugeStrip: consider hiding or keeping visible during end screen (UX call — keep it if it shows the final state, but it's acceptable either way)
+  - [x] ChoiceCards: must NOT render during Game Over or Complete state
+  - [x] No navigation chrome — just the narrative outcome and the replay button
 
 ## Dev Notes
 
@@ -101,9 +101,18 @@ Prerequisites:
 ### Agent Model Used
 
 claude-sonnet-4-6
+Code Review: claude-opus-4-6
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- EndScreen: renders Game Over paragraph content or completion tier text via ParagraphDisplay
+- Score reveal: shows Kiff gauge icon + numeric value with --color-accent styling
+- Replay CTA: calls onReplay → resetEngine() + themeManager.resetToDefaults() + setPhase('profile')
+- Reset order: persistence.clear() → engine.reset() → theme reset → navigate to ProfileCreation
+- Code review (2026-03-02): Fixed EndScreen content rendering, CSS variables. Added theme reset on replay.
+
 ### File List
+
+- `components/EndScreen.tsx` — game over / completion display with score reveal and replay

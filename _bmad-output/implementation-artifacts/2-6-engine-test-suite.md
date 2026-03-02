@@ -1,6 +1,6 @@
 # Story 2.6: Engine Test Suite
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -25,9 +25,9 @@ so that all gauge arithmetic, decay sequences, weighted outcome resolution, and 
 
 ## Tasks / Subtasks
 
-- [ ] Create test fixture `engine/__fixtures__/dub-camp-fixture.ts` (AC: 12)
-  - [ ] Export a minimal but representative `StoryConfig` fixture that mirrors Dub Camp mechanics
-  - [ ] Must include:
+- [x] Create test fixture `engine/__fixtures__/dub-camp-fixture.ts` (AC: 12)
+  - [x] Export a minimal but representative `StoryConfig` fixture that mirrors Dub Camp mechanics
+  - [x] Must include:
     - All 4 stats: `endurance`, `estomac`, `resistanceAlcool`, `resistanceFumette` (maxPerStat: 4)
     - All 5 gauges: `energie` (100), `alcool` (0), `fumette` (0), `nourriture` (50), `kiff` (0, isScore, isHidden)
     - Decay nodes: `['s20', 's40', 's50', 's60', 's70']` with correct decay amounts
@@ -35,71 +35,71 @@ so that all gauge arithmetic, decay sequences, weighted outcome resolution, and 
     - At least a sparse subset of paragraphs to test paths: s1, s10, s20, s40, s41, s50, s60, s70, sEVT1, s201, s202, s203, s204, and a completion paragraph
     - 4 act definitions with correct paragraphIds triggers and theme CSS overrides
     - End state tiers (4 tiers)
-  - [ ] Note: This fixture does NOT need full 53-paragraph fidelity — it needs enough to exercise all mechanics. The full JSON comes in Epic 4.
+  - [x] Note: This fixture does NOT need full 53-paragraph fidelity — it needs enough to exercise all mechanics. The full JSON comes in Epic 4.
 
-- [ ] Create `engine/storyEngine.test.ts` with test file structure (AC: 1)
-  - [ ] Import Vitest: `import { describe, it, expect, beforeEach, vi } from 'vitest'`
-  - [ ] Import engine and persistence modules
-  - [ ] Import `dubCampFixture` from the fixtures file
-  - [ ] Add `beforeEach` to reset engine state between tests
+- [x] Create `engine/storyEngine.test.ts` with test file structure (AC: 1)
+  - [x] Import Vitest: `import { describe, it, expect, beforeEach, vi } from 'vitest'`
+  - [x] Import engine and persistence modules
+  - [x] Import `dubCampFixture` from the fixtures file
+  - [x] Add `beforeEach` to reset engine state between tests
 
-- [ ] Gauge clamping tests (AC: 3)
-  - [ ] Test: applying a +1000 gauge effect results in gauge value === 100
-  - [ ] Test: applying a -1000 gauge effect results in gauge value === 0
-  - [ ] Test: applying +50 to a gauge at 80 results in 100, not 130
-  - [ ] Test: applying -50 to a gauge at 30 results in 0, not -20
+- [x] Gauge clamping tests (AC: 3)
+  - [x] Test: applying a +1000 gauge effect results in gauge value === 100
+  - [x] Test: applying a -1000 gauge effect results in gauge value === 0
+  - [x] Test: applying +50 to a gauge at 80 results in 100, not 130
+  - [x] Test: applying -50 to a gauge at 30 results in 0, not -20
 
-- [ ] Decay node tests (AC: 4, 5)
-  - [ ] Test: `applyDecay()` changes gauge values when current paragraphId is in `decayNodes`
-  - [ ] Test: calling `applyDecay()` when NOT at a decay node has no effect (or engine guards against it)
-  - [ ] Test: at §20 (decay node), a choice that reduces energie + then applyDecay fires — net result = choice effects + decay (choice first, then decay)
-  - [ ] Verify decay amount at §50 includes the universal `-10⚡` penalty
+- [x] Decay node tests (AC: 4, 5)
+  - [x] Test: `applyDecay()` changes gauge values when current paragraphId is in `decayNodes`
+  - [x] Test: calling `applyDecay()` when NOT at a decay node has no effect (or engine guards against it)
+  - [x] Test: at §20 (decay node), a choice that reduces energie + then applyDecay fires — net result = choice effects + decay (choice first, then decay)
+  - [x] Verify decay amount at §50 includes the universal `-10⚡` penalty
 
-- [ ] Nourriture decay formula tests (AC: 7)
-  - [ ] Test: with `estomac = 0`, Nourriture decay = 10 (max(3, 10-0) = 10)
-  - [ ] Test: with `estomac = 4`, Nourriture decay = 4 (max(3, 10-6) = max(3,4) = 4)
-  - [ ] Test: with `estomac = 6` (hypothetical), Nourriture decay = 3 (max(3, 10-9) = max(3,1) = 3 — floor at 3)
-  - [ ] Test: Nourriture cannot go below 0 even with max decay
+- [x] Nourriture decay formula tests (AC: 7)
+  - [x] Test: with `estomac = 0`, Nourriture decay = 10 (max(3, 10-0) = 10)
+  - [x] Test: with `estomac = 4`, Nourriture decay = 4 (max(3, 10-6) = max(3,4) = 4)
+  - [x] Test: with `estomac = 6` (hypothetical), Nourriture decay = 3 (max(3, 10-9) = max(3,1) = 3 — floor at 3)
+  - [x] Test: Nourriture cannot go below 0 even with max decay
 
-- [ ] Game Over path tests (AC: 2, 6)
-  - [ ] Test §201 trigger: set `alcool` gauge to > threshold (e.g., 86), call `resolveChoice` → `engineState.isGameOver === true`, `gameOverParagraphId === 's201'`
-  - [ ] Test §202 trigger: manipulate state to trigger "dans le gaz" condition (likely alcool + energie combination)
-  - [ ] Test §203 trigger: alcool high + nourriture low → game over
-  - [ ] Test §204 trigger: energie below threshold (exhaustion) → game over
-  - [ ] Test: Game Over is evaluated BEFORE act transition (create a scenario where act transition would fire and verify it doesn't when Game Over triggers first)
+- [x] Game Over path tests (AC: 2, 6)
+  - [x] Test §201 trigger: set `alcool` gauge to > threshold (e.g., 86), call `resolveChoice` → `engineState.isGameOver === true`, `gameOverParagraphId === 's201'`
+  - [x] Test §202 trigger: manipulate state to trigger "dans le gaz" condition (likely alcool + energie combination)
+  - [x] Test §203 trigger: alcool high + nourriture low → game over
+  - [x] Test §204 trigger: energie below threshold (exhaustion) → game over
+  - [x] Test: Game Over is evaluated BEFORE act transition (create a scenario where act transition would fire and verify it doesn't when Game Over triggers first)
 
-- [ ] Voluntary exit §41 test (AC: 8)
-  - [ ] Set up engine at §41 in Dub Camp (navigate there via choices in fixture)
-  - [ ] Resolve the voluntary exit choice → `kiff` gauge increases by 5
-  - [ ] Verify `isGameOver === false` (bypasses Game Over checks)
-  - [ ] Verify `isComplete === true` (or appropriate completion state)
+- [x] Voluntary exit §41 test (AC: 8)
+  - [x] Set up engine at §41 in Dub Camp (navigate there via choices in fixture)
+  - [x] Resolve the voluntary exit choice → `kiff` gauge increases by 5
+  - [x] Verify `isGameOver === false` (bypasses Game Over checks)
+  - [x] Verify `isComplete === true` (or appropriate completion state)
 
-- [ ] §EVT1 probabilistic event test (AC: 9)
-  - [ ] Use `vi.spyOn(Math, 'random')` to mock the random value
-  - [ ] Set `Math.random` to return 0.1 (< 1/3) → §EVT1 fires (good path)
-  - [ ] Set `Math.random` to return 0.9 (> 1/3) → §EVT1 does not fire (no-op or normal path)
-  - [ ] Restore mock after test
+- [x] §EVT1 probabilistic event test (AC: 9)
+  - [x] Use `vi.spyOn(Math, 'random')` to mock the random value
+  - [x] Set `Math.random` to return 0.1 (< 1/3) → §EVT1 fires (good path)
+  - [x] Set `Math.random` to return 0.9 (> 1/3) → §EVT1 does not fire (no-op or normal path)
+  - [x] Restore mock after test
 
-- [ ] State serialization round-trip test (AC: 10)
-  - [ ] Create engine, navigate to a mid-story paragraph with modified gauge state
-  - [ ] Call `engine.serialize()` → get `SaveState`
-  - [ ] Create a mock localStorage and call `persistence.save(engineState, storyId)`
-  - [ ] Call `persistence.load()` → verify returns the same `SaveState`
-  - [ ] Create new engine from config + loaded save → verify `getState()` matches original
-  - [ ] Specifically check: paragraphId, all gauge values, stats, act, inventory, score
+- [x] State serialization round-trip test (AC: 10)
+  - [x] Create engine, navigate to a mid-story paragraph with modified gauge state
+  - [x] Call `engine.serialize()` → get `SaveState`
+  - [x] Create a mock localStorage and call `persistence.save(engineState, storyId)`
+  - [x] Call `persistence.load()` → verify returns the same `SaveState`
+  - [x] Create new engine from config + loaded save → verify `getState()` matches original
+  - [x] Specifically check: paragraphId, all gauge values, stats, act, inventory, score
 
-- [ ] Corrupt save tests (AC: 11)
-  - [ ] Test: `persistence.load()` returns `null` when localStorage has invalid JSON
-  - [ ] Test: `persistence.load()` returns `null` when save has `version: 2` (mismatch)
-  - [ ] Test: `persistence.load()` returns `null` when `engineState.paragraphId` doesn't exist in config
-  - [ ] Test: `persistence.load()` returns `null` when required `EngineState` field is missing
-  - [ ] Test: `persistence.load()` returns `null` when localStorage key doesn't exist
+- [x] Corrupt save tests (AC: 11)
+  - [x] Test: `persistence.load()` returns `null` when localStorage has invalid JSON
+  - [x] Test: `persistence.load()` returns `null` when save has `version: 2` (mismatch)
+  - [x] Test: `persistence.load()` returns `null` when `engineState.paragraphId` doesn't exist in config
+  - [x] Test: `persistence.load()` returns `null` when required `EngineState` field is missing
+  - [x] Test: `persistence.load()` returns `null` when localStorage key doesn't exist
 
-- [ ] Weighted outcome mock tests
-  - [ ] Mock `Math.random()` to return < threshold → good outcome (goodEffects applied)
-  - [ ] Mock `Math.random()` to return > threshold → bad outcome (badEffects applied)
-  - [ ] Verify correct effects applied in each case
-  - [ ] Verify that neither probability values nor risk scores are accessible from outside the module
+- [x] Weighted outcome mock tests
+  - [x] Mock `Math.random()` to return < threshold → good outcome (goodEffects applied)
+  - [x] Mock `Math.random()` to return > threshold → bad outcome (badEffects applied)
+  - [x] Verify correct effects applied in each case
+  - [x] Verify that neither probability values nor risk scores are accessible from outside the module
 
 ## Dev Notes
 
@@ -156,6 +156,24 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None — 56 tests pass on first run.
+
 ### Completion Notes List
 
+- 56 tests across 7 `describe` blocks: Gauge System, Weighted Outcome Resolution, Core Story Engine, Persistence, EVT1 probabilistic event
+- All 4 Game Over paths tested: §201 (alcool >= 85), §202 (fumette >= 85), §203 (nourriture <= 5), §204 (energie <= 0)
+- Game Over before act transition verified with dedicated test
+- Gauge clamping: +1000, -1000, boundary overflow/underflow all tested
+- Nourriture decay formula verified at estomac=0 (decay 10), estomac=4 (decay 4), estomac=6 (decay 3 floor)
+- Passive energy risk: `Math.random` mocked for both branches (< 0.06 and >= 0.06)
+- Weighted outcome: good/bad paths, hunger modifier, missing gauge/stat edge cases
+- §41 voluntary exit: kiff +5, isComplete=true, isGameOver=false
+- State serialization round-trip: serialize → save → load → createEngine matches original state
+- Corrupt save handling: invalid JSON, wrong version, missing key, missing fields all return null
+- localStorage mocked with in-memory implementation (no external dependency)
+- `dubCampFixture`: 14 paragraphs, 4 acts, 5 gauges, 4 stats, 2 decay rules, 4 end state tiers
+
 ### File List
+
+- `engine/storyEngine.test.ts` — new, 56 Vitest tests covering all engine mechanics
+- `engine/__fixtures__/dub-camp-fixture.ts` — new, minimal Dub Camp story config for testing

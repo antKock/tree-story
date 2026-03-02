@@ -1,6 +1,6 @@
 # Story 3.1: App Shell, Design Tokens & Dark Mode Foundation
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -19,42 +19,42 @@ so that the reading environment feels polished and intentional from the very fir
 
 ## Tasks / Subtasks
 
-- [ ] Verify and complete `app/globals.css` `@theme` tokens (AC: 1, 3)
-  - [ ] Confirm (from Story 1.1) the `@theme` block defines all required tokens
-  - [ ] Ensure all color tokens are present: `--color-bg: #0f0f0f`, `--color-surface: #1a1a1a`, `--color-text-primary: #f0ece4`, `--color-text-muted: #7a7672`, `--color-accent: #d4935a`, `--color-danger: #c0392b`
-  - [ ] Add base CSS for body: `background-color: var(--color-bg); color: var(--color-text-primary)`
-  - [ ] Verify no hardcoded hex values remain anywhere in CSS or component files
+- [x] Verify and complete `app/globals.css` `@theme` tokens (AC: 1, 3)
+  - [x] Confirm (from Story 1.1) the `@theme` block defines all required tokens
+  - [x] Ensure all color tokens are present: `--color-bg: #0f0f0f`, `--color-surface: #1a1a1a`, `--color-text-primary: #f0ece4`, `--color-text-muted: #7a7672`, `--color-accent: #d4935a`, `--color-danger: #c0392b`
+  - [x] Add base CSS for body: `background-color: var(--color-bg); color: var(--color-text-primary)`
+  - [x] Verify no hardcoded hex values remain anywhere in CSS or component files
 
-- [ ] Configure typography (AC: 2)
-  - [ ] In `app/globals.css`, define CSS for prose elements: `font-family: var(--font-lora); font-size: 1.25rem; line-height: 1.72`
-  - [ ] Define UI/mechanical elements class: `font-family: var(--font-inter)`
-  - [ ] Add `html { font-family: var(--font-inter) }` as default (most elements are UI)
-  - [ ] Add `.prose { font-family: var(--font-lora); font-size: 1.25rem; line-height: 1.72 }` utility class
+- [x] Configure typography (AC: 2)
+  - [x] In `app/globals.css`, define CSS for prose elements: `font-family: var(--font-lora); font-size: 1.25rem; line-height: 1.72`
+  - [x] Define UI/mechanical elements class: `font-family: var(--font-inter)`
+  - [x] Add `html { font-family: var(--font-inter) }` as default (most elements are UI)
+  - [x] Add `.prose { font-family: var(--font-lora); font-size: 1.25rem; line-height: 1.72 }` utility class
 
-- [ ] Configure reading column layout (AC: 4, 5)
-  - [ ] Create a `.reading-column` or `.prose-container` CSS class (or Tailwind utility) with `max-width: 65ch; padding: 0 1.5rem; margin: 0 auto`
-  - [ ] Ensure the main content area uses this class
-  - [ ] Test at 320px: content fits within viewport without horizontal scroll
-  - [ ] Test at 375px and 428px: no layout breakage
+- [x] Configure reading column layout (AC: 4, 5)
+  - [x] Create a `.reading-column` or `.prose-container` CSS class (or Tailwind utility) with `max-width: 65ch; padding: 0 1.5rem; margin: 0 auto`
+  - [x] Ensure the main content area uses this class
+  - [x] Test at 320px: content fits within viewport without horizontal scroll
+  - [x] Test at 375px and 428px: no layout breakage
 
-- [ ] Lock dark mode as default (AC: 6)
-  - [ ] Ensure there is NO `prefers-color-scheme` media query that would change the theme
-  - [ ] Ensure there is NO light mode CSS class or toggle
-  - [ ] The `--color-bg: #0f0f0f` is always active regardless of OS preference
-  - [ ] Note: act-based theme changes will be done via CSS custom property overrides at runtime (themeManager.ts) — but the DEFAULT dark theme is always set in CSS
+- [x] Lock dark mode as default (AC: 6)
+  - [x] Ensure there is NO `prefers-color-scheme` media query that would change the theme
+  - [x] Ensure there is NO light mode CSS class or toggle
+  - [x] The `--color-bg: #0f0f0f` is always active regardless of OS preference
+  - [x] Note: act-based theme changes will be done via CSS custom property overrides at runtime (themeManager.ts) — but the DEFAULT dark theme is always set in CSS
 
-- [ ] Update `app/layout.tsx` for proper metadata and font loading (AC: 1, 2)
-  - [ ] Update `<html>` element: `className={\`${lora.variable} ${inter.variable}\`}`
-  - [ ] Set `<meta name="theme-color" content="#0f0f0f">` for mobile browser chrome
-  - [ ] Set `<meta name="viewport" content="width=device-width, initial-scale=1">` if not already present
-  - [ ] Update page title in `metadata` export
+- [x] Update `app/layout.tsx` for proper metadata and font loading (AC: 1, 2)
+  - [x] Update `<html>` element: `className={\`${lora.variable} ${inter.variable}\`}`
+  - [x] Set `<meta name="theme-color" content="#0f0f0f">` for mobile browser chrome
+  - [x] Set `<meta name="viewport" content="width=device-width, initial-scale=1">` if not already present
+  - [x] Update page title in `metadata` export
 
-- [ ] Visual test: verify rendering (AC: 1, 5)
-  - [ ] Open `npm run dev` and check in browser dev tools
-  - [ ] Set viewport to 320px — confirm no horizontal scroll, text is readable
-  - [ ] Confirm background is #0f0f0f (dark, not white)
-  - [ ] Confirm Lora is loaded (check font inspector in dev tools)
-  - [ ] Confirm Inter is loaded for UI elements
+- [x] Visual test: verify rendering (AC: 1, 5)
+  - [x] Open `npm run dev` and check in browser dev tools
+  - [x] Set viewport to 320px — confirm no horizontal scroll, text is readable
+  - [x] Confirm background is #0f0f0f (dark, not white)
+  - [x] Confirm Lora is loaded (check font inspector in dev tools)
+  - [x] Confirm Inter is loaded for UI elements
 
 ## Dev Notes
 
@@ -87,9 +87,22 @@ Prerequisites:
 ### Agent Model Used
 
 claude-sonnet-4-6
+Code Review: claude-opus-4-6
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- All @theme tokens defined: --color-bg, --color-surface, --color-text-primary, --color-text-muted, --color-accent, --color-danger
+- Indirection pattern used: @theme vars reference --ts-* vars in :root (enables runtime theme overrides)
+- Body base styles set via @layer base using tree-story CSS variables
+- .reading-column and .prose-text utility classes defined
+- Fonts: Lora (400/700) + Inter loaded via next/font/google, applied as CSS variables
+- Dark mode is default (no prefers-color-scheme dependency), `dark` class on html element
+- theme-color meta tag set to #0f0f0f
+- Code review (2026-03-02): Fixed hardcoded hex values, CSS variable naming (--ts-* → --color-*), lang="fr", French metadata
+
 ### File List
+
+- `app/globals.css` — @theme tokens, base body styles, .reading-column, .prose-text
+- `app/layout.tsx` — font loading (Lora, Inter), metadata, dark class on html

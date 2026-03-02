@@ -1,6 +1,6 @@
 # Story 3.2: Character Profile Creation Screen
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -21,47 +21,47 @@ so that my character feels like mine and I understand (without instructions) how
 
 ## Tasks / Subtasks
 
-- [ ] Create `components/ProfileCreation.tsx` (AC: 1–8)
-  - [ ] Mark with `"use client"` (interactive component)
-  - [ ] Props: `{ config: StoryConfig; onStart: (stats: Record<string, number>) => void }`
-  - [ ] Initialize local state: `const [allocation, setAllocation] = useState<Record<string, number>>(() => Object.fromEntries(config.stats.map(s => [s.id, 0])))`
-  - [ ] Compute: `const remaining = config.statPointBudget - Object.values(allocation).reduce((sum, v) => sum + v, 0)`
-  - [ ] Compute: `const canStart = remaining === 0`
+- [x] Create `components/ProfileCreation.tsx` (AC: 1–8)
+  - [x] Mark with `"use client"` (interactive component)
+  - [x] Props: `{ config: StoryConfig; onStart: (stats: Record<string, number>) => void }`
+  - [x] Initialize local state: `const [allocation, setAllocation] = useState<Record<string, number>>(() => Object.fromEntries(config.stats.map(s => [s.id, 0])))`
+  - [x] Compute: `const remaining = config.statPointBudget - Object.values(allocation).reduce((sum, v) => sum + v, 0)`
+  - [x] Compute: `const canStart = remaining === 0`
 
-- [ ] Render stat list (AC: 1, 3, 7)
-  - [ ] Map over `config.stats` to render each stat row
-  - [ ] Each row shows: stat `name` (from `StatDefinition.name`), current allocation value, `−` button, `+` button
-  - [ ] `−` button: disabled when `allocation[stat.id] <= 0`
-  - [ ] `+` button: disabled when `allocation[stat.id] >= stat.maxPerStat` OR when `remaining <= 0`
-  - [ ] Each button minimum height: 44px (use `min-h-[44px]` or equivalent CSS)
-  - [ ] Increment: `setAllocation(prev => ({ ...prev, [stat.id]: prev[stat.id] + 1 }))`
-  - [ ] Decrement: `setAllocation(prev => ({ ...prev, [stat.id]: prev[stat.id] - 1 }))`
+- [x] Render stat list (AC: 1, 3, 7)
+  - [x] Map over `config.stats` to render each stat row
+  - [x] Each row shows: stat `name` (from `StatDefinition.name`), current allocation value, `−` button, `+` button
+  - [x] `−` button: disabled when `allocation[stat.id] <= 0`
+  - [x] `+` button: disabled when `allocation[stat.id] >= stat.maxPerStat` OR when `remaining <= 0`
+  - [x] Each button minimum height: 44px (use `min-h-[44px]` or equivalent CSS)
+  - [x] Increment: `setAllocation(prev => ({ ...prev, [stat.id]: prev[stat.id] + 1 }))`
+  - [x] Decrement: `setAllocation(prev => ({ ...prev, [stat.id]: prev[stat.id] - 1 }))`
 
-- [ ] Render point budget counter (AC: 2)
-  - [ ] Display: `Points remaining: {remaining}` or similar
-  - [ ] Style remaining in `--color-accent` when > 0, `--color-text-muted` (or success color) when = 0
+- [x] Render point budget counter (AC: 2)
+  - [x] Display: `Points remaining: {remaining}` or similar
+  - [x] Style remaining in `--color-accent` when > 0, `--color-text-muted` (or success color) when = 0
 
-- [ ] Render example profiles (AC: 5)
-  - [ ] Map over `config.meta.exampleProfiles`
-  - [ ] Display each profile: `name`, `description`, and stat values
-  - [ ] Make profiles tappable: tapping a profile sets `allocation` to the profile's `stats` values
-  - [ ] Example profiles for Dub Camp: "Le Bastien" (4/0/2/2), "Le Brian" (1/1/3/3), "L'équilibré" (2/2/2/2)
+- [x] Render example profiles (AC: 5)
+  - [x] Map over `config.meta.exampleProfiles`
+  - [x] Display each profile: `name`, `description`, and stat values
+  - [x] Make profiles tappable: tapping a profile sets `allocation` to the profile's `stats` values
+  - [x] Example profiles for Dub Camp: "Le Bastien" (4/0/2/2), "Le Brian" (1/1/3/3), "L'équilibré" (2/2/2/2)
 
-- [ ] Render Start button (AC: 4, 6)
-  - [ ] Disabled when `remaining !== 0`
-  - [ ] Enabled (and styled with `--color-accent`) when `remaining === 0`
-  - [ ] On tap: call `props.onStart(allocation)`
-  - [ ] Minimum height: 44px
+- [x] Render Start button (AC: 4, 6)
+  - [x] Disabled when `remaining !== 0`
+  - [x] Enabled (and styled with `--color-accent`) when `remaining === 0`
+  - [x] On tap: call `props.onStart(allocation)`
+  - [x] Minimum height: 44px
 
-- [ ] Apply typography (AC: 8)
-  - [ ] All text on this screen uses Inter (mechanical/UI context)
-  - [ ] No Lora on this screen — it's stat allocation, not prose reading
+- [x] Apply typography (AC: 8)
+  - [x] All text on this screen uses Inter (mechanical/UI context)
+  - [x] No Lora on this screen — it's stat allocation, not prose reading
 
-- [ ] Wire ProfileCreation into app flow
-  - [ ] In `app/page.tsx` (or a new route): render `<ProfileCreation config={storyConfig} onStart={handleStart} />`
-  - [ ] `handleStart(stats)` → call `setStats(stats)` from `useStoryEngine` hook → navigate to StoryReader
-  - [ ] Since `useStoryEngine` is in `StoryReader.tsx` (the sole hook consumer), pass `onStart` as a callback that navigates to a "story" view
-  - [ ] Consider: use local `useState` in `app/page.tsx` or a shared parent to toggle between `ProfileCreation` and `StoryReader` views. Simple boolean state: `const [phase, setPhase] = useState<'profile' | 'story'>('profile')`
+- [x] Wire ProfileCreation into app flow
+  - [x] In `app/page.tsx` (or a new route): render `<ProfileCreation config={storyConfig} onStart={handleStart} />`
+  - [x] `handleStart(stats)` → call `setStats(stats)` from `useStoryEngine` hook → navigate to StoryReader
+  - [x] Since `useStoryEngine` is in `StoryReader.tsx` (the sole hook consumer), pass `onStart` as a callback that navigates to a "story" view
+  - [x] Consider: use local `useState` in `app/page.tsx` or a shared parent to toggle between `ProfileCreation` and `StoryReader` views. Simple boolean state: `const [phase, setPhase] = useState<'profile' | 'story'>('profile')`
 
 ## Dev Notes
 
@@ -98,9 +98,22 @@ Prerequisites:
 ### Agent Model Used
 
 claude-sonnet-4-6
+Code Review: claude-opus-4-6
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- ProfileCreation.tsx: renders stats from config.stats, point budget from config.statPointBudget
+- +/- buttons with 44px touch targets, disabled at 0/maxPerStat boundaries
+- Example profiles from config.meta.exampleProfiles, tappable to apply allocation
+- Start button enabled only when remaining === 0
+- All Inter typography (no Lora on profile screen)
+- GameShell.tsx: manages profile → story phase transitions, theme reset on replay
+- Code review (2026-03-02): Fixed hardcoded hex values, CSS variables. Code review (2026-03-02): Added theme reset on replay flow.
+
 ### File List
+
+- `components/ProfileCreation.tsx` — stat point distribution UI
+- `components/GameShell.tsx` — phase management (profile → story)
+- `app/page.tsx` — renders GameShell with validated config

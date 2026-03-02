@@ -1,6 +1,6 @@
 # Story 2.3: Weighted Outcome Resolution
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -19,37 +19,37 @@ so that tension moments produce a good or bad result with probabilities that cor
 
 ## Tasks / Subtasks
 
-- [ ] Create `engine/weightedOutcome.ts` (AC: 6)
-  - [ ] Import from `engine/types.ts` only
-  - [ ] Zero imports from `components/`, `hooks/`, or `app/`
+- [x] Create `engine/weightedOutcome.ts` (AC: 6)
+  - [x] Import from `engine/types.ts` only
+  - [x] Zero imports from `components/`, `hooks/`, or `app/`
 
-- [ ] Implement `resolveOutcome` (AC: 1–5)
-  - [ ] Signature: `resolveOutcome(outcome: WeightedOutcome, gauges: Record<string, number>, stats: Record<string, number>, config: StoryConfig): 'good' | 'bad'`
-  - [ ] Extract `gaugeLevel = gauges[outcome.gaugeId]`
-  - [ ] Extract `statValue = stats[outcome.statId]`
-  - [ ] Compute hunger modifier:
+- [x] Implement `resolveOutcome` (AC: 1–5)
+  - [x] Signature: `resolveOutcome(outcome: WeightedOutcome, gauges: Record<string, number>, stats: Record<string, number>, config: StoryConfig): 'good' | 'bad'`
+  - [x] Extract `gaugeLevel = gauges[outcome.gaugeId]`
+  - [x] Extract `statValue = stats[outcome.statId]`
+  - [x] Compute hunger modifier:
     ```typescript
     const nourriture = gauges['nourriture'] ?? 50
     const hungerModifier = nourriture > 50 ? 0 : nourriture >= 25 ? 10 : 25
     ```
-  - [ ] Compute risk: `const risk = gaugeLevel - (statValue * 15) + hungerModifier`
-  - [ ] Map risk to good probability:
+  - [x] Compute risk: `const risk = gaugeLevel - (statValue * 15) + hungerModifier`
+  - [x] Map risk to good probability:
     ```typescript
     const goodProbability = risk < 30 ? 0.9 : risk <= 55 ? 0.6 : risk <= 75 ? 0.4 : 0.2
     ```
-  - [ ] Call `Math.random()` exactly once: `const roll = Math.random()`
-  - [ ] Return: `roll < goodProbability ? 'good' : 'bad'`
-  - [ ] Return type is `'good' | 'bad'` — never expose `risk`, `goodProbability`, or `roll`
+  - [x] Call `Math.random()` exactly once: `const roll = Math.random()`
+  - [x] Return: `roll < goodProbability ? 'good' : 'bad'`
+  - [x] Return type is `'good' | 'bad'` — never expose `risk`, `goodProbability`, or `roll`
 
-- [ ] Apply good/bad effects to gauges (AC: 1)
-  - [ ] Note: `resolveOutcome` returns a string decision — the CALLER (`storyEngine.ts`) applies the effects using `gaugeSystem.applyGaugeEffects()`
-  - [ ] This function's sole responsibility is the probability resolution — not effect application
-  - [ ] Confirm: `outcome.goodEffects` and `outcome.badEffects` are arrays of `GaugeEffect` — applied by storyEngine
+- [x] Apply good/bad effects to gauges (AC: 1)
+  - [x] Note: `resolveOutcome` returns a string decision — the CALLER (`storyEngine.ts`) applies the effects using `gaugeSystem.applyGaugeEffects()`
+  - [x] This function's sole responsibility is the probability resolution — not effect application
+  - [x] Confirm: `outcome.goodEffects` and `outcome.badEffects` are arrays of `GaugeEffect` — applied by storyEngine
 
-- [ ] Handle edge cases
-  - [ ] If `outcome.gaugeId` not found in `gauges`: treat as `gaugeLevel = 0` (worst case risk calculation)
-  - [ ] If `outcome.statId` not found in `stats`: treat as `statValue = 0` (no stat benefit)
-  - [ ] Risk can be negative (high stat value, low gauge) — this is fine, it maps to 90% (< 30 branch)
+- [x] Handle edge cases
+  - [x] If `outcome.gaugeId` not found in `gauges`: treat as `gaugeLevel = 0` (worst case risk calculation)
+  - [x] If `outcome.statId` not found in `stats`: treat as `statValue = 0` (no stat benefit)
+  - [x] Risk can be negative (high stat value, low gauge) — this is fine, it maps to 90% (< 30 branch)
 
 ## Dev Notes
 
@@ -82,6 +82,17 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None — clean implementation.
+
 ### Completion Notes List
 
+- `resolveOutcome` implements the full risk formula: `Risk = gaugeLevel - (statValue * 15) + hungerModifier`
+- Hunger modifier: `+0` (nourriture > 50), `+10` (25–50), `+25` (< 25)
+- Risk-to-probability mapping: `< 30 → 90%`, `30–55 → 60%`, `55–75 → 40%`, `> 75 → 20%`
+- `Math.random()` called exactly once per invocation
+- No probability values, risk scores, or random numbers exposed outside the module
+- Missing gauge/stat IDs default to 0 gracefully (no throws)
+
 ### File List
+
+- `engine/weightedOutcome.ts` — new, `resolveOutcome` function

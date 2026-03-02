@@ -1,6 +1,6 @@
 # Story 3.5: Character Sheet & Inventory
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -20,47 +20,47 @@ so that I can check where I stand without being pulled out of the reading experi
 
 ## Tasks / Subtasks
 
-- [ ] Install shadcn Sheet component (prerequisite — from Story 1.1 init)
-  - [ ] Run `npx shadcn@latest add sheet` if not already added
-  - [ ] Verify `components/ui/sheet.tsx` is created by shadcn
-  - [ ] Note: shadcn installs into `components/ui/` by default
+- [x] Install shadcn Sheet component (prerequisite — from Story 1.1 init)
+  - [x] Run `npx shadcn@latest add sheet` if not already added
+  - [x] Verify `components/ui/sheet.tsx` is created by shadcn
+  - [x] Note: shadcn installs into `components/ui/` by default
 
-- [ ] Create `components/CharacterSheet.tsx` (AC: 1–6)
-  - [ ] `"use client"` directive
-  - [ ] Props: `{ open: boolean; onClose: () => void; engineState: EngineState; config: StoryConfig }`
-  - [ ] Use shadcn `<Sheet>`, `<SheetContent>`, `<SheetHeader>`, `<SheetTitle>` components
-  - [ ] `<Sheet open={open} onOpenChange={(o) => !o && onClose()}>`
-  - [ ] SheetContent side: `side="bottom"` for a slide-up overlay on mobile
+- [x] Create `components/CharacterSheet.tsx` (AC: 1–6)
+  - [x] `"use client"` directive
+  - [x] Props: `{ open: boolean; onClose: () => void; engineState: EngineState; config: StoryConfig }`
+  - [x] Use shadcn `<Sheet>`, `<SheetContent>`, `<SheetHeader>`, `<SheetTitle>` components
+  - [x] `<Sheet open={open} onOpenChange={(o) => !o && onClose()}>`
+  - [x] SheetContent side: `side="bottom"` for a slide-up overlay on mobile
 
-- [ ] Render ALL gauges including Kiff (AC: 2)
-  - [ ] Map over ALL `config.gauges` (no `isHidden` filter — show everything in character sheet)
-  - [ ] For each gauge: render name, emoji icon, and fill bar
-  - [ ] Fill bar: same style as GaugeStrip bars (7px height, 4px border-radius, `--color-accent` fill)
-  - [ ] No numeric values — just the fill bar percentage
-  - [ ] Kiff (score gauge): render with `GaugeDefinition.name` — but note it's hidden from GaugeStrip, shown here
+- [x] Render ALL gauges including Kiff (AC: 2)
+  - [x] Map over ALL `config.gauges` (no `isHidden` filter — show everything in character sheet)
+  - [x] For each gauge: render name, emoji icon, and fill bar
+  - [x] Fill bar: same style as GaugeStrip bars (7px height, 4px border-radius, `--color-accent` fill)
+  - [x] No numeric values — just the fill bar percentage
+  - [x] Kiff (score gauge): render with `GaugeDefinition.name` — but note it's hidden from GaugeStrip, shown here
 
-- [ ] Render player stats (AC: 3)
-  - [ ] Map over `config.stats`
-  - [ ] Display: `{stat.name}: {engineState.stats[stat.id]}` (e.g., "Endurance: 3")
-  - [ ] Use Inter typography (mechanical/UI context)
-  - [ ] Style with `--color-text-muted` for label, `--color-text-primary` for value
+- [x] Render player stats (AC: 3)
+  - [x] Map over `config.stats`
+  - [x] Display: `{stat.name}: {engineState.stats[stat.id]}` (e.g., "Endurance: 3")
+  - [x] Use Inter typography (mechanical/UI context)
+  - [x] Style with `--color-text-muted` for label, `--color-text-primary` for value
 
-- [ ] Render inventory (AC: 4)
-  - [ ] Display `engineState.inventory` as a list of item name strings
-  - [ ] If `inventory.length === 0`: show neutral message (e.g., "No items" or "Empty pockets")
-  - [ ] List items with a simple bullet or card layout
-  - [ ] Inter typography
+- [x] Render inventory (AC: 4)
+  - [x] Display `engineState.inventory` as a list of item name strings
+  - [x] If `inventory.length === 0`: show neutral message (e.g., "No items" or "Empty pockets")
+  - [x] List items with a simple bullet or card layout
+  - [x] Inter typography
 
-- [ ] Handle open/close without state changes (AC: 6)
-  - [ ] Verify: opening CharacterSheet does NOT call any engine methods
-  - [ ] Verify: closing CharacterSheet does NOT call any engine methods
-  - [ ] The `open` state is managed in `StoryReader` — CharacterSheet receives it as prop and calls `onClose()` to signal close intent
+- [x] Handle open/close without state changes (AC: 6)
+  - [x] Verify: opening CharacterSheet does NOT call any engine methods
+  - [x] Verify: closing CharacterSheet does NOT call any engine methods
+  - [x] The `open` state is managed in `StoryReader` — CharacterSheet receives it as prop and calls `onClose()` to signal close intent
 
-- [ ] Ensure trigger is GaugeStrip only (AC: 7)
-  - [ ] CharacterSheet has no self-open button
-  - [ ] It only opens when `open === true` is passed from `StoryReader`
-  - [ ] `StoryReader` sets `open = true` only from `GaugeStrip`'s `onOpenCharacterSheet` callback
-  - [ ] Verify there are no other places in the codebase that set `charSheetOpen = true`
+- [x] Ensure trigger is GaugeStrip only (AC: 7)
+  - [x] CharacterSheet has no self-open button
+  - [x] It only opens when `open === true` is passed from `StoryReader`
+  - [x] `StoryReader` sets `open = true` only from `GaugeStrip`'s `onOpenCharacterSheet` callback
+  - [x] Verify there are no other places in the codebase that set `charSheetOpen = true`
 
 ## Dev Notes
 
@@ -93,9 +93,20 @@ Prerequisites:
 ### Agent Model Used
 
 claude-sonnet-4-6
+Code Review: claude-opus-4-6
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- CharacterSheet: shadcn Sheet overlay, side="bottom" for mobile slide-up
+- Shows ALL gauges (no isHidden filter) including Kiff score gauge
+- Stats displayed with Inter typography, inventory with empty-state message
+- Open/close triggers no engine state changes or localStorage writes
+- Triggered exclusively from GaugeStrip tap (no other trigger points)
+- Code review (2026-03-02): Fixed CSS variable naming
+
 ### File List
+
+- `components/CharacterSheet.tsx` — shadcn Sheet overlay with gauges, stats, inventory
+- `components/ui/sheet.tsx` — shadcn Sheet component (auto-generated)

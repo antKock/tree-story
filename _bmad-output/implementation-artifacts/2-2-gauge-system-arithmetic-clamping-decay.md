@@ -1,6 +1,6 @@
 # Story 2.2: Gauge System — Arithmetic, Clamping & Decay
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -16,42 +16,42 @@ so that gauge values always stay within [0, 100] and decay fires correctly at st
 
 ## Tasks / Subtasks
 
-- [ ] Create `lib/utils.ts` with `clamp()` utility (AC: 3)
-  - [ ] Export `function clamp(value: number, min: number, max: number): number`
-  - [ ] Implementation: `Math.min(max, Math.max(min, value))`
-  - [ ] This is the single place where gauge bounds are enforced — all gauge arithmetic goes through this
+- [x] Create `lib/utils.ts` with `clamp()` utility (AC: 3)
+  - [x] Export `function clamp(value: number, min: number, max: number): number`
+  - [x] Implementation: `Math.min(max, Math.max(min, value))`
+  - [x] This is the single place where gauge bounds are enforced — all gauge arithmetic goes through this
 
-- [ ] Create `engine/gaugeSystem.ts` (AC: 1, 2)
-  - [ ] Import from `engine/types.ts` and `lib/utils.ts` only
-  - [ ] Zero imports from `components/`, `hooks/`, or `app/`
+- [x] Create `engine/gaugeSystem.ts` (AC: 1, 2)
+  - [x] Import from `engine/types.ts` only (clamp defined locally to respect engine isolation)
+  - [x] Zero imports from `components/`, `hooks/`, or `app/`
 
-- [ ] Implement `applyGaugeEffects` (AC: 1)
-  - [ ] Signature: `applyGaugeEffects(gauges: Record<string, number>, effects: GaugeEffect[], stats: Record<string, number>, config: StoryConfig): Record<string, number>`
-  - [ ] Create a shallow copy of `gauges` — never mutate the input object
-  - [ ] For each `GaugeEffect`:
+- [x] Implement `applyGaugeEffects` (AC: 1)
+  - [x] Signature: `applyGaugeEffects(gauges: Record<string, number>, effects: GaugeEffect[], stats: Record<string, number>, config: StoryConfig): Record<string, number>`
+  - [x] Create a shallow copy of `gauges` — never mutate the input object
+  - [x] For each `GaugeEffect`:
     - Find the gauge by `effect.gaugeId`
     - If `effect.statInfluence` exists: multiply delta by `(1 - stats[statInfluence.statId] * statInfluence.multiplier)` or similar formula from config — apply stat-reduced delta
     - If no stat influence: apply delta directly
     - Clamp result with `clamp(value, 0, 100)`
-  - [ ] Return the new gauges object
-  - [ ] Handle missing gauge IDs gracefully (skip or warn, never throw)
+  - [x] Return the new gauges object
+  - [x] Handle missing gauge IDs gracefully (skip or warn, never throw)
 
-- [ ] Implement `applyDecay` (AC: 2)
-  - [ ] Signature: `applyDecay(gauges: Record<string, number>, decayRules: DecayRule[], stats: Record<string, number>, config: StoryConfig): Record<string, number>`
-  - [ ] Create a shallow copy of `gauges`
-  - [ ] For each `DecayRule`:
+- [x] Implement `applyDecay` (AC: 2)
+  - [x] Signature: `applyDecay(gauges: Record<string, number>, decayRules: DecayRule[], stats: Record<string, number>, config: StoryConfig): Record<string, number>`
+  - [x] Create a shallow copy of `gauges`
+  - [x] For each `DecayRule`:
     - If rule has `statReductionId` and `statReductionFormula`:
       - Evaluate formula string OR use the encoded formula for Nourriture: `amount = -Math.max(3, 10 - stats[statReductionId] * 1.5)` (negative because decay)
       - This is the Estomac stat reduction: higher Estomac stat = less Nourriture decay
-    - For the passive ⚡ risk (6% chance of `-8` energie): check `rule.isPassiveRisk` flag (or equivalent encoding), then `if (Math.random() < 0.06) { apply -8 to energie }`
+    - For the passive ⚡ risk (6% chance of `-8` energie): check `rule.probabilityChance` field, then `if (Math.random() < 0.06) { apply -8 to energie }`
     - Apply clamped decay: `clamp(gauges[rule.gaugeId] + delta, 0, 100)`
-  - [ ] Return the new gauges object without mutating input
+  - [x] Return the new gauges object without mutating input
 
-- [ ] Unit test setup for gauge system (no test file required in this story, covered in Story 2.6)
-  - [ ] Verify manually that: applying `+200` to a gauge at 100 clamps to 100
-  - [ ] Verify: applying `-200` to a gauge at 0 clamps to 0
-  - [ ] Verify: Nourriture with Estomac=4: decay = `max(3, 10 - 4*1.5) = max(3, 4) = 4`
-  - [ ] Verify: Nourriture with Estomac=0: decay = `max(3, 10 - 0) = 10`
+- [x] Unit test setup for gauge system (no test file required in this story, covered in Story 2.6)
+  - [x] Verify manually that: applying `+200` to a gauge at 100 clamps to 100
+  - [x] Verify: applying `-200` to a gauge at 0 clamps to 0
+  - [x] Verify: Nourriture with Estomac=4: decay = `max(3, 10 - 4*1.5) = max(3, 4) = 4`
+  - [x] Verify: Nourriture with Estomac=0: decay = `max(3, 10 - 0) = 10`
 
 ## Dev Notes
 
@@ -86,6 +86,17 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None — clean implementation.
+
 ### Completion Notes List
 
+- `clamp()` utility implemented in `lib/utils.ts` (also used by shadcn `cn()` in same file); engine-local copy added during code review to respect engine isolation rule
+- `applyGaugeEffects` returns new object, never mutates input; stat influence formula `delta * (1 - statValue * multiplier)` implemented
+- `applyDecay` handles probabilistic rules via `probabilityChance` field and stat-reduction via hardcoded Dub Camp formula `max(3, base - stat * 1.5)`
+- Decay formula is hardcoded — `statReductionFormula` string stored but not dynamically evaluated (documented as known limitation)
+- All gauge arithmetic flows through `clamp(value, 0, 100)`
+
 ### File List
+
+- `lib/utils.ts` — new, `clamp()` utility + shadcn `cn()` utility
+- `engine/gaugeSystem.ts` — new, `applyGaugeEffects` and `applyDecay` functions

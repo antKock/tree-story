@@ -1,6 +1,6 @@
 # Story 3.3: Gauge Strip
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -20,17 +20,17 @@ so that I can glance at my status without interrupting reading — and never hav
 
 ## Tasks / Subtasks
 
-- [ ] Create `components/GaugeStrip.tsx` (AC: 1–7)
-  - [ ] Mark with `"use client"` (receives engine state, handles tap)
-  - [ ] Props: `{ gauges: Record<string, number>; config: StoryConfig; onOpenCharacterSheet: () => void }`
+- [x] Create `components/GaugeStrip.tsx` (AC: 1–7)
+  - [x] Mark with `"use client"` (receives engine state, handles tap)
+  - [x] Props: `{ gauges: Record<string, number>; config: StoryConfig; onOpenCharacterSheet: () => void }`
 
-- [ ] Filter visible gauges (AC: 2)
-  - [ ] `const visibleGauges = config.gauges.filter(g => !g.isHidden)`
-  - [ ] Note: For Dub Camp, this shows: `energie`, `alcool`, `fumette`, `nourriture` (4 gauges) — `kiff` is hidden
+- [x] Filter visible gauges (AC: 2)
+  - [x] `const visibleGauges = config.gauges.filter(g => !g.isHidden)`
+  - [x] Note: For Dub Camp, this shows: `energie`, `alcool`, `fumette`, `nourriture` (4 gauges) — `kiff` is hidden
 
-- [ ] Render gauge row (AC: 3, 4, 7)
-  - [ ] Container: `display: flex; gap: 8px; align-items: center` (or Tailwind equivalent)
-  - [ ] For each visible gauge, render a column:
+- [x] Render gauge row (AC: 3, 4, 7)
+  - [x] Container: `display: flex; gap: 8px; align-items: center` (or Tailwind equivalent)
+  - [x] For each visible gauge, render a column:
     - Emoji icon: `<span style={{ fontSize: '17px' }}>{gauge.icon}</span>`, centered horizontally
     - Fill bar:
       ```html
@@ -44,23 +44,23 @@ so that I can glance at my status without interrupting reading — and never hav
         }} />
       </div>
       ```
-  - [ ] No numeric labels — fill percentage is the only visual indicator (FR — mechanics invisible)
-  - [ ] Bar fill uses `--color-accent` — this is overridden per act by `themeManager.ts` at runtime
+  - [x] No numeric labels — fill percentage is the only visual indicator (FR — mechanics invisible)
+  - [x] Bar fill uses `--color-accent` — this is overridden per act by `themeManager.ts` at runtime
 
-- [ ] Implement sticky positioning (AC: 1)
-  - [ ] Outer wrapper: `position: sticky; top: 0; z-index: 10; background: var(--color-bg); padding: 8px 1.5rem`
-  - [ ] This ensures the strip stays at top during prose scroll
+- [x] Implement sticky positioning (AC: 1)
+  - [x] Outer wrapper: `position: sticky; top: 0; z-index: 10; background: var(--color-bg); padding: 8px 1.5rem`
+  - [x] This ensures the strip stays at top during prose scroll
 
-- [ ] Implement tap-to-open CharacterSheet (AC: 5, 6)
-  - [ ] Wrap entire strip in a button or clickable div: `onClick={onOpenCharacterSheet}`
-  - [ ] Set `role="button"` and `aria-label="Open character sheet"` if using a div
-  - [ ] Entire strip height must be at least 44px — verify with CSS `min-height: 44px`
-  - [ ] No `cursor: pointer` is required on mobile but add for desktop usability
+- [x] Implement tap-to-open CharacterSheet (AC: 5, 6)
+  - [x] Wrap entire strip in a button or clickable div: `onClick={onOpenCharacterSheet}`
+  - [x] Set `role="button"` and `aria-label="Open character sheet"` if using a div
+  - [x] Entire strip height must be at least 44px — verify with CSS `min-height: 44px`
+  - [x] No `cursor: pointer` is required on mobile but add for desktop usability
 
-- [ ] Integrate GaugeStrip into StoryReader (preview — AC: 5)
-  - [ ] `StoryReader.tsx` will render `<GaugeStrip>` and manage `charSheetOpen` state
-  - [ ] Pass `onOpenCharacterSheet={() => setCharSheetOpen(true)}` as prop
-  - [ ] Note: `StoryReader.tsx` is built in Story 3.4 — GaugeStrip can be standalone for now
+- [x] Integrate GaugeStrip into StoryReader (preview — AC: 5)
+  - [x] `StoryReader.tsx` will render `<GaugeStrip>` and manage `charSheetOpen` state
+  - [x] Pass `onOpenCharacterSheet={() => setCharSheetOpen(true)}` as prop
+  - [x] Note: `StoryReader.tsx` is built in Story 3.4 — GaugeStrip can be standalone for now
 
 ## Dev Notes
 
@@ -93,9 +93,18 @@ Prerequisites:
 ### Agent Model Used
 
 claude-sonnet-4-6
+Code Review: claude-opus-4-6
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- GaugeStrip: sticky top, filters isHidden gauges, 17px emoji icons, 7px fill bars
+- Fill uses --color-accent (auto-updates on act transitions via themeManager)
+- Entire strip is a 44px+ button triggering CharacterSheet
+- No numeric labels — fill percentage is sole indicator
+- Code review (2026-03-02): Fixed hardcoded hex values, CSS variable naming
+
 ### File List
+
+- `components/GaugeStrip.tsx` — sticky gauge bar with fill indicators

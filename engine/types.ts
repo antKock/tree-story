@@ -1,0 +1,138 @@
+// Pure type definitions — zero imports from components/, hooks/, app/, or lib/
+
+export class StoryValidationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'StoryValidationError'
+  }
+}
+
+export class EngineError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'EngineError'
+  }
+}
+
+export interface StatDefinition {
+  id: string
+  name: string
+  description?: string
+  maxPerStat: number
+}
+
+export interface GaugeDefinition {
+  id: string
+  name: string
+  icon: string
+  initialValue: number
+  isScore: boolean
+  isHidden: boolean
+  gameOverThreshold?: number
+  gameOverCondition?: 'above' | 'below'
+  gameOverParagraphId?: string
+}
+
+export interface GaugeEffect {
+  gaugeId: string
+  delta: number
+  statInfluence?: {
+    statId: string
+    multiplier: number
+  }
+}
+
+export interface DecayRule {
+  gaugeId: string
+  amount: number
+  statReductionId?: string
+  statReductionFormula?: string
+  probabilityChance?: number
+}
+
+export interface WeightedOutcome {
+  gaugeId: string
+  statId: string
+  goodEffects: GaugeEffect[]
+  badEffects: GaugeEffect[]
+}
+
+export interface Choice {
+  id: string
+  text: string
+  targetParagraphId: string
+  gaugeEffects?: GaugeEffect[]
+  weightedOutcome?: WeightedOutcome
+  inventoryAdd?: string[]
+  inventoryRemove?: string[]
+}
+
+export interface Paragraph {
+  id: string
+  content: string
+  choices: Choice[]
+  isGameOver?: boolean
+  isComplete?: boolean
+}
+
+export interface ActDefinition {
+  id: string
+  name: string
+  paragraphIds: string[]
+  theme: Record<string, string>
+}
+
+export interface EndStateTier {
+  minScore: number
+  maxScore: number
+  text: string
+}
+
+export interface ExampleProfile {
+  name: string
+  stats: Record<string, number>
+  description: string
+}
+
+export interface StoryMeta {
+  title: string
+  author: string
+  version: string
+  description?: string
+  exampleProfiles: ExampleProfile[]
+}
+
+export interface StoryConfig {
+  id: string
+  version: number
+  meta: StoryMeta
+  startParagraphId: string
+  statPointBudget: number
+  stats: StatDefinition[]
+  gauges: GaugeDefinition[]
+  acts: ActDefinition[]
+  decayNodes: string[]
+  decayRules: DecayRule[]
+  paragraphs: Record<string, Paragraph>
+  endStateTiers: EndStateTier[]
+}
+
+export interface EngineState {
+  storyId: string
+  paragraphId: string
+  gauges: Record<string, number>
+  stats: Record<string, number>
+  act: string
+  inventory: string[]
+  score: number
+  isGameOver: boolean
+  gameOverParagraphId: string | null
+  isComplete: boolean
+}
+
+export interface SaveState {
+  storyId: string
+  version: number
+  savedAt: number
+  engineState: EngineState
+}

@@ -1,6 +1,6 @@
 # Story 1.1: Install Dependencies & Configure Project Scaffold
 
-Status: ready-for-dev
+Status: complete
 
 ## Story
 
@@ -19,14 +19,14 @@ so that the project compiles cleanly and every subsequent story has a ready-to-u
 
 ## Tasks / Subtasks
 
-- [ ] Install shadcn/ui and initialize (AC: 1)
-  - [ ] Run `npx shadcn@latest init` — select dark mode, CSS variables, and default slate palette (can override later)
-  - [ ] Verify `components.json` is created at project root
-  - [ ] Stage `components.json` for commit
+- [x] Install shadcn/ui and initialize (AC: 1)
+  - [x] Run `npx shadcn@latest init` — select dark mode, CSS variables, and default slate palette (can override later)
+  - [x] Verify `components.json` is created at project root
+  - [x] Stage `components.json` for commit
 
-- [ ] Install Vitest (AC: 2)
-  - [ ] Run `npm install -D vitest @vitest/ui`
-  - [ ] Create `vitest.config.ts` at project root:
+- [x] Install Vitest (AC: 2)
+  - [x] Run `npm install -D vitest @vitest/ui`
+  - [x] Create `vitest.config.ts` at project root:
     ```typescript
     import { defineConfig } from 'vitest/config'
     export default defineConfig({
@@ -36,31 +36,31 @@ so that the project compiles cleanly and every subsequent story has a ready-to-u
       },
     })
     ```
-  - [ ] Verify `npx vitest run` executes without error (0 tests passes)
+  - [x] Verify `npx vitest run` executes without error (0 tests passes)
 
-- [ ] Replace default Geist fonts with Lora + Inter (AC: 3)
-  - [ ] Open `app/layout.tsx`
-  - [ ] Remove `Geist` and `Geist_Mono` imports from `next/font/google`
-  - [ ] Import `Lora` (subsets: `latin`, weights: `400`, `700`, `variable`) and `Inter` (subsets: `latin`, variable)
-  - [ ] Apply `lora.variable` as `--font-lora` and `inter.variable` as `--font-inter` on the `<html>` element
-  - [ ] Remove any references to `geistSans` or `geistMono` from className
+- [x] Replace default Geist fonts with Lora + Inter (AC: 3)
+  - [x] Open `app/layout.tsx`
+  - [x] Remove `Geist` and `Geist_Mono` imports from `next/font/google`
+  - [x] Import `Lora` (subsets: `latin`, weights: `400`, `700`, `variable`) and `Inter` (subsets: `latin`, variable)
+  - [x] Apply `lora.variable` as `--font-lora` and `inter.variable` as `--font-inter` on the `<html>` element
+  - [x] Remove any references to `geistSans` or `geistMono` from className
 
-- [ ] Configure design tokens in `app/globals.css` (AC: 4)
-  - [ ] Replace existing `@theme` block (or add if absent) with the full token set:
+- [x] Configure design tokens in `app/globals.css` (AC: 4)
+  - [x] Replace existing `@theme` block (or add if absent) with the full token set:
     - App shell colors: `--color-bg: #0f0f0f`, `--color-surface: #1a1a1a`, `--color-text-primary: #f0ece4`, `--color-text-muted: #7a7672`, `--color-accent: #d4935a`, `--color-danger: #c0392b`
     - Typography: `--font-prose: var(--font-lora)`, `--font-ui: var(--font-inter)`
     - Prose scale: `--prose-font-size: 1.25rem` (20px), `--prose-line-height: 1.72`
     - Reading layout: `--reading-max-width: 65ch`, `--reading-padding: 0 1.5rem`
-  - [ ] Set `body` background to `var(--color-bg)` and color to `var(--color-text-primary)` as base styles
-  - [ ] Ensure no hardcoded hex values remain in component-level CSS
+  - [x] Set `body` background to `var(--color-bg)` and color to `var(--color-text-primary)` as base styles
+  - [x] Ensure no hardcoded hex values remain in component-level CSS
 
-- [ ] Create `public/stories/` directory (AC: 5)
-  - [ ] Create `public/stories/.gitkeep` (empty file so directory is tracked by git)
+- [x] Create `public/stories/` directory (AC: 5)
+  - [x] Create `public/stories/.gitkeep` (empty file so directory is tracked by git)
 
-- [ ] Verify everything works end-to-end (AC: 6)
-  - [ ] Run `npm run dev` — confirm no startup errors in terminal
-  - [ ] Open browser at localhost:3000 — confirm page loads with dark background (#0f0f0f)
-  - [ ] Run `npx vitest run` — confirm exits with 0 failures
+- [x] Verify everything works end-to-end (AC: 6)
+  - [x] Run `npm run dev` — confirm no startup errors in terminal
+  - [x] Open browser at localhost:3000 — confirm page loads with dark background (#0f0f0f)
+  - [x] Run `npx vitest run` — confirm exits with 0 failures
 
 ## Dev Notes
 
@@ -102,6 +102,25 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+None.
+
 ### Completion Notes List
 
+- shadcn/ui initialized with new-york style, neutral base color, CSS variables enabled
+- Vitest v4 + @vitest/ui installed; config targets `engine/**/*.test.ts` with `passWithNoTests: true`
+- Geist fonts fully removed, Lora (400/700) + Inter loaded via `next/font/google`
+- Design tokens use indirection pattern: `--color-bg: var(--ts-bg)` in @theme, `--ts-bg: #0f0f0f` in `:root` (enables runtime theme overrides)
+- Body base styles set via `@layer base` using tree-story CSS variables
+- `public/stories/.gitkeep` created
+- `npx tsc --noEmit` passes, `npx vitest run` exits clean (0 tests)
+
 ### File List
+
+- `components.json` — new, shadcn/ui configuration
+- `vitest.config.ts` — new, Vitest configuration
+- `app/layout.tsx` — modified, Geist → Lora + Inter
+- `app/globals.css` — modified, full @theme token set + body base styles
+- `public/stories/.gitkeep` — new, directory placeholder
+- `package.json` — modified, new dependencies (vitest, @vitest/ui, shadcn, etc.)
+- `package-lock.json` — modified, lockfile update
+- `lib/utils.ts` — new, shadcn auto-generated cn() utility
