@@ -126,11 +126,10 @@
         "s10"
       ],
       "theme": {
-        "--color-bg": "#1e1a08",
-        "--color-surface": "#2a2410",
-        "--color-text": "#f0e8cc",
-        "--color-text-primary": "#f0e8cc",
-        "--color-accent": "#d4a820"
+        "--color-bg": "#f0e8cc",
+        "--color-surface": "#e6dbb8",
+        "--color-text-primary": "#1a1a08",
+        "--color-accent": "#2a7a18"
       }
     },
     {
@@ -140,10 +139,9 @@
         "s40"
       ],
       "theme": {
-        "--color-bg": "#1a0c05",
-        "--color-surface": "#261408",
-        "--color-text": "#f0e0c0",
-        "--color-text-primary": "#f0e0c0",
+        "--color-bg": "#2a1505",
+        "--color-surface": "#361c08",
+        "--color-text-primary": "#f0d8a0",
         "--color-accent": "#e06020"
       }
     },
@@ -155,8 +153,7 @@
       ],
       "theme": {
         "--color-bg": "#0d1a0d",
-        "--color-surface": "#0f1f0f",
-        "--color-text": "#e8dfc8",
+        "--color-surface": "#0f2010",
         "--color-text-primary": "#e8dfc8",
         "--color-accent": "#c4421a"
       }
@@ -168,11 +165,10 @@
         "s70"
       ],
       "theme": {
-        "--color-bg": "#0a1410",
-        "--color-surface": "#0d1a14",
-        "--color-text": "#e8dfc8",
-        "--color-text-primary": "#e8dfc8",
-        "--color-accent": "#c4421a"
+        "--color-bg": "#080f08",
+        "--color-surface": "#0a140a",
+        "--color-text-primary": "#c8c0a8",
+        "--color-accent": "#a03418"
       }
     }
   ],
@@ -228,15 +224,15 @@
   "decayRules": [
     {
       "gaugeId": "energie",
-      "amount": -7
+      "amount": -5
     },
     {
       "gaugeId": "alcool",
-      "amount": -12
+      "amount": -7
     },
     {
       "gaugeId": "fumette",
-      "amount": -8
+      "amount": -5
     },
     {
       "gaugeId": "nourriture",
@@ -246,7 +242,7 @@
     },
     {
       "gaugeId": "energie",
-      "amount": -8,
+      "amount": -5,
       "probabilityChance": 0.06
     }
   ],
@@ -1039,7 +1035,7 @@
     },
     "s50": {
       "id": "s50",
-      "content": "La nuit est tombée mais l'air est encore lourd, dense, chaud comme une couverture mouillée. La Dub Club Arena est pleine à craquer — t'as jamais vu autant de monde dans un espace aussi petit. Dubkasm monte sur scène et les premières notes font taire tout le monde une seconde — puis la foule explose. C'est lourd, profond, hypnotique. Bastien est quelque part devant à sauter. Brian est à côté de toi, il sourit comme un gamin.\n\nLa chaleur te grignote déjà. Comment tu vis ce concert ?",
+      "content": "La nuit est tombée mais l'air est encore lourd, dense, chaud comme l'intérieur d'un four mal ventilé. La Dub Club Arena est pleine à craquer — t'as jamais vu autant de monde dans un espace aussi petit. Dubkasm monte sur scène et les premières notes font taire tout le monde une seconde — puis la foule explose. C'est lourd, profond, hypnotique. Bastien est quelque part devant à sauter. Brian est à côté de toi, il sourit comme un gamin.\n\nLa chaleur te grignote déjà. Comment tu vis ce concert ?",
       "choices": [
         {
           "id": "s50-a",
@@ -1214,6 +1210,11 @@
               }
             ]
           }
+        },
+        {
+          "id": "s53-c",
+          "text": "Tu vas vite manger un truc",
+          "targetParagraphId": "s53c"
         }
       ]
     },
@@ -1562,7 +1563,7 @@
     },
     "s201": {
       "id": "s201",
-      "content": "T'as déjà du mal à marcher droit. Bastien te regarde avec un mélange d'amusement et d'inquiétude sincère. « Mec… on vient d'arriver. » Brian essaie de t'expliquer que c'est les mojitos. Il a peut-être raison. Il a probablement tort.\n\nLes pompiers du festival sont très sympas — ils t'ont vu d'autres, et ça se voit. Ils te posent sur un brancard, te mettent sous sérum, et t'expliquent que tu pourras reprendre demain matin avec un sourire professionnel qui ne dit pas tout.\n\nLa nuit, tu l'entends de loin. Dubkasm, Channel One — à travers la toile de la tente médicale.\n\n**FIN DE PARTIE** — Trop bu trop tôt.",
+      "content": "T'as déjà du mal à marcher droit. Bastien te regarde avec un mélange d'amusement et d'inquiétude sincère. Brian essaie de t'expliquer que c'est les mojitos. Il a peut-être raison. Il a probablement tort.\n\nLes pompiers du festival sont très sympas — ils t'en ont vu d'autres, et ça se voit. Ils te posent sur un brancard, te mettent sous sérum, et t'expliquent que tu pourras reprendre demain matin avec un sourire professionnel qui ne dit pas tout.\n\nLa nuit, tu l'entends de loin. À travers la toile de la tente médicale.\n\n**FIN DE PARTIE** — Trop bu.",
       "choices": [],
       "isGameOver": true
     },
@@ -1574,13 +1575,13 @@
     },
     "s203": {
       "id": "s203",
-      "content": "Ça arrive vite quand on boit sur un estomac pas bien rempli, avec la chaleur. La physique est une science exacte et elle vient de te le démontrer.\n\nTu es en train de danser — enfin, tu croyais danser — quand le sol décide de ne plus être horizontal. Bastien te rattrape de justesse. Direction le poste de secours.\n\nLes infirmiers te connaissent pas, mais ils ont le sourire professionnel de gens qui savent exactement ce qui s'est passé rien qu'en te regardant arriver.\n\n**FIN DE PARTIE** — Trop d'alcool, pas assez de bouffe.",
+      "content": "Ça arrive vite quand on boit sur un estomac pas bien rempli, avec la chaleur. La physique est une science exacte et elle vient de te le démontrer.\n\nBastien te rattrape de justesse. Direction le poste de secours.\n\nLes infirmiers te connaissent pas, mais ils ont le sourire professionnel de gens qui savent exactement ce qui s'est passé rien qu'en te regardant arriver.\n\n**FIN DE PARTIE** — Trop d'alcool, pas assez de bouffe.",
       "choices": [],
       "isGameOver": true
     },
     "s204": {
       "id": "s204",
-      "content": "T'as pas vu venir. T'étais tellement dans la musique que t'as pas senti ton corps négocier en coulisses depuis une heure. En sortant du concert, tes jambes ont une opinion différente de la tienne sur la suite des événements.\n\nTu t'assieds par terre, les yeux mi-clos. Un bénévole s'approche. « Ça va ? » La question est rhétorique mais il la pose quand même, sympa.\n\nTu passes la fin de nuit à récupérer au poste médical pendant que Bastien envoie des photos depuis la Dub Club. Il en envoie sept. Dont trois floues.\n\n**FIN DE PARTIE** — Épuisement.",
+      "content": "T'as pas vu venir. T'étais tellement dans le truc que t'as pas senti ton corps négocier en coulisses depuis une heure. Soudain tes jambes ont une opinion différente de la tienne sur la suite des événements.\n\nTu t'assieds par terre, les yeux mi-clos. Un bénévole s'approche. « Ça va ? » La question est rhétorique mais il la pose quand même, sympa.\n\nTu passes le reste de la soirée à récupérer au poste médical pendant que Bastien envoie des photos depuis la Dub Club. Il en envoie sept. Dont trois floues.\n\n**FIN DE PARTIE** — Épuisement.",
       "choices": [],
       "isGameOver": true
     },
@@ -1724,7 +1725,7 @@
         },
         {
           "id": "s40f-c",
-          "text": "Tu gardes la tête froide, direct Dubkasm",
+          "text": "Tu vas traîner, voir l'ambiance du festival",
           "targetParagraphId": "s50",
           "gaugeEffects": [
             {
@@ -1732,18 +1733,73 @@
               "delta": 5
             }
           ]
+        },
+        {
+          "id": "s40f-d",
+          "text": "Tu vas manger un truc avant le concert",
+          "targetParagraphId": "s40h"
         }
       ]
     },
     "s40g": {
       "id": "s40g",
-      "content": "Tu bois tranquillement. Autour de toi le festival tourne à plein régime. Au loin, les premières notes de la soundcheck de Dubkasm filtrent dans l'air chaud.",
+      "content": "Tu bois tranquillement. Autour de toi le festival tourne à plein régime. Le groupe d'avant Dubkasm finit son set — t'entends la foule depuis ici. Bastien vérifie son téléphone : 22h35.",
       "choices": [
         {
           "id": "s40g-a",
           "text": "Tu te mets en route pour Dubkasm",
           "targetParagraphId": "s50",
           "gaugeEffects": []
+        }
+      ]
+    },
+    "s40h": {
+      "id": "s40h",
+      "content": "T'as le temps — un rapide détour par les stands. Le cuisinier du stand végé commence à ranger mais il te sert quand même. Tu manges debout, les basses du groupe sur scène dans le dos. C'est exactement ce qu'il fallait.",
+      "choices": [
+        {
+          "id": "s40h-a",
+          "text": "Tu files vers la Dub Club Arena",
+          "targetParagraphId": "s50",
+          "gaugeEffects": [
+            {
+              "gaugeId": "nourriture",
+              "delta": 22,
+              "statInfluence": {
+                "statId": "estomac",
+                "multiplier": 3
+              }
+            },
+            {
+              "gaugeId": "energie",
+              "delta": -3
+            }
+          ]
+        }
+      ]
+    },
+    "s53c": {
+      "id": "s53c",
+      "content": "Il y a un petit stand encore ouvert pas loin — frites, une sauce qui pique. Tu manges vite, debout, les oreilles encore pleines des basses. Ça fait du bien de recharger un peu avant de voir si la fin du set vaut le coup.",
+      "choices": [
+        {
+          "id": "s53c-a",
+          "text": "Tu retournes voir la fin de Dubkasm",
+          "targetParagraphId": "s60",
+          "gaugeEffects": [
+            {
+              "gaugeId": "nourriture",
+              "delta": 18,
+              "statInfluence": {
+                "statId": "estomac",
+                "multiplier": 3
+              }
+            },
+            {
+              "gaugeId": "energie",
+              "delta": -2
+            }
+          ]
         }
       ]
     }
