@@ -15,7 +15,7 @@ export default function ParagraphDisplay({ content, outcomeText, gaugeDeltas, ga
   const outcomeParagraphs = outcomeText ? outcomeText.split(/\n\n+/) : []
 
   const visibleDeltas = (gaugeDeltas && gauges)
-    ? gauges.filter(g => !g.isHidden && gaugeDeltas[g.id] !== undefined && gaugeDeltas[g.id] !== 0)
+    ? gauges.filter(g => (!g.isHidden || g.isScore) && gaugeDeltas[g.id] !== undefined && gaugeDeltas[g.id] !== 0)
     : []
 
   const hasResult = outcomeParagraphs.length > 0 || visibleDeltas.length > 0

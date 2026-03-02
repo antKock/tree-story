@@ -6,7 +6,7 @@
     "title": "Dub Camp",
     "author": "Anthony",
     "version": "v1.5",
-    "description": "Une soirée dont vous êtes le héros",
+    "description": "Dub Camp, un festival quelque part en France. Trois jours, deux potes, une glacière et un programme chargé.\n\nTu joues le rôle du troisième larron — ni le stratège (c'est Bastien), ni le fêtard invétéré (c'est Brian). Ton objectif : passer la meilleure soirée possible sans te planter.\n\nAvant de commencer, répartis tes points de caractéristiques. Ils influenceront l'impact des activités sur ton énergie, ta résistance à l'alcool et à la fumette, et ta capacité à te ravitailler.",
     "exampleProfiles": [
       {
         "name": "Le Bastien",
@@ -241,7 +241,7 @@
   "paragraphs": {
     "s1": {
       "id": "s1",
-      "content": "Le soleil tape déjà fort quand vous posez les sacs. Trois tentes, un carré d'herbe pas trop mal placé, et devant vous : le Dub Camp.\n\nÀ ta gauche, Bastien est déjà debout sur la glacière à scanner le site comme un général de brigade. « Les gars, j'ai regardé le programme, ce soir c'est chargé, faut être en forme à 19h. » À ta droite, Brian ouvre tranquillement sa première bière en souriant. « On a le temps… »\n\nC'est la même scène depuis cinq ans. Bastien planifie. Brian boit. Toi tu décides.\n\n*Il est 13h. L'après-midi commence.*",
+      "content": "Le soleil tape déjà fort quand vous posez les sacs. Trois tentes, un carré d'herbe pas trop mal placé, et devant vous : le Dub Camp.\n\nÀ ta gauche, Bastien est déjà debout sur la glacière à scanner le site comme un général de brigade. « Les gars, j'ai regardé le programme, ce soir c'est chargé, faut pas se cramer cet aprem. » À ta droite, Brian ouvre tranquillement sa première bière en souriant. « On a le temps… »\n\nC'est la même scène depuis cinq ans. Bastien planifie. Brian boit. Toi tu décides.\n\nIl est 13h. L'après-midi commence.",
       "choices": [
         {
           "id": "s1-a",
@@ -252,7 +252,7 @@
     },
     "s10": {
       "id": "s10",
-      "content": "Le camping s'anime doucement. Des basses lointaines s'échappent déjà du site — quelqu'un a commencé sans attendre. Bastien a disparu « faire un tour de reconnaissance » et Brian somnole à moitié dans son transat, bière à la main, casquette sur le visage.\n\n*Qu'est-ce que tu fais ?*",
+      "content": "Le camping s'anime doucement. Des basses lointaines s'échappent déjà du site — quelqu'un a commencé sans attendre. Bastien a disparu « faire un tour de reconnaissance » et Brian somnole à moitié dans son transat, bière à la main, casquette sur le visage.\n\nQu'est-ce que tu fais ?",
       "choices": [
         {
           "id": "s10-a",
@@ -307,7 +307,25 @@
         {
           "id": "s10-b",
           "text": "Tu pars manger un truc aux stands",
-          "targetParagraphId": "s12"
+          "targetParagraphId": "s12",
+          "gaugeEffects": [
+            {
+              "gaugeId": "nourriture",
+              "delta": 40,
+              "statInfluence": {
+                "statId": "estomac",
+                "multiplier": 3
+              }
+            },
+            {
+              "gaugeId": "energie",
+              "delta": 5
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 10
+            }
+          ]
         },
         {
           "id": "s10-c",
@@ -317,7 +335,25 @@
         {
           "id": "s10-d",
           "text": "Tu rejoins Brian dans son transat",
-          "targetParagraphId": "s14"
+          "targetParagraphId": "s14",
+          "gaugeEffects": [
+            {
+              "gaugeId": "alcool",
+              "delta": 25
+            },
+            {
+              "gaugeId": "fumette",
+              "delta": 25
+            },
+            {
+              "gaugeId": "energie",
+              "delta": -10
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 12
+            }
+          ]
         }
       ]
     },
@@ -340,24 +376,7 @@
           "id": "s12-a",
           "text": "Tu rentres au camp, le ventre plein",
           "targetParagraphId": "s15",
-          "gaugeEffects": [
-            {
-              "gaugeId": "nourriture",
-              "delta": 40,
-              "statInfluence": {
-                "statId": "estomac",
-                "multiplier": 3
-              }
-            },
-            {
-              "gaugeId": "energie",
-              "delta": 5
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 10
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
@@ -390,30 +409,13 @@
           "id": "s14-a",
           "text": "Rejoindre Bastien",
           "targetParagraphId": "s15",
-          "gaugeEffects": [
-            {
-              "gaugeId": "alcool",
-              "delta": 20
-            },
-            {
-              "gaugeId": "fumette",
-              "delta": 20
-            },
-            {
-              "gaugeId": "energie",
-              "delta": -10
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 12
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
     "s15": {
       "id": "s15",
-      "content": "Il est 16h. Bastien regarde son téléphone. « Les premiers concerts commencent à 17h. » Brian sort son matos et te regarde avec un sourire. « On se roule un petit truc avant ? »\n\n*Tu dis quoi ?*",
+      "content": "Il est 16h. Bastien regarde son téléphone. « Les premiers concerts commencent à 17h. » Brian sort son matos et te regarde avec un sourire. « On se roule un petit truc avant ? »\n\nTu dis quoi ?",
       "choices": [
         {
           "id": "s15-a",
@@ -430,7 +432,7 @@
                 "effects": [
                   {
                     "gaugeId": "fumette",
-                    "delta": 20
+                    "delta": 30
                   },
                   {
                     "gaugeId": "energie",
@@ -449,7 +451,7 @@
                 "effects": [
                   {
                     "gaugeId": "fumette",
-                    "delta": 45
+                    "delta": 58
                   },
                   {
                     "gaugeId": "energie",
@@ -502,7 +504,7 @@
     },
     "s16": {
       "id": "s16",
-      "content": "Il reste une heure avant les premiers concerts. L'ambiance sur le camping monte sérieusement.\n\n*Qu'est-ce que tu fais ?*",
+      "content": "Il reste une heure avant les premiers concerts. L'ambiance sur le camping monte sérieusement.\n\nQu'est-ce que tu fais ?",
       "choices": [
         {
           "id": "s16-a",
@@ -517,13 +519,23 @@
         {
           "id": "s16-c",
           "text": "Partie de Skull avec les potes",
-          "targetParagraphId": "s16c"
+          "targetParagraphId": "s16c",
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": 5
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 12
+            }
+          ]
         }
       ]
     },
     "s16a": {
       "id": "s16a",
-      "content": "Bonne idée. Tu trouves un truc solide — riz, légumes, quelque chose qui tient au corps. Les serveurs du stand t'expliquent qu'il y aura une rupture de stock vers 23h, l'air légèrement coupable, comme s'ils allaient fermer à Noël.\n\nTu reviens au camping le ventre plein et l'esprit tranquille.",
+      "content": "Bonne idée. Tu trouves un truc solide — riz, légumes, quelque chose qui tient au corps. Les serveurs du stand t'expliquent qu'il y aura une rupture de stock vers minuit, l'air légèrement coupable, comme s'ils allaient fermer à Noël.\n\nTu reviens au camping le ventre plein et l'esprit tranquille.",
       "choices": [
         {
           "id": "s16a-a",
@@ -579,22 +591,13 @@
           "id": "s16c-a",
           "text": "Tu files vers les scènes",
           "targetParagraphId": "s20",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": 5
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 12
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
     "s20": {
       "id": "s20",
-      "content": "Vous arrivez sur le site. L'air vibre déjà. À droite la **Dub Club Arena** — grande scène ouverte, les basses font trembler le sol sous tes pieds. À gauche l'**Outernational Arena** — plus petite, plus intime, une sono roots qui réchauffe doucement.\n\nBastien pointe la Dub Club : « NOFA Sound System dans dix minutes, faut y aller. » Brian hausse les épaules. « Moi je vais voir l'Outernational. »\n\n*Tu vas où ?*",
+      "content": "Vous arrivez sur le site. L'air vibre déjà. À droite la **Dub Club Arena** — grande scène ouverte, les basses font trembler le sol sous tes pieds. À gauche l'**Outernational Arena** — plus petite, plus intime, une sono roots qui réchauffe doucement.\n\nBastien pointe la Dub Club : « NOFA Sound System dans dix minutes, faut y aller. » Brian hausse les épaules. « Moi je vais voir l'Outernational. »\n\nTu vas où ?",
       "choices": [
         {
           "id": "s20-a",
@@ -721,7 +724,7 @@
     },
     "s40": {
       "id": "s40",
-      "content": "Vous vous retrouvez tous les trois entre les deux scènes. Bastien est euphorique. « Dubkasm à 21h30, c'est LE concert du soir. Faut pas arriver cramés. » Brian acquiesce avec l'expression de quelqu'un qui ne compte pas vraiment respecter cette consigne.\n\n*D'abord : tu bois quoi ?*",
+      "content": "Vous vous retrouvez tous les trois entre les deux scènes. Bastien est euphorique. « Dubkasm à 23h, c'est LE concert du soir. Faut pas arriver cramés. » Brian acquiesce avec l'expression de quelqu'un qui ne compte pas vraiment respecter cette consigne.\n\nD'abord : tu bois quoi ?",
       "choices": [
         {
           "id": "s40-a",
@@ -738,7 +741,7 @@
                 "effects": [
                   {
                     "gaugeId": "alcool",
-                    "delta": 15
+                    "delta": 22
                   },
                   {
                     "gaugeId": "nourriture",
@@ -753,7 +756,7 @@
                 "effects": [
                   {
                     "gaugeId": "alcool",
-                    "delta": 28
+                    "delta": 42
                   },
                   {
                     "gaugeId": "nourriture",
@@ -825,7 +828,7 @@
     },
     "s40c": {
       "id": "s40c",
-      "content": "Brian te tend le joint qu'il vient de rouler. « Allez, c'est Dubkasm dans deux heures… »\n\n*Tu prends ?*",
+      "content": "Brian te tend le joint qu'il vient de rouler. « Allez, c'est Dubkasm dans deux heures… »\n\nTu prends ?",
       "choices": [
         {
           "id": "s40c-a",
@@ -842,7 +845,7 @@
                 "effects": [
                   {
                     "gaugeId": "fumette",
-                    "delta": 22
+                    "delta": 30
                   },
                   {
                     "gaugeId": "energie",
@@ -861,7 +864,7 @@
                 "effects": [
                   {
                     "gaugeId": "fumette",
-                    "delta": 52
+                    "delta": 65
                   },
                   {
                     "gaugeId": "energie",
@@ -964,7 +967,7 @@
     },
     "s50": {
       "id": "s50",
-      "content": "La nuit est tombée mais l'air est encore lourd, dense, chaud comme une couverture mouillée. La Dub Club Arena est pleine à craquer — t'as jamais vu autant de monde dans un espace aussi petit. Dubkasm monte sur scène et les premières notes font taire tout le monde une seconde — puis la foule explose. C'est lourd, profond, hypnotique. Bastien est quelque part devant à sauter. Brian est à côté de toi, il sourit comme un gamin.\n\n*La chaleur te coûte déjà de l'énergie. Comment tu vis ce concert ?*",
+      "content": "La nuit est tombée mais l'air est encore lourd, dense, chaud comme une couverture mouillée. La Dub Club Arena est pleine à craquer — t'as jamais vu autant de monde dans un espace aussi petit. Dubkasm monte sur scène et les premières notes font taire tout le monde une seconde — puis la foule explose. C'est lourd, profond, hypnotique. Bastien est quelque part devant à sauter. Brian est à côté de toi, il sourit comme un gamin.\n\nLa chaleur te grignote déjà. Comment tu vis ce concert ?",
       "choices": [
         {
           "id": "s50-a",
@@ -973,7 +976,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "energie",
-              "delta": -10
+              "delta": -5
             }
           ],
           "weightedOutcome": {
@@ -987,7 +990,7 @@
                 "effects": [
                   {
                     "gaugeId": "energie",
-                    "delta": -28,
+                    "delta": -20,
                     "statInfluence": {
                       "statId": "endurance",
                       "multiplier": 2
@@ -1006,7 +1009,7 @@
                 "effects": [
                   {
                     "gaugeId": "energie",
-                    "delta": -40,
+                    "delta": -30,
                     "statInfluence": {
                       "statId": "endurance",
                       "multiplier": 2
@@ -1029,7 +1032,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "energie",
-              "delta": -10
+              "delta": -5
             }
           ]
         },
@@ -1040,7 +1043,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "energie",
-              "delta": -10
+              "delta": -5
             }
           ]
         }
@@ -1105,7 +1108,7 @@
     },
     "s60": {
       "id": "s60",
-      "content": "Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux — le genre de regard qui fixe un point à six kilomètres de distance. Brian a disparu — vous le retrouvez assis contre une barrière, un gobelet vide à la main. « Les gars, j'crois que j'ai un peu trop bu. »\n\nIl est 23h. Channel One passe à l'Outernational jusqu'à 1h du mat.\n\nBrian sort machinalement son matos, par réflexe. « Dernier petit truc ? »",
+      "content": "Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux — le genre de regard qui fixe un point à six kilomètres de distance. Brian a disparu — vous le retrouvez assis contre une barrière, un gobelet vide à la main. « Les gars, j'crois que j'ai un peu trop bu. »\n\nIl est 23h. Channel One passe à l'Outernational jusqu'à 3h du mat.\n\nBrian sort machinalement son matos, par réflexe. « Dernier petit truc ? »",
       "choices": [
         {
           "id": "s60-a",
@@ -1122,7 +1125,7 @@
                 "effects": [
                   {
                     "gaugeId": "fumette",
-                    "delta": 18
+                    "delta": 25
                   },
                   {
                     "gaugeId": "kiff",
@@ -1137,7 +1140,7 @@
                 "effects": [
                   {
                     "gaugeId": "fumette",
-                    "delta": 42
+                    "delta": 55
                   },
                   {
                     "gaugeId": "energie",
@@ -1180,7 +1183,7 @@
     },
     "s61c": {
       "id": "s61c",
-      "content": "*Maintenant qu'est-ce que tu fais ?*",
+      "content": "Maintenant qu'est-ce que tu fais ?",
       "choices": [
         {
           "id": "s61c-a",
@@ -1262,7 +1265,7 @@
     },
     "s62": {
       "id": "s62",
-      "content": "Tu accompagnes Brian jusqu'au camping. Il s'effondre sur son sac de couchage en marmonnant un « merci mec » sincère. Tu restes assis dehors sous les étoiles, les basses du festival en fond sonore. Quelqu'un au loin joue une flûte. Personne lui a rien demandé mais c'est pas déplaisant.\n\n*T'as encore de l'énergie. Tu repars ?*",
+      "content": "Tu accompagnes Brian jusqu'au camping. Il s'effondre sur son sac de couchage en marmonnant un « merci mec » sincère. Tu restes assis dehors sous les étoiles, les basses du festival en fond sonore. Quelqu'un au loin joue une flûte. Personne lui a rien demandé mais c'est pas déplaisant.\n\nT'as encore de l'énergie. Tu repars ?",
       "choices": [
         {
           "id": "s62-a",
@@ -1335,7 +1338,7 @@
     },
     "s63": {
       "id": "s63",
-      "content": "Les stands sont encore ouverts. Frites, sauce — le genre de truc qui goûte trop bon à minuit dans un festival, c'est-à-dire objectivement meilleur que dans n'importe quel restaurant. T'es pas sûr si c'est la faim, la fatigue, ou les basses au loin, mais c'est parfait.\n\n*Et maintenant ?*",
+      "content": "Les stands sont encore ouverts. Frites, sauce — le genre de truc qui goûte trop bon à minuit dans un festival, c'est-à-dire objectivement meilleur que dans n'importe quel restaurant. T'es pas sûr si c'est la faim, la fatigue, ou les basses au loin, mais c'est parfait.\n\nEt maintenant ?",
       "choices": [
         {
           "id": "s63-a",
