@@ -10,6 +10,8 @@ import ChoiceCards from './ChoiceCards'
 import CharacterSheet from './CharacterSheet'
 import EndScreen from './EndScreen'
 
+const RESULT_DISPLAY_MS = 1500
+
 interface StoryReaderProps {
   config: StoryConfig
   initialStats: Record<string, number> | null
@@ -19,10 +21,55 @@ interface StoryReaderProps {
 export default function StoryReader({ config, initialStats, onReplay }: StoryReaderProps) {
   const { engineState, resolveChoice, applyDecay, resetEngine, setStats, animKey } = useStoryEngine(config)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const prevParagraphId = useRef(engineState.paragraphId)
   const statsApplied = useRef(false)
 
-  // Apply initial stats once on mount
+  // ── Result phase ─────────────────────────────────────────────────────────────
+  // displayedParagraphId holds the paragraph currently shown in the UI.
+  // It lags behind engineState.paragraphId for RESULT_DISPLAY_MS when there is a
+  // result to show, so the result appears with the departing paragraph (B) rather
+  // than the arriving paragraph (C).
+  const [displayedParagraphId, setDisplayedParagraphId] = useState(engineState.paragraphId)
+  const [capturedResult, setCapturedResult] = useState<{
+    text: string | null
+    deltas: Record<string, number> | null
+  } | null>(null)
+
+  const isTransitioning =
+    !engineState.isGameOver &&
+    !engineState.isComplete &&
+    displayedParagraphId !== engineState.paragraphId
+
+  useEffect(() => {
+    if (engineState.paragraphId === displayedParagraphId) return
+
+    // Game over / complete: skip the result phase, advance immediately
+    if (engineState.isGameOver || engineState.isComplete) {
+      setDisplayedParagraphId(engineState.paragraphId)
+      return
+    }
+
+    const hasResult =
+      !!engineState.lastOutcomeText ||
+      !!(engineState.lastGaugeDeltas && Object.keys(engineState.lastGaugeDeltas).length > 0)
+
+    if (!hasResult) {
+      setDisplayedParagraphId(engineState.paragraphId)
+      return
+    }
+
+    // Capture the result snapshot (engine state will be overwritten on the next choice)
+    setCapturedResult({ text: engineState.lastOutcomeText, deltas: engineState.lastGaugeDeltas })
+    window.scrollTo({ top: 0, behavior: 'instant' })
+
+    const timer = setTimeout(() => {
+      setDisplayedParagraphId(engineState.paragraphId)
+      setCapturedResult(null)
+    }, RESULT_DISPLAY_MS)
+
+    return () => clearTimeout(timer)
+  }, [engineState.paragraphId, engineState.isGameOver, engineState.isComplete]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Stats init ────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (initialStats && !statsApplied.current) {
       setStats(initialStats)
@@ -30,24 +77,23 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
     }
   }, [initialStats, setStats])
 
-  // Apply decay when arriving at a decay node
+  // ── Arrival effects (decay + scroll) ─────────────────────────────────────────
+  // These fire when the displayed paragraph actually changes (after the result phase),
+  // not when the engine paragraph changes.
+  const prevDisplayedRef = useRef(displayedParagraphId)
   useEffect(() => {
-    if (prevParagraphId.current !== engineState.paragraphId) {
-      prevParagraphId.current = engineState.paragraphId
-      if (config.decayNodes.includes(engineState.paragraphId)) {
-        applyDecay()
-      }
+    if (prevDisplayedRef.current === displayedParagraphId) return
+    prevDisplayedRef.current = displayedParagraphId
+
+    if (config.decayNodes.includes(displayedParagraphId)) {
+      applyDecay()
     }
-  }, [engineState.paragraphId, config.decayNodes, applyDecay])
-
-  // Scroll to top on every paragraph transition
-  useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [engineState.paragraphId])
+  }, [displayedParagraphId, config.decayNodes, applyDecay])
 
-  const currentParagraph = config.paragraphs[engineState.paragraphId]
+  // ── Render ────────────────────────────────────────────────────────────────────
+  const currentParagraph = config.paragraphs[displayedParagraphId]
 
-  // Game over or story complete → show end screen
   if (engineState.isGameOver || engineState.isComplete) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -80,7 +126,7 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
     return (
       <div className="reading-column" style={{ paddingTop: '3rem' }}>
         <p style={{ color: 'var(--color-danger)' }}>
-          Paragraph &quot;{engineState.paragraphId}&quot; not found.
+          Paragraph &quot;{displayedParagraphId}&quot; not found.
         </p>
       </div>
     )
@@ -98,12 +144,19 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
 
       <main style={{ flex: 1, paddingTop: '1.5rem' }}>
         <ParagraphDisplay content={currentParagraph.content} />
-        <ResultBlock
-          text={engineState.lastOutcomeText}
-          gaugeDeltas={engineState.lastGaugeDeltas}
-          gauges={config.gauges}
-        />
-        <ChoiceCards choices={currentParagraph.choices} onChoose={resolveChoice} />
+
+        {/* Result appears with the departing paragraph (B), then the arriving paragraph (C) renders clean */}
+        {isTransitioning && capturedResult && (
+          <ResultBlock
+            text={capturedResult.text}
+            gaugeDeltas={capturedResult.deltas}
+            gauges={config.gauges}
+          />
+        )}
+
+        {!isTransitioning && (
+          <ChoiceCards choices={currentParagraph.choices} onChoose={resolveChoice} />
+        )}
       </main>
 
       <CharacterSheet
