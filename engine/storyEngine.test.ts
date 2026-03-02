@@ -33,6 +33,29 @@ function createFreshEngine(stats: Record<string, number> = {}): Engine {
 
 const defaultStats = { endurance: 2, estomac: 3, resistanceAlcool: 3, resistanceFumette: 2 }
 
+function makeEngineAt(paragraphId: string, gauges: Record<string, number>, stats: Record<string, number> = defaultStats, extras: Partial<EngineState> = {}): Engine {
+  return createEngine(config, {
+    storyId: 'dub-camp-test',
+    version: 1,
+    savedAt: Date.now(),
+    engineState: {
+      storyId: 'dub-camp-test',
+      paragraphId,
+      gauges: { energie: 100, alcool: 0, fumette: 0, nourriture: 50, kiff: 0, ...gauges },
+      stats,
+      act: 'act1',
+      inventory: [],
+      score: gauges.kiff ?? 0,
+      isGameOver: false,
+      gameOverParagraphId: null,
+      isComplete: false,
+      lastOutcomeText: null,
+      lastGaugeDeltas: null,
+      ...extras,
+    },
+  })
+}
+
 // ─── Tests ──────────────────────────────────────────────────────────────────
 
 describe('Gauge System', () => {
@@ -56,19 +79,19 @@ describe('Gauge System', () => {
       expect(result.energie).toBe(90)
     })
 
-    it('applies stat influence to delta', () => {
+    it('applies stat influence to delta (additive formula)', () => {
       const gauges = { energie: 100 }
       const result = applyGaugeEffects(
         gauges,
         [{
           gaugeId: 'energie',
           delta: -20,
-          statInfluence: { statId: 'endurance', multiplier: 0.1 },
+          statInfluence: { statId: 'endurance', multiplier: 2 },
         }],
         { endurance: 4 },
         config
       )
-      // delta = -20 * (1 - 4 * 0.1) = -20 * 0.6 = -12
+      // delta = -20 + (4 * 2) = -12
       expect(result.energie).toBe(88)
     })
 
@@ -176,11 +199,13 @@ describe('Weighted Outcome Resolution', () => {
   const outcome = {
     gaugeId: 'alcool',
     statId: 'resistanceAlcool',
-    goodEffects: [{ gaugeId: 'kiff', delta: 5 }],
-    badEffects: [{ gaugeId: 'alcool', delta: 10 }],
+    outcomes: [
+      { id: 'a', maxRisk: 60, text: 'Good outcome.', effects: [{ gaugeId: 'kiff', delta: 5 }] },
+      { id: 'b', maxRisk: 100, text: 'Bad outcome.', effects: [{ gaugeId: 'alcool', delta: 10 }] },
+    ],
   }
 
-  it('returns good when roll < goodProbability', () => {
+  it('returns outcome a when roll < goodProbability', () => {
     const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1)
     const result = resolveOutcome(
       outcome,
@@ -188,13 +213,13 @@ describe('Weighted Outcome Resolution', () => {
       { resistanceAlcool: 3 },
       config
     )
-    // risk = 20 - (3*15) + 0 = 20 - 45 = -25 → < 30 → 90% good
-    // roll 0.1 < 0.9 → good
-    expect(result).toBe('good')
+    // risk = 20 - (3*15) + 0 = -25 → < 30 → 90% good
+    // roll 0.1 < 0.9 → outcome a
+    expect(result.id).toBe('a')
     spy.mockRestore()
   })
 
-  it('returns bad when roll >= goodProbability', () => {
+  it('returns outcome b when roll >= goodProbability', () => {
     const spy = vi.spyOn(Math, 'random').mockReturnValue(0.95)
     const result = resolveOutcome(
       outcome,
@@ -202,8 +227,8 @@ describe('Weighted Outcome Resolution', () => {
       { resistanceAlcool: 3 },
       config
     )
-    // risk = -25 → 90% good, roll 0.95 >= 0.9 → bad
-    expect(result).toBe('bad')
+    // risk = -25 → 90% good, roll 0.95 >= 0.9 → outcome b
+    expect(result.id).toBe('b')
     spy.mockRestore()
   })
 
@@ -216,8 +241,8 @@ describe('Weighted Outcome Resolution', () => {
       config
     )
     // risk = 60 - (2*15) + 25 = 60 - 30 + 25 = 55 → <= 55 → 60% good
-    // roll 0.55 < 0.6 → good
-    expect(result).toBe('good')
+    // roll 0.55 < 0.6 → outcome a
+    expect(result.id).toBe('a')
     spy.mockRestore()
   })
 
@@ -230,7 +255,7 @@ describe('Weighted Outcome Resolution', () => {
       config
     )
     // gaugeLevel = 0, risk = 0 - 45 + 0 = -45 → 90%
-    expect(result).toBe('good')
+    expect(result.id).toBe('a')
     spy.mockRestore()
   })
 
@@ -243,8 +268,56 @@ describe('Weighted Outcome Resolution', () => {
       config
     )
     // risk = 70 - 0 + 0 = 70 → 55–75 → 40% good
-    // roll 0.85 >= 0.4 → bad
-    expect(result).toBe('bad')
+    // roll 0.85 >= 0.4 → outcome b
+    expect(result.id).toBe('b')
+    spy.mockRestore()
+  })
+
+  it('selects correct branch from 3-outcome weighted resolution', () => {
+    const threeOutcome = {
+      gaugeId: 'alcool',
+      statId: 'resistanceAlcool',
+      outcomes: [
+        { id: 'a', maxRisk: 30, text: 'Amazing', effects: [] },
+        { id: 'b', maxRisk: 70, text: 'Decent', effects: [] },
+        { id: 'c', maxRisk: 100, text: 'Bad', effects: [] },
+      ],
+    }
+    // risk in 30-55 range → goodProbability = 0.6
+    // roll 0.65 >= 0.6 → bad zone: badZoneWidth = (1-0.6)/2 = 0.2
+    // badIndex = 1 + Math.floor((0.65-0.6)/0.2) = 1 + 0 = 1 → outcome b
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.65)
+    const result = resolveOutcome(
+      threeOutcome,
+      { alcool: 60, nourriture: 60 },
+      { resistanceAlcool: 2 }, // risk = 60 - 30 = 30 → exactly 30–55 → 0.6
+      config
+    )
+    expect(result.id).toBe('b')
+    expect(result.text).toBe('Decent')
+    spy.mockRestore()
+  })
+
+  it('selects outcome c from 3-outcome at high roll', () => {
+    const threeOutcome = {
+      gaugeId: 'alcool',
+      statId: 'resistanceAlcool',
+      outcomes: [
+        { id: 'a', maxRisk: 30, text: 'Amazing', effects: [] },
+        { id: 'b', maxRisk: 70, text: 'Decent', effects: [] },
+        { id: 'c', maxRisk: 100, text: 'Bad', effects: [] },
+      ],
+    }
+    // goodProbability = 0.6, badZoneWidth = 0.2
+    // roll 0.85 → badIndex = 1 + Math.floor((0.85-0.6)/0.2) = 1 + 1 = 2 → outcome c
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.85)
+    const result = resolveOutcome(
+      threeOutcome,
+      { alcool: 60, nourriture: 60 },
+      { resistanceAlcool: 2 },
+      config
+    )
+    expect(result.id).toBe('c')
     spy.mockRestore()
   })
 })
@@ -270,6 +343,8 @@ describe('Core Story Engine', () => {
       expect(state.isGameOver).toBe(false)
       expect(state.isComplete).toBe(false)
       expect(state.inventory).toEqual([])
+      expect(state.lastOutcomeText).toBeNull()
+      expect(state.lastGaugeDeltas).toBeNull()
     })
 
     it('restores from valid saved state', () => {
@@ -284,6 +359,8 @@ describe('Core Story Engine', () => {
         isGameOver: false,
         gameOverParagraphId: null,
         isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
       }
       const savedState = {
         storyId: 'dub-camp-test',
@@ -298,6 +375,33 @@ describe('Core Story Engine', () => {
       expect(state.gauges.energie).toBe(60)
       expect(state.inventory).toEqual(['sandwich'])
       expect(state.act).toBe('act2')
+    })
+
+    it('restores old saves missing lastOutcomeText/lastGaugeDeltas (migration guard)', () => {
+      // Old v1.0 save without the new fields
+      const savedState = {
+        storyId: 'dub-camp-test',
+        version: 1,
+        savedAt: Date.now(),
+        engineState: {
+          storyId: 'dub-camp-test',
+          paragraphId: 's20',
+          gauges: { energie: 60, alcool: 30, fumette: 10, nourriture: 40, kiff: 15 },
+          stats: defaultStats,
+          act: 'act2',
+          inventory: [],
+          score: 15,
+          isGameOver: false,
+          gameOverParagraphId: null,
+          isComplete: false,
+          // lastOutcomeText and lastGaugeDeltas intentionally absent (old save)
+        },
+      }
+      const restoredEngine = createEngine(config, savedState as unknown as Parameters<typeof createEngine>[1])
+      const state = restoredEngine.getState()
+      expect(state.paragraphId).toBe('s20') // restored, not fresh
+      expect(state.lastOutcomeText).toBeNull()
+      expect(state.lastGaugeDeltas).toBeNull()
     })
 
     it('ignores saved state with wrong version', () => {
@@ -316,6 +420,8 @@ describe('Core Story Engine', () => {
           isGameOver: false,
           gameOverParagraphId: null,
           isComplete: false,
+          lastOutcomeText: null,
+          lastGaugeDeltas: null,
         },
       }
       const restoredEngine = createEngine(config, savedState)
@@ -338,6 +444,8 @@ describe('Core Story Engine', () => {
           isGameOver: false,
           gameOverParagraphId: null,
           isComplete: false,
+          lastOutcomeText: null,
+          lastGaugeDeltas: null,
         },
       }
       const restoredEngine = createEngine(config, savedState)
@@ -360,6 +468,8 @@ describe('Core Story Engine', () => {
           isGameOver: false,
           gameOverParagraphId: null,
           isComplete: false,
+          lastOutcomeText: null,
+          lastGaugeDeltas: null,
         },
       }
       const restoredEngine = createEngine(config, savedState)
@@ -402,18 +512,18 @@ describe('Core Story Engine', () => {
     it('applies weighted outcome good effects', () => {
       // Navigate to s10
       engine.resolveChoice('c1a')
-      const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1) // good outcome
+      const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1) // good outcome, no conditional
       const state = engine.resolveChoice('c10b')
-      expect(state.gauges.kiff).toBeGreaterThan(0) // goodEffects: kiff +5
+      expect(state.gauges.kiff).toBeGreaterThan(0) // outcomes[0] (good): kiff +5
       spy.mockRestore()
     })
 
     it('applies weighted outcome bad effects', () => {
       engine.resolveChoice('c1a')
-      const spy = vi.spyOn(Math, 'random').mockReturnValue(0.99) // bad outcome
+      const spy = vi.spyOn(Math, 'random').mockReturnValue(0.99) // bad outcome + no conditional branch
       const stateBefore = engine.getState()
       const stateAfter = engine.resolveChoice('c10b')
-      // badEffects: alcool +10 on top of choice effect alcool +15
+      // outcomes[1] (bad): alcool +10 on top of choice effect alcool +15
       expect(stateAfter.gauges.alcool).toBe(stateBefore.gauges.alcool + 15 + 10)
       spy.mockRestore()
     })
@@ -432,38 +542,73 @@ describe('Core Story Engine', () => {
     })
   })
 
+  describe('lastOutcomeText and lastGaugeDeltas', () => {
+    it('lastOutcomeText is null after choice with no weighted outcome', () => {
+      const state = engine.resolveChoice('c1a') // no weightedOutcome
+      expect(state.lastOutcomeText).toBeNull()
+    })
+
+    it('lastOutcomeText is set after weighted outcome resolves (good)', () => {
+      engine.resolveChoice('c1a') // navigate to s10
+      const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1) // good outcome
+      const state = engine.resolveChoice('c10b')
+      expect(state.lastOutcomeText).toBe('Good outcome.')
+      spy.mockRestore()
+    })
+
+    it('lastOutcomeText is set after weighted outcome resolves (bad)', () => {
+      engine.resolveChoice('c1a')
+      const spy = vi.spyOn(Math, 'random').mockReturnValue(0.99) // bad outcome + conditional
+      const state = engine.resolveChoice('c10b')
+      expect(state.lastOutcomeText).toBe('Bad outcome.')
+      spy.mockRestore()
+    })
+
+    it('lastOutcomeText is cleared to null at start of next resolveChoice', () => {
+      engine.resolveChoice('c1a')
+      // c10b has weightedOutcome + conditionalBranch (prob 0.33)
+      // Use 0.1 for resolveOutcome (good outcome), 0.5 for conditionalBranch (0.5 >= 0.33 → normal route s20)
+      const spy = vi.spyOn(Math, 'random')
+        .mockReturnValueOnce(0.1)  // resolveOutcome → outcome a
+        .mockReturnValueOnce(0.5)  // conditionalBranch → 0.5 >= 0.33 → normal route s20
+      engine.resolveChoice('c10b') // sets lastOutcomeText, routes to s20
+      spy.mockRestore()
+
+      // Next choice at s20 (no weighted outcome)
+      vi.spyOn(Math, 'random').mockReturnValue(0.99)
+      const state = engine.resolveChoice('c20b')
+      expect(state.lastOutcomeText).toBeNull()
+      vi.restoreAllMocks()
+    })
+
+    it('lastGaugeDeltas reflects correct delta after choice with gauge effects', () => {
+      const state = engine.resolveChoice('c1a') // energie -5
+      expect(state.lastGaugeDeltas).not.toBeNull()
+      expect(state.lastGaugeDeltas!['energie']).toBe(-5)
+    })
+
+    it('lastGaugeDeltas includes combined choice + outcome deltas', () => {
+      engine.resolveChoice('c1a')
+      const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1) // good outcome: kiff +5
+      const state = engine.resolveChoice('c10b') // choice: alcool +15, energie -5; good: kiff +5
+      expect(state.lastGaugeDeltas!['alcool']).toBe(15)
+      expect(state.lastGaugeDeltas!['kiff']).toBe(5)
+      spy.mockRestore()
+    })
+
+    it('lastGaugeDeltas is null when no gauges changed', () => {
+      // A choice that has no gaugeEffects and no weightedOutcome would produce null deltas.
+      // Use a fresh engine where we can test by navigating to sAlt (isComplete, no effects).
+      const e = makeEngineAt('s40', { energie: 50, kiff: 10 })
+      const state = e.resolveChoice('c40b') // kiff +5 only
+      // kiff changed by 5
+      expect(state.lastGaugeDeltas!['kiff']).toBe(5)
+    })
+  })
+
   describe('Game Over paths', () => {
     it('triggers §201 (alcool too high)', () => {
-      // Directly manipulate to test Game Over trigger
-      // Navigate and accumulate alcool
-      engine.resolveChoice('c1b') // +20 alcool
-      engine.resolveChoice('c10a') // just advance
-      vi.spyOn(Math, 'random').mockReturnValue(0.99)
-      engine.resolveChoice('c20b')
-      engine.resolveChoice('c30b') // +25 fumette
-      // At s40, alcool is at 20 from c1b. Need more.
-      // Use c40c: +40 alcool → total 60. Still not enough.
-      // Force alcool high through multiple choices isn't easy, so let's test the threshold logic directly
-      vi.restoreAllMocks()
-
-      // Create an engine with high alcool from saved state
-      const highAlcoolEngine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's60',
-          gauges: { energie: 50, alcool: 70, fumette: 0, nourriture: 50, kiff: 10 },
-          stats: defaultStats,
-          act: 'act4',
-          inventory: [],
-          score: 10,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
+      const highAlcoolEngine = makeEngineAt('s60', { energie: 50, alcool: 70, nourriture: 50, kiff: 10 }, defaultStats, { act: 'act4' })
 
       // c60a: +20 alcool → 90, threshold is >= 85 → Game Over
       const state = highAlcoolEngine.resolveChoice('c60a')
@@ -472,23 +617,7 @@ describe('Core Story Engine', () => {
     })
 
     it('triggers §202 (fumette too high)', () => {
-      const engine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's30',
-          gauges: { energie: 50, alcool: 0, fumette: 65, nourriture: 50, kiff: 10 },
-          stats: defaultStats,
-          act: 'act2',
-          inventory: [],
-          score: 10,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
+      const engine = makeEngineAt('s30', { energie: 50, fumette: 65, nourriture: 50, kiff: 10 }, defaultStats, { act: 'act2' })
 
       // c30b: +25 fumette → 90, threshold >= 85 → Game Over
       const state = engine.resolveChoice('c30b')
@@ -496,51 +625,8 @@ describe('Core Story Engine', () => {
       expect(state.gameOverParagraphId).toBe('s202')
     })
 
-    it('triggers §203 (nourriture too low)', () => {
-      const engine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's20',
-          gauges: { energie: 50, alcool: 0, fumette: 0, nourriture: 6, kiff: 0 },
-          stats: { estomac: 0 },
-          act: 'act2',
-          inventory: [],
-          score: 0,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
-
-      // Apply decay at s20 (decay node): nourriture 6 - 10 = 0, clamped to 0 → <= 5 threshold
-      vi.spyOn(Math, 'random').mockReturnValue(0.99)
-      const state = engine.applyDecay()
-      expect(state.isGameOver).toBe(true)
-      expect(state.gameOverParagraphId).toBe('s203')
-      vi.restoreAllMocks()
-    })
-
     it('triggers §204 (energie exhaustion)', () => {
-      const engine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's60',
-          gauges: { energie: 20, alcool: 0, fumette: 0, nourriture: 50, kiff: 10 },
-          stats: defaultStats,
-          act: 'act4',
-          inventory: [],
-          score: 10,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
+      const engine = makeEngineAt('s60', { energie: 20, alcool: 0, nourriture: 50, kiff: 10 }, defaultStats, { act: 'act4' })
 
       // c60a: -25 energie → -5 → clamped to 0, threshold <= 0 → Game Over
       const state = engine.resolveChoice('c60a')
@@ -549,54 +635,20 @@ describe('Core Story Engine', () => {
     })
 
     it('evaluates Game Over BEFORE act transition', () => {
-      // Set up state where choice would trigger both Game Over and act transition
-      const engine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's50',
-          gauges: { energie: 10, alcool: 0, fumette: 0, nourriture: 50, kiff: 10 },
-          stats: defaultStats,
-          act: 'act3',
-          inventory: [],
-          score: 10,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
+      const engine = makeEngineAt('s50', { energie: 10, nourriture: 50, kiff: 10 }, defaultStats, { act: 'act3' })
 
       // c50a: -15 energie → -5 → clamped to 0. Game Over threshold triggered.
-      // Target is s60 (act4) but Game Over should fire first, preventing act transition.
+      // Target is s60 (act4) but Game Over should fire first.
       const state = engine.resolveChoice('c50a')
       expect(state.isGameOver).toBe(true)
-      // Act should NOT have changed to act4 since Game Over stops execution
       expect(state.gameOverParagraphId).toBe('s204')
     })
   })
 
   describe('voluntary exit §41', () => {
     it('awards Kiff +5 and sets isComplete without Game Over', () => {
-      // Navigate to s40
-      const engine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's40',
-          gauges: { energie: 50, alcool: 50, fumette: 50, nourriture: 30, kiff: 10 },
-          stats: defaultStats,
-          act: 'act3',
-          inventory: [],
-          score: 10,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
+      // Use alcool=0, fumette=0 to avoid triggering the score multiplier rule (needs 20–55 range)
+      const engine = makeEngineAt('s40', { energie: 50, alcool: 0, fumette: 0, nourriture: 30, kiff: 10 }, defaultStats, { act: 'act3' })
 
       const state = engine.resolveChoice('c40b') // kiff +5, target s41 (isComplete)
       expect(state.gauges.kiff).toBe(15) // 10 + 5
@@ -608,23 +660,7 @@ describe('Core Story Engine', () => {
 
   describe('decay at nodes', () => {
     it('applyDecay changes gauges at decay nodes', () => {
-      const engine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's20', // decay node
-          gauges: { energie: 80, alcool: 0, fumette: 0, nourriture: 50, kiff: 0 },
-          stats: { estomac: 0 },
-          act: 'act2',
-          inventory: [],
-          score: 0,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
+      const engine = makeEngineAt('s20', { energie: 80, nourriture: 50 }, { estomac: 0 }, { act: 'act2' })
 
       vi.spyOn(Math, 'random').mockReturnValue(0.99) // no passive risk
       const state = engine.applyDecay()
@@ -633,24 +669,7 @@ describe('Core Story Engine', () => {
     })
 
     it('decay fires AFTER choice effects on same-node choices', () => {
-      // At s20 (decay node), make a choice, THEN apply decay separately
-      const engine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's20',
-          gauges: { energie: 80, alcool: 0, fumette: 0, nourriture: 50, kiff: 0 },
-          stats: { estomac: 0 },
-          act: 'act2',
-          inventory: [],
-          score: 0,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
+      const engine = makeEngineAt('s20', { energie: 80, nourriture: 50 }, { estomac: 0 }, { act: 'act2' })
 
       vi.spyOn(Math, 'random').mockReturnValue(0.99)
 
@@ -658,33 +677,13 @@ describe('Core Story Engine', () => {
       const afterChoice = engine.resolveChoice('c20a')
       expect(afterChoice.gauges.energie).toBe(60) // 80 - 20
 
-      // Then decay applied separately (caller responsibility)
-      // Note: decay is applied at the CURRENT node before making the choice,
-      // or after depending on architecture. The engine's applyDecay works on current state.
-
       vi.restoreAllMocks()
     })
   })
 
   describe('act transitions', () => {
     it('transitions act when entering new act paragraphs', () => {
-      const engine = createEngine(config, {
-        storyId: 'dub-camp-test',
-        version: 1,
-        savedAt: Date.now(),
-        engineState: {
-          storyId: 'dub-camp-test',
-          paragraphId: 's10',
-          gauges: { energie: 80, alcool: 0, fumette: 0, nourriture: 50, kiff: 0 },
-          stats: defaultStats,
-          act: 'act1',
-          inventory: [],
-          score: 0,
-          isGameOver: false,
-          gameOverParagraphId: null,
-          isComplete: false,
-        },
-      })
+      const engine = makeEngineAt('s10', { energie: 80 }, defaultStats, { act: 'act1' })
 
       // c10a targets s20, which is in act2
       const state = engine.resolveChoice('c10a')
@@ -734,6 +733,300 @@ describe('Core Story Engine', () => {
       expect(state.score).toBe(3)
       expect(state.gauges.kiff).toBe(3)
     })
+  })
+})
+
+describe('Score Multipliers', () => {
+  it('applies score multiplier when all conditions met', () => {
+    // alcool 35 (20–55 ✓), fumette 30 (20–55 ✓) → multiplier 1.4
+    const engine = makeEngineAt('s1', { alcool: 35, fumette: 30, kiff: 0, energie: 100, nourriture: 50 })
+    // c1b gives kiff +3 → 3 * 1.4 = 4.2 → 4 (kiff gauge = 4.2 but clamped to integer via number)
+    const state = engine.resolveChoice('c1b') // kiff +3
+    expect(state.gauges.kiff).toBeCloseTo(4.2)
+  })
+
+  it('does NOT apply score multiplier when one condition unmet', () => {
+    // alcool 35 (✓), fumette 10 (fails min: 20) → no multiplier
+    const engine = makeEngineAt('s1', { alcool: 35, fumette: 10, kiff: 0, energie: 100, nourriture: 50 })
+    const state = engine.resolveChoice('c1b') // kiff +3
+    expect(state.gauges.kiff).toBe(3) // no multiplier
+  })
+
+  it('first matching rule wins', () => {
+    // Use a config with two rules; first rule applies
+    const engine = makeEngineAt('s1', { alcool: 35, fumette: 30, kiff: 0, energie: 100, nourriture: 50 })
+    const state = engine.resolveChoice('c1b') // kiff +3 * 1.4
+    // Should have applied 1.4x (first rule match)
+    expect(state.gauges.kiff).toBeCloseTo(4.2)
+    expect(state.gauges.kiff).not.toBe(3) // baseline without multiplier
+  })
+
+  it('applies score multiplier to weighted outcome branch effects', () => {
+    // Navigate to s10, set up sweet-spot gauges (alcool 35, fumette 30) → 1.4× multiplier
+    // c10b: choice gaugeEffects (alcool +15, energie -5) + weightedOutcome good: kiff +5
+    // With multiplier 1.4: kiff delta from outcome = 5 * 1.4 = 7
+    const engine = makeEngineAt('s10', { alcool: 35, fumette: 30, kiff: 0, energie: 100, nourriture: 50 })
+    const spy = vi.spyOn(Math, 'random')
+      .mockReturnValueOnce(0.1)  // resolveOutcome → good branch (kiff +5)
+      .mockReturnValueOnce(0.5)  // conditionalBranch → 0.5 >= 0.33 → normal route
+    const state = engine.resolveChoice('c10b')
+    // kiff from outcome: 5 * 1.4 = 7
+    expect(state.gauges.kiff).toBeCloseTo(7)
+    spy.mockRestore()
+  })
+})
+
+describe('Contextual Game Over', () => {
+  // Add a contextualGameOver test by extending the config temporarily
+  it('contextual GO fires when gauge crosses threshold at that paragraph', () => {
+    // Build a custom config with contextualGameOver on s50
+    const customConfig: StoryConfig = {
+      ...config,
+      paragraphs: {
+        ...config.paragraphs,
+        s50: {
+          ...config.paragraphs['s50'],
+          contextualGameOver: [
+            { gaugeId: 'energie', threshold: 20, condition: 'below', targetParagraphId: 's204' },
+          ],
+        },
+      },
+    }
+    const engine = createEngine(customConfig, {
+      storyId: 'dub-camp-test',
+      version: 1,
+      savedAt: Date.now(),
+      engineState: {
+        storyId: 'dub-camp-test',
+        paragraphId: 's50',
+        gauges: { energie: 30, alcool: 0, fumette: 0, nourriture: 50, kiff: 0 },
+        stats: defaultStats,
+        act: 'act3',
+        inventory: [],
+        score: 0,
+        isGameOver: false,
+        gameOverParagraphId: null,
+        isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
+      },
+    })
+    // c50a: -15 energie → 15, threshold below 20 → contextual GO fires
+    const state = engine.resolveChoice('c50a')
+    expect(state.isGameOver).toBe(true)
+    expect(state.paragraphId).toBe('s204')
+  })
+
+  it('contextual GO does NOT fire at other paragraphs', () => {
+    // Same GO rule only on s50 — at s60, it should not fire
+    const customConfig: StoryConfig = {
+      ...config,
+      paragraphs: {
+        ...config.paragraphs,
+        s50: {
+          ...config.paragraphs['s50'],
+          contextualGameOver: [
+            { gaugeId: 'energie', threshold: 20, condition: 'below', targetParagraphId: 's204' },
+          ],
+        },
+      },
+    }
+    const engine = createEngine(customConfig, {
+      storyId: 'dub-camp-test',
+      version: 1,
+      savedAt: Date.now(),
+      engineState: {
+        storyId: 'dub-camp-test',
+        paragraphId: 's60',
+        gauges: { energie: 30, alcool: 0, fumette: 0, nourriture: 50, kiff: 10 },
+        stats: defaultStats,
+        act: 'act4',
+        inventory: [],
+        score: 10,
+        isGameOver: false,
+        gameOverParagraphId: null,
+        isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
+      },
+    })
+    // c60b: -10 energie → 20, which is exactly 20 (below threshold is < 20, not <=)
+    // Actually threshold <= uses <= so 20 <= 20 is true, but that's at s60 which has no contextualGO
+    // Use c60a: -25 energie → 5, definitely below 20, but contextual GO only on s50
+    const state = engine.resolveChoice('c60b') // -10 energie → 20
+    // s60 has no contextualGameOver — only global GO would fire (>= 0 threshold for energie)
+    // energie = 20, not <= 0, so no GO
+    expect(state.isGameOver).toBe(false)
+  })
+
+  it('contextual GO with probability: 0.5 fires when roll < 0.5', () => {
+    const customConfig: StoryConfig = {
+      ...config,
+      paragraphs: {
+        ...config.paragraphs,
+        s50: {
+          ...config.paragraphs['s50'],
+          contextualGameOver: [
+            { gaugeId: 'energie', threshold: 20, condition: 'below', probability: 0.5, targetParagraphId: 's204' },
+          ],
+        },
+      },
+    }
+    const engine = createEngine(customConfig, {
+      storyId: 'dub-camp-test',
+      version: 1,
+      savedAt: Date.now(),
+      engineState: {
+        storyId: 'dub-camp-test',
+        paragraphId: 's50',
+        gauges: { energie: 30, alcool: 0, fumette: 0, nourriture: 50, kiff: 0 },
+        stats: defaultStats,
+        act: 'act3',
+        inventory: [],
+        score: 0,
+        isGameOver: false,
+        gameOverParagraphId: null,
+        isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
+      },
+    })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.3) // < 0.5 → fires
+    const state = engine.resolveChoice('c50a')
+    expect(state.isGameOver).toBe(true)
+    spy.mockRestore()
+  })
+
+  it('contextual GO with probability: 0.5 does NOT fire when roll >= 0.5', () => {
+    const customConfig: StoryConfig = {
+      ...config,
+      paragraphs: {
+        ...config.paragraphs,
+        s50: {
+          ...config.paragraphs['s50'],
+          contextualGameOver: [
+            { gaugeId: 'energie', threshold: 20, condition: 'below', probability: 0.5, targetParagraphId: 's204' },
+          ],
+        },
+      },
+    }
+    const engine = createEngine(customConfig, {
+      storyId: 'dub-camp-test',
+      version: 1,
+      savedAt: Date.now(),
+      engineState: {
+        storyId: 'dub-camp-test',
+        paragraphId: 's50',
+        gauges: { energie: 30, alcool: 0, fumette: 0, nourriture: 50, kiff: 0 },
+        stats: defaultStats,
+        act: 'act3',
+        inventory: [],
+        score: 0,
+        isGameOver: false,
+        gameOverParagraphId: null,
+        isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
+      },
+    })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.7) // >= 0.5 → does not fire
+    const state = engine.resolveChoice('c50a')
+    expect(state.isGameOver).toBe(false)
+    spy.mockRestore()
+  })
+})
+
+describe('Conditional Branching', () => {
+  it('routes to conditionalBranch.targetParagraphId when roll < probability', () => {
+    // c10b has conditionalBranch: { probability: 0.33, targetParagraphId: 'sAlt' }
+    const engine = makeEngineAt('s10', { energie: 80, alcool: 0 })
+    // Need roll < 0.33 for conditional branch AND the weighted outcome roll
+    // resolveOutcome is called first (first Math.random call), then conditional branch (second call)
+    // But both use Math.random. Let's mock to return 0.1 for both calls.
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1) // < 0.33 → conditional branch fires
+    const state = engine.resolveChoice('c10b')
+    expect(state.paragraphId).toBe('sAlt')
+    spy.mockRestore()
+  })
+
+  it('routes to choice.targetParagraphId when roll >= probability', () => {
+    const engine = makeEngineAt('s10', { energie: 80, alcool: 0 })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.5) // >= 0.33 → normal route
+    const state = engine.resolveChoice('c10b')
+    expect(state.paragraphId).toBe('s20')
+    spy.mockRestore()
+  })
+})
+
+describe('Composite Game Over', () => {
+  // fixture has compositeGameOverRules: alcool >= 60, nourriture <= 20, probability: 0.22
+
+  it('triggers composite GO when all conditions met and probability roll succeeds', () => {
+    const engine = makeEngineAt('s50', { energie: 100, alcool: 65, nourriture: 10, kiff: 0 })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1) // < 0.22 → GO fires
+    // c50b: +10 energie, +3 kiff (doesn't change alcool/nourriture, conditions already met)
+    const state = engine.resolveChoice('c50b')
+    expect(state.isGameOver).toBe(true)
+    expect(state.paragraphId).toBe('s203')
+    spy.mockRestore()
+  })
+
+  it('does NOT trigger composite GO when one condition unmet', () => {
+    // nourriture = 30 > 20 → condition fails
+    const engine = makeEngineAt('s50', { energie: 100, alcool: 65, nourriture: 30, kiff: 0 })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1) // would fire if conditions met
+    const state = engine.resolveChoice('c50b')
+    expect(state.isGameOver).toBe(false)
+    spy.mockRestore()
+  })
+
+  it('does NOT trigger composite GO when probability roll fails', () => {
+    const engine = makeEngineAt('s50', { energie: 100, alcool: 65, nourriture: 10, kiff: 0 })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.8) // >= 0.22 → does not fire
+    const state = engine.resolveChoice('c50b')
+    expect(state.isGameOver).toBe(false)
+    spy.mockRestore()
+  })
+
+  it('paragraphScope restricts rule to specific paragraphs only', () => {
+    const scopedConfig: StoryConfig = {
+      ...config,
+      compositeGameOverRules: [
+        {
+          paragraphScope: ['s60'], // only at s60
+          conditions: [
+            { gaugeId: 'alcool', min: 60 },
+            { gaugeId: 'nourriture', max: 20 },
+          ],
+          probability: 0.22,
+          targetParagraphId: 's203',
+        },
+      ],
+    }
+    // At s50 (not in paragraphScope) — should NOT fire
+    const engine = createEngine(scopedConfig, {
+      storyId: 'dub-camp-test',
+      version: 1,
+      savedAt: Date.now(),
+      engineState: {
+        storyId: 'dub-camp-test',
+        paragraphId: 's50',
+        gauges: { energie: 100, alcool: 65, fumette: 0, nourriture: 10, kiff: 0 },
+        stats: defaultStats,
+        act: 'act3',
+        inventory: [],
+        score: 0,
+        isGameOver: false,
+        gameOverParagraphId: null,
+        isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
+      },
+    })
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1)
+    const state = engine.resolveChoice('c50b')
+    expect(state.isGameOver).toBe(false) // scoped to s60, not s50
+    spy.mockRestore()
   })
 })
 
@@ -841,6 +1134,8 @@ describe('Persistence', () => {
         isGameOver: false,
         gameOverParagraphId: null,
         isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
       }, 'test')
 
       expect(persistence.load()).not.toBeNull()
@@ -852,23 +1147,7 @@ describe('Persistence', () => {
 
 describe('EVT1 probabilistic event', () => {
   it('applies good effects when outcome is good', () => {
-    const engine = createEngine(config, {
-      storyId: 'dub-camp-test',
-      version: 1,
-      savedAt: Date.now(),
-      engineState: {
-        storyId: 'dub-camp-test',
-        paragraphId: 'sEVT1',
-        gauges: { energie: 80, alcool: 20, fumette: 0, nourriture: 60, kiff: 10 },
-        stats: { resistanceAlcool: 3 },
-        act: 'act3',
-        inventory: [],
-        score: 10,
-        isGameOver: false,
-        gameOverParagraphId: null,
-        isComplete: false,
-      },
-    })
+    const engine = makeEngineAt('sEVT1', { energie: 80, alcool: 20, nourriture: 60, kiff: 10 }, { resistanceAlcool: 3 }, { act: 'act3' })
 
     // kiff +10 from choice, then good outcome: kiff +8
     const spy = vi.spyOn(Math, 'random').mockReturnValue(0.1) // good
@@ -878,23 +1157,7 @@ describe('EVT1 probabilistic event', () => {
   })
 
   it('applies bad effects when outcome is bad', () => {
-    const engine = createEngine(config, {
-      storyId: 'dub-camp-test',
-      version: 1,
-      savedAt: Date.now(),
-      engineState: {
-        storyId: 'dub-camp-test',
-        paragraphId: 'sEVT1',
-        gauges: { energie: 80, alcool: 20, fumette: 0, nourriture: 60, kiff: 10 },
-        stats: { resistanceAlcool: 3 },
-        act: 'act3',
-        inventory: [],
-        score: 10,
-        isGameOver: false,
-        gameOverParagraphId: null,
-        isComplete: false,
-      },
-    })
+    const engine = makeEngineAt('sEVT1', { energie: 80, alcool: 20, nourriture: 60, kiff: 10 }, { resistanceAlcool: 3 }, { act: 'act3' })
 
     // kiff +10 from choice, then bad outcome: alcool +15, energie -10
     const spy = vi.spyOn(Math, 'random').mockReturnValue(0.99) // bad

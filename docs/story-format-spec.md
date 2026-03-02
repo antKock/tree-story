@@ -1,4 +1,4 @@
-# Tree Story — JSON Story Format Specification v1
+# Tree Story — JSON Story Format Specification v1.5
 
 ## Purpose
 
@@ -12,11 +12,14 @@ A story is a single JSON file with this top-level structure:
 {
   "id": "my-story",
   "version": 1,
+  "startParagraphId": "p1",
   "meta": { ... },
   "statPointBudget": 8,
   "stats": [ ... ],
   "gauges": [ ... ],
   "acts": [ ... ],
+  "scoreMultipliers": [ ... ],
+  "compositeGameOverRules": [ ... ],
   "decayNodes": [ ... ],
   "decayRules": [ ... ],
   "paragraphs": { ... },
@@ -41,6 +44,12 @@ Store the file at `public/stories/<id>.json`. The engine loads it on startup, va
 - **Required:** yes
 - **Description:** Schema version. Currently always `1`.
 - **Example:** `1`
+
+### `startParagraphId`
+- **Type:** `string`
+- **Required:** yes
+- **Description:** The paragraph ID where a fresh story session begins. Must reference an existing key in `paragraphs`. Validated at startup by the engine.
+- **Example:** `"s1"`
 
 ### `meta`
 - **Type:** `StoryMeta` object
@@ -67,6 +76,15 @@ Store the file at `public/stories/<id>.json`. The engine loads it on startup, va
 - **Type:** `ActDefinition[]`
 - **Required:** yes
 - **Description:** Story acts, each with theme overrides applied when the player reaches a trigger paragraph. See [ActDefinition](#actdefinition).
+
+### `scoreMultipliers`
+- **Type:** `ScoreMultiplierRule[]`, optional
+- **Description:** Rules that multiply score gauge deltas based on current gauge conditions. Evaluated against the pre-choice gauge snapshot. See [ScoreMultiplierRule](#scoremultiplierrule).
+- **Example:** Moderate alcohol + fumette gives a 1.4× kiff bonus; very high alcohol halves kiff gains.
+
+### `compositeGameOverRules`
+- **Type:** `CompositeGameOverRule[]`, optional
+- **Description:** Multi-gauge Game Over conditions that fire after global single-gauge Game Over checks. See [CompositeGameOverRule](#compositegameoverrule).
 
 ### `decayNodes`
 - **Type:** `string[]`
@@ -113,7 +131,7 @@ interface StoryMeta {
 
 ### `version`
 - **Type:** `string`, required — human-readable version label
-- **Example:** `"v0.8"`
+- **Example:** `"v1.5"`
 
 ### `description`
 - **Type:** `string`, optional
@@ -211,6 +229,7 @@ interface GaugeDefinition {
   isHidden: boolean
   gameOverThreshold?: number
   gameOverCondition?: 'above' | 'below'
+  gameOverParagraphId?: string
 }
 ```
 
@@ -248,12 +267,15 @@ interface GaugeDefinition {
   - `'above'`: Game Over when `gaugeValue > gameOverThreshold` (e.g. Alcool overdose)
 - **Example:** `"below"` for Énergie, `"above"` for Alcool
 
+### `gameOverParagraphId`
+- **Type:** `string`, optional — paragraph to display when this gauge's Game Over condition fires. Must exist in `paragraphs`. Required when `gameOverThreshold` is set.
+
 Dub Camp gauge definitions:
 ```json
 [
-  { "id": "energie", "name": "Énergie", "icon": "⚡", "initialValue": 100, "isScore": false, "isHidden": false, "gameOverThreshold": 10, "gameOverCondition": "below" },
-  { "id": "alcool", "name": "Alcool", "icon": "🍺", "initialValue": 0, "isScore": false, "isHidden": false, "gameOverThreshold": 85, "gameOverCondition": "above" },
-  { "id": "fumette", "name": "Fumette", "icon": "🌿", "initialValue": 0, "isScore": false, "isHidden": false },
+  { "id": "energie", "name": "Énergie", "icon": "⚡", "initialValue": 100, "isScore": false, "isHidden": false, "gameOverThreshold": 10, "gameOverCondition": "below", "gameOverParagraphId": "s204" },
+  { "id": "alcool", "name": "Alcool", "icon": "🍺", "initialValue": 0, "isScore": false, "isHidden": false, "gameOverThreshold": 85, "gameOverCondition": "above", "gameOverParagraphId": "s201" },
+  { "id": "fumette", "name": "Fumette", "icon": "🌿", "initialValue": 0, "isScore": false, "isHidden": false, "gameOverThreshold": 90, "gameOverCondition": "above", "gameOverParagraphId": "s202" },
   { "id": "nourriture", "name": "Nourriture", "icon": "🍔", "initialValue": 50, "isScore": false, "isHidden": false },
   { "id": "kiff", "name": "Kiff", "icon": "🎉", "initialValue": 0, "isScore": true, "isHidden": true }
 ]
@@ -325,6 +347,112 @@ Dub Camp act definitions (with theme palette):
 
 ---
 
+## GaugeCondition
+
+```typescript
+interface GaugeCondition {
+  gaugeId: string
+  min?: number
+  max?: number
+}
+```
+
+A reusable building block for range-testing a gauge. Used in `ScoreMultiplierRule` and `CompositeGameOverRule`. A condition passes when ALL specified bounds are satisfied simultaneously:
+
+- `min`: gauge value must be `>= min`
+- `max`: gauge value must be `<= max`
+- Both can be specified for a range check: `min ≤ value ≤ max`
+- If neither is specified, the condition always passes
+
+---
+
+## ScoreMultiplierRule
+
+```typescript
+interface ScoreMultiplierRule {
+  conditions: GaugeCondition[]
+  multiplier: number
+}
+```
+
+Score multipliers modify score gauge deltas when a set of gauge conditions are all met. They are evaluated against the **pre-choice** gauge snapshot, then applied to score gauge deltas before effects are committed.
+
+- All conditions in the rule must pass simultaneously for the multiplier to apply.
+- Multiple rules are evaluated in order; the **first matching rule wins** (no stacking).
+- Only score gauge deltas (`isScore: true`) are affected — other gauge effects are unchanged.
+
+### `conditions`
+- **Type:** `GaugeCondition[]`, required — all must pass for the multiplier to activate
+- **Example:** `[{ "gaugeId": "alcool", "min": 20, "max": 55 }, { "gaugeId": "fumette", "min": 20, "max": 55 }]`
+
+### `multiplier`
+- **Type:** `number`, required — factor applied to score gauge deltas. Values > 1 amplify; values < 1 reduce.
+- **Example:** `1.4` (sweet spot bonus), `0.5` (penalty for overdrinking)
+
+Dub Camp score multipliers:
+```json
+[
+  {
+    "conditions": [
+      { "gaugeId": "alcool", "min": 20, "max": 55 },
+      { "gaugeId": "fumette", "min": 20, "max": 55 }
+    ],
+    "multiplier": 1.4
+  },
+  {
+    "conditions": [
+      { "gaugeId": "alcool", "min": 75 }
+    ],
+    "multiplier": 0.5
+  }
+]
+```
+
+---
+
+## CompositeGameOverRule
+
+```typescript
+interface CompositeGameOverRule {
+  paragraphScope?: string[]
+  conditions: GaugeCondition[]
+  probability?: number
+  targetParagraphId: string
+}
+```
+
+Composite Game Over rules trigger a Game Over based on multiple gauge conditions simultaneously. They fire after single-gauge Game Over checks, in config order.
+
+### `paragraphScope`
+- **Type:** `string[]`, optional — if set, the rule only applies when the current paragraph is in this list. Omit to apply everywhere.
+
+### `conditions`
+- **Type:** `GaugeCondition[]`, required — all conditions must pass for this rule to be eligible
+- **Example:** `[{ "gaugeId": "alcool", "min": 60 }, { "gaugeId": "nourriture", "max": 20 }]`
+
+### `probability`
+- **Type:** `number`, optional — 0.0 to 1.0. If set, `Math.random()` is called; the rule only fires if the result is less than `probability`. Omit or set to `1` for a guaranteed trigger.
+- **Example:** `0.22` (22% chance to fire when conditions are met)
+
+### `targetParagraphId`
+- **Type:** `string`, required — paragraph to display when this rule fires. Must exist in `paragraphs`.
+
+Dub Camp composite Game Over rules:
+```json
+[
+  {
+    "conditions": [
+      { "gaugeId": "alcool", "min": 60 },
+      { "gaugeId": "nourriture", "max": 20 }
+    ],
+    "probability": 0.22,
+    "targetParagraphId": "s203"
+  }
+]
+```
+
+---
+
 ## DecayRule
 
 ```typescript
@@ -333,6 +461,7 @@ interface DecayRule {
   amount: number
   statReductionId?: string
   statReductionFormula?: string
+  probabilityChance?: number
 }
 ```
 
@@ -353,19 +482,8 @@ Natural decay fires at every paragraph in `decayNodes`, AFTER choice effects on 
 - **Type:** `string`, optional — formula string documenting the reduction calculation for the engine. Format: `"max(floor, base - statValue * multiplier)"`.
 - **Example:** `"max(3, 10 - estomac * 1.5)"` — Nourriture decay is reduced by the Estomac stat; minimum decay is 3 regardless.
 
-#### Probabilistic Decay Rule
-
-A gauge can also have a probabilistic decay: a percentage chance that an additional amount is applied. Encode this as a separate `DecayRule` with a `probabilityChance` field:
-
-```typescript
-interface DecayRule {
-  gaugeId: string
-  amount: number
-  probabilityChance?: number  // 0.0 to 1.0 — random roll, fires if Math.random() < probabilityChance
-}
-```
-
-- **`probabilityChance`:** optional float `0.0–1.0`. If present, `Math.random()` is called; the decay fires only if the result is less than `probabilityChance`.
+### `probabilityChance`
+- **Type:** `number`, optional — 0.0 to 1.0. If present, `Math.random()` is called; the decay fires only if the result is less than `probabilityChance`.
 
 Dub Camp decay rules:
 ```json
@@ -391,6 +509,7 @@ interface Paragraph {
   choices: Choice[]
   isGameOver?: boolean
   isComplete?: boolean
+  contextualGameOver?: ContextualGameOver[]
 }
 ```
 
@@ -419,6 +538,40 @@ interface Paragraph {
 ### `isComplete`
 - **Type:** `boolean`, optional — marks this paragraph as a successful story completion. Displayed on the EndScreen with score tier narrative.
 
+### `contextualGameOver`
+- **Type:** `ContextualGameOver[]`, optional — paragraph-level Game Over conditions checked before global gauge Game Over. See [ContextualGameOver](#contextualgameover).
+
+---
+
+## ContextualGameOver
+
+```typescript
+interface ContextualGameOver {
+  gaugeId: string
+  threshold: number
+  condition: 'above' | 'below'
+  probability?: number
+  targetParagraphId: string
+}
+```
+
+Contextual Game Over rules are evaluated at the paragraph level, **before** global single-gauge checks. They allow specific paragraphs to have their own lethal thresholds independent of the gauge-level defaults.
+
+### `gaugeId`
+- **Type:** `string`, required — gauge to test
+
+### `threshold`
+- **Type:** `number`, required — the boundary value
+
+### `condition`
+- **Type:** `'above' | 'below'`, required — direction of check
+
+### `probability`
+- **Type:** `number`, optional — 0.0 to 1.0. If set, the rule fires only if `Math.random() < probability`.
+
+### `targetParagraphId`
+- **Type:** `string`, required — Game Over paragraph to display
+
 ---
 
 ## Choice
@@ -430,6 +583,7 @@ interface Choice {
   targetParagraphId: string
   gaugeEffects?: GaugeEffect[]
   weightedOutcome?: WeightedOutcome
+  conditionalBranch?: ConditionalBranch
   inventoryAdd?: string[]
   inventoryRemove?: string[]
 }
@@ -440,17 +594,20 @@ interface Choice {
 - **Example:** `"s1-a"`, `"s1-b"`
 
 ### `text`
-- **Type:** `string`, required — choice label shown on the choice card
-- **Example:** `"Aller voir le programme avec Bastien"`
+- **Type:** `string`, required — choice label shown on the choice card. Use immersive, in-world phrasing rather than meta labels.
+- **Example:** `"Tu rentres au camp, satisfait"` (not `"Retourner au camping"`)
 
 ### `targetParagraphId`
-- **Type:** `string`, required — must match an existing key in `paragraphs`. The validator checks referential integrity at startup.
+- **Type:** `string`, required — default destination paragraph. The validator checks referential integrity at startup. If a `conditionalBranch` fires, this value is overridden.
 
 ### `gaugeEffects`
 - **Type:** `GaugeEffect[]`, optional — gauge changes applied when this choice is selected. See [GaugeEffect](#gaugeeffect).
 
 ### `weightedOutcome`
-- **Type:** `WeightedOutcome`, optional — probabilistic outcome attached to this choice. See [WeightedOutcome](#weightedoutcome).
+- **Type:** `WeightedOutcome`, optional — probabilistic multi-outcome attached to this choice. See [WeightedOutcome](#weightedoutcome).
+
+### `conditionalBranch`
+- **Type:** `ConditionalBranch`, optional — probabilistic override of `targetParagraphId`. See [ConditionalBranch](#conditionalbranch).
 
 ### `inventoryAdd`
 - **Type:** `string[]`, optional — item IDs added to the player's inventory when this choice is selected.
@@ -458,6 +615,37 @@ interface Choice {
 
 ### `inventoryRemove`
 - **Type:** `string[]`, optional — item IDs removed from the player's inventory when this choice is selected.
+
+---
+
+## ConditionalBranch
+
+```typescript
+interface ConditionalBranch {
+  probability: number
+  targetParagraphId: string
+}
+```
+
+A conditional branch gives a choice a chance to redirect to a different paragraph instead of the default `targetParagraphId`. Evaluated at navigation time (step 10 of the evaluation order), after all effects are applied.
+
+### `probability`
+- **Type:** `number`, required — 0.0 to 1.0. The branch fires if `Math.random() < probability`.
+- **Example:** `0.33` (1-in-3 chance)
+
+### `targetParagraphId`
+- **Type:** `string`, required — the paragraph to navigate to when the branch fires. Must exist in `paragraphs`.
+
+**Example — §EVT1 random encounter:**
+```json
+{
+  "id": "s40a-a",
+  "text": "Tu rejoins les autres",
+  "targetParagraphId": "s40c",
+  "conditionalBranch": { "probability": 0.33, "targetParagraphId": "sEVT1" },
+  "weightedOutcome": { ... }
+}
+```
 
 ---
 
@@ -484,9 +672,13 @@ interface GaugeEffect {
 ### `statInfluence`
 - **Type:** optional object — if present, the final delta is modified by a player stat:
   - `statId`: must match a `StatDefinition.id`
-  - `multiplier`: the stat value is multiplied by this and subtracted from the base delta magnitude (reducing cost)
-  - Formula: `effectiveDelta = delta + (stats[statId] * multiplier)`
-  - Example: `{ "statId": "endurance", "multiplier": 2 }` with `delta: -15` and `endurance: 3` → `effectiveDelta = -15 + (3 * 2) = -9`
+  - `multiplier`: stat value multiplied by this is added to the base delta
+  - **Formula:** `effectiveDelta = delta + (stats[statId] * multiplier)`
+  - **Sign-safety for negative deltas:** result is `Math.min(0, effectiveDelta)` — a stat can reduce a cost toward zero but never flip its sign to a gain
+  - **Example:** `{ "statId": "endurance", "multiplier": 2 }` with `delta: -15` and `endurance: 3` → `effectiveDelta = -15 + (3 * 2) = -9`
+  - **Example (food gain):** `{ "statId": "estomac", "multiplier": 3 }` with `delta: 20` and `estomac: 2` → `effectiveDelta = 20 + (2 * 3) = 26`
+
+> **Multiplier guideline:** Use `multiplier: 2` for standard stat influence on negative effects (energy costs, etc.). Use `multiplier: 3` for food gain effects with Estomac.
 
 ---
 
@@ -496,12 +688,11 @@ interface GaugeEffect {
 interface WeightedOutcome {
   gaugeId: string
   statId: string
-  goodEffects: GaugeEffect[]
-  badEffects: GaugeEffect[]
+  outcomes: OutcomeBranch[]
 }
 ```
 
-A weighted outcome is attached to a choice. When that choice is selected, the engine evaluates a risk formula and calls `Math.random()` to determine whether the good or bad outcome fires. **Neither the probability nor the risk value is ever shown to the player.**
+A weighted outcome is attached to a choice. When that choice is selected, the engine evaluates a risk formula and calls `Math.random()` to select one of N outcome branches. **Neither the probability, the risk value, nor unchosen outcome texts are ever shown to the player** — only the selected branch's `text` is revealed as narrative feedback.
 
 ### Risk Formula
 
@@ -519,12 +710,20 @@ Where:
 
 ### Probability Table
 
-| Risk | Probability of good outcome |
-|------|-----------------------------|
+| Risk | Probability of good outcome (outcomes[0]) |
+|------|------------------------------------------|
 | < 30 | 90% |
 | 30–55 | 60% |
 | 55–75 | 40% |
 | > 75 | 20% |
+
+### N-Outcome Partitioning
+
+For N outcomes, the probability space is partitioned as:
+- `outcomes[0]` (good): `[0, goodProbability)`
+- `outcomes[1]` through `outcomes[N-1]` (bad): remainder split equally
+
+If only one outcome is defined, it always fires regardless of the roll.
 
 ### Fields
 
@@ -536,24 +735,68 @@ Where:
 - **Type:** `string`, required — the stat that reduces risk
 - **Example:** `"resistanceAlcool"`
 
-### `goodEffects`
-- **Type:** `GaugeEffect[]`, required — gauge changes applied when the good outcome fires
-- **Example:** `[{ "gaugeId": "kiff", "delta": 10 }]`
-
-### `badEffects`
-- **Type:** `GaugeEffect[]`, required — gauge changes applied when the bad outcome fires
-- **Example:** `[{ "gaugeId": "kiff", "delta": -5 }, { "gaugeId": "energie", "delta": -10 }]`
+### `outcomes`
+- **Type:** `OutcomeBranch[]`, required — 1 to N outcome branches. Must not be empty. The last branch must have `maxRisk: 100`.
 
 ---
 
-## Probabilistic Events (Random Branching)
+## OutcomeBranch
 
-Some paragraphs (e.g., §EVT1 in Dub Camp) use a 1-in-N random branch. Encode these using a special `weightedOutcome` on the choice that leads to the event:
+```typescript
+interface OutcomeBranch {
+  id: string
+  label?: string
+  maxRisk: number
+  text: string
+  effects: GaugeEffect[]
+}
+```
 
-- Set `goodEffects` to the effects for the normal path and `badEffects` to the rare path effects, or
-- More precisely: model the random branch by setting the risk such that `Math.random()` produces the desired probability. For a 1-in-3 chance (33%), ensure the Risk formula results in the 30–55 range → 60% probability. If exact control is needed, use a dedicated `probabilityChance` field on the choice.
+A single branch within a `WeightedOutcome`. The first branch is the "good" path; all subsequent branches are "bad" paths of increasing severity.
 
-The Dub Camp §EVT1 event (1-in-3 chance of a bonus encounter) should be encoded with a `weightedOutcome` calibrated for ~33% success: set `gaugeId` to `"energie"` at a baseline that produces Risk in the 55–75 range → 40% probability, or adjust as needed for the intended story feel.
+### `id`
+- **Type:** `string`, required — unique within the outcome. Convention: `"a"` for good, `"b"`, `"c"` for bad variants.
+
+### `label`
+- **Type:** `string`, optional — internal label for authoring reference (e.g. `"good"`, `"bad"`). Not shown to the player.
+
+### `maxRisk`
+- **Type:** `number`, required — upper risk bound for this branch's probability partition. The **last** branch must always be `100`. Earlier branches define split points.
+- **Example:** First branch `maxRisk: 60` means outcomes[0] covers the good probability; `maxRisk: 100` on outcomes[1] covers the rest.
+
+### `text`
+- **Type:** `string`, required — narrative text displayed after the choice resolves. Shown in the ResultBlock. Supports markdown-lite (`**bold**`, `*italic*`). This replaces the old content-embedded A/B text pattern.
+
+### `effects`
+- **Type:** `GaugeEffect[]`, required — gauge changes applied when this branch fires. Can be empty `[]` if the branch has no mechanical effects.
+
+**Example WeightedOutcome with two branches:**
+```json
+{
+  "gaugeId": "alcool",
+  "statId": "resistanceAlcool",
+  "outcomes": [
+    {
+      "id": "a",
+      "maxRisk": 60,
+      "text": "Légère et fraîche, elle descend bien sans trop monter.",
+      "effects": [
+        { "gaugeId": "alcool", "delta": 15 },
+        { "gaugeId": "nourriture", "delta": -5 }
+      ]
+    },
+    {
+      "id": "b",
+      "maxRisk": 100,
+      "text": "Plus forte que prévu, ou t'avais le ventre moins plein que tu croyais.",
+      "effects": [
+        { "gaugeId": "alcool", "delta": 28 },
+        { "gaugeId": "nourriture", "delta": -10 }
+      ]
+    }
+  ]
+}
+```
 
 ---
 
@@ -608,26 +851,37 @@ Dub Camp end-state tiers:
 
 ## Evaluation Order
 
-The engine applies effects in this strict order at every choice node:
+The engine applies effects in this strict 14-step order at every choice node:
 
-1. Apply `choice.gaugeEffects` (all GaugeEffect deltas)
-2. Resolve `choice.weightedOutcome` if present (call `Math.random()`, apply `goodEffects` or `badEffects`)
-3. Apply `choice.inventoryAdd` and `choice.inventoryRemove`
-4. Clamp all gauges to [0, 100]
-5. Evaluate Game Over conditions (in gauge config order) — if triggered: set `isGameOver: true`, set `gameOverParagraphId`, STOP
-6. If no Game Over: evaluate act transition (check if new `paragraphId` is in any act's `paragraphIds`)
-7. Advance `paragraphId` to `choice.targetParagraphId`
-8. Persist state to localStorage
+1. **Clear** `lastOutcomeText` and `lastGaugeDeltas` to `null`
+2. **Snapshot** pre-choice gauges (`prevGauges`) for delta computation and score multiplier evaluation
+3. **Apply** `choice.gaugeEffects` — score gauge deltas are scaled by the first matching `scoreMultiplier` rule (evaluated against `prevGauges`)
+4. **Resolve** `choice.weightedOutcome` if present — call `Math.random()`, select branch, apply `branch.effects` (score deltas also scaled), store `branch.text` in `lastOutcomeText`
+5. **Apply** `choice.inventoryAdd` and `choice.inventoryRemove`
+6. *(Clamping is handled by `applyGaugeEffects` — all deltas are clamped to [0, 100] on apply)*
+7. **Compute** `lastGaugeDeltas` as `currentGauges - prevGauges` for each gauge
+8. **Evaluate contextual Game Over** (`paragraph.contextualGameOver[]`) — if triggered: set `isGameOver: true`, set paragraph to `targetParagraphId`, **STOP**
+9. **Evaluate global Game Over** (gauge-level thresholds in config order) — if triggered: **STOP**
+10. **Evaluate composite Game Over** (`config.compositeGameOverRules[]`) — if triggered: **STOP**
+11. **Evaluate conditional branch** (`choice.conditionalBranch`) — if `Math.random() < probability`: override `targetParagraphId`
+12. **Evaluate act transition** — if new `paragraphId` is in any act's `paragraphIds`, apply theme
+13. **Advance** `paragraphId` to (possibly overridden) `targetParagraphId`
+14. **Sync score** from score gauge; check `isComplete` if paragraph has that flag. Persist state.
 
 At **decay nodes**, after the above choice resolution, decay additionally fires:
 
 1. Apply all `decayRules` (including probabilistic ones)
 2. Clamp all gauges to [0, 100]
-3. Evaluate Game Over — if triggered: set `isGameOver: true`, STOP
+3. Evaluate Game Over (global thresholds only — no contextual or composite) — if triggered: **STOP**
 4. Evaluate act transition
 5. Persist state
 
-**Critical:** Game Over is ALWAYS evaluated before act transition. Decay fires AFTER choice effects. These orders are invariant.
+**Critical invariants:**
+- Contextual Game Over fires **before** global Game Over (higher priority)
+- Composite Game Over fires **after** global Game Over
+- Score multipliers are always evaluated against **pre-choice** gauges
+- Conditional branching happens **after** all effects and Game Over checks
+- Decay fires **after** choice effects, never before
 
 ---
 
@@ -665,7 +919,8 @@ A complete minimal story with 1 gauge, 1 stat, 1 weighted outcome, 1 Game Over, 
       "isScore": false,
       "isHidden": false,
       "gameOverThreshold": 10,
-      "gameOverCondition": "below"
+      "gameOverCondition": "below",
+      "gameOverParagraphId": "pDeath"
     },
     {
       "id": "score",
@@ -688,6 +943,12 @@ A complete minimal story with 1 gauge, 1 stat, 1 weighted outcome, 1 Game Over, 
       "name": "Evening",
       "paragraphIds": ["p2"],
       "theme": { "--color-bg": "#080810", "--color-accent": "#7c5cbf" }
+    }
+  ],
+  "scoreMultipliers": [
+    {
+      "conditions": [{ "gaugeId": "energy", "min": 60 }],
+      "multiplier": 1.2
     }
   ],
   "decayNodes": ["p2"],
@@ -713,13 +974,25 @@ A complete minimal story with 1 gauge, 1 stat, 1 weighted outcome, 1 Game Over, 
           "text": "Push through the hard path",
           "targetParagraphId": "p2",
           "gaugeEffects": [
-            { "gaugeId": "energy", "delta": -25, "statInfluence": { "statId": "endurance", "multiplier": 3 } }
+            { "gaugeId": "energy", "delta": -25, "statInfluence": { "statId": "endurance", "multiplier": 2 } }
           ],
           "weightedOutcome": {
             "gaugeId": "energy",
             "statId": "endurance",
-            "goodEffects": [{ "gaugeId": "score", "delta": 30 }],
-            "badEffects": [{ "gaugeId": "energy", "delta": -20 }]
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "You push through cleanly. The hard path yields its rewards.",
+                "effects": [{ "gaugeId": "score", "delta": 30 }]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "Harder than expected. You make it but at a cost.",
+                "effects": [{ "gaugeId": "energy", "delta": -20 }]
+              }
+            ]
           }
         }
       ]
@@ -736,7 +1009,7 @@ A complete minimal story with 1 gauge, 1 stat, 1 weighted outcome, 1 Game Over, 
         },
         {
           "id": "p2-b",
-          "text": "Press on",
+          "text": "Press on through the dark",
           "targetParagraphId": "pEnd",
           "gaugeEffects": [{ "gaugeId": "energy", "delta": -30 }]
         }
@@ -804,13 +1077,21 @@ Encode as a choice with `gaugeEffects: [{ "gaugeId": "kiff", "delta": 5 }]` targ
 
 ### §EVT1 Random Event
 
-§EVT1 fires with approximately 1-in-3 probability. Encode using `weightedOutcome` calibrated to ~33% success rate: use `gaugeId: "energie"` at a gauge level that falls in the 55–75 risk band → 40% probability (closest to 1-in-3).
+§EVT1 fires with approximately 1-in-3 probability from §40A and §40B. Encode using `conditionalBranch` on those choices:
+
+```json
+{
+  "conditionalBranch": { "probability": 0.33, "targetParagraphId": "sEVT1" }
+}
+```
+
+The default `targetParagraphId` on those choices routes to `s40c` (normal path). The conditional branch overrides it 33% of the time to redirect to `sEVT1`.
 
 ### Game Over Paragraphs
 
-- `§201` (`"s201"`) — Game Over: trop bu trop tôt (Alcool > 85)
-- `§202` (`"s202"`) — Game Over: dans le gaz (energy exhaustion)
-- `§203` (`"s203"`) — Game Over: alcool + low Nourriture
-- `§204` (`"s204"`) — Game Over: épuisement
+- `§201` (`"s201"`) — Game Over: trop bu trop tôt (Alcool > 85, global gauge check)
+- `§202` (`"s202"`) — Game Over: dans le gaz (Fumette > 90, global gauge check)
+- `§203` (`"s203"`) — Game Over: alcool + faim (composite rule: Alcool ≥ 60 AND Nourriture ≤ 20, 22% probability)
+- `§204` (`"s204"`) — Game Over: épuisement (Énergie < 10, global gauge check)
 
 All four must have `"isGameOver": true` and `"choices": []`.

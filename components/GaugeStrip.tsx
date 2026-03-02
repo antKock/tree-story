@@ -6,9 +6,11 @@ interface GaugeStripProps {
   gauges: Record<string, number>
   config: StoryConfig
   onOpenCharacterSheet: () => void
+  gaugeDeltas?: Record<string, number> | null
+  animKey?: number
 }
 
-export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: GaugeStripProps) {
+export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gaugeDeltas, animKey }: GaugeStripProps) {
   const visibleGauges = config.gauges.filter(g => !g.isHidden)
 
   return (
@@ -36,6 +38,9 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: Gau
     >
       {visibleGauges.map(gaugeDef => {
         const value = gauges[gaugeDef.id] ?? 0
+        const delta = gaugeDeltas ? (gaugeDeltas[gaugeDef.id] ?? 0) : 0
+        const showPill = gaugeDeltas !== null && gaugeDeltas !== undefined && delta !== 0
+
         return (
           <div
             key={gaugeDef.id}
@@ -46,8 +51,20 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: Gau
               gap: '3px',
               flex: 1,
               maxWidth: '80px',
+              position: 'relative',
             }}
           >
+            {showPill && (
+              <span
+                key={animKey}
+                className="gauge-delta-pill"
+                style={{
+                  color: delta > 0 ? 'var(--color-accent)' : 'var(--color-danger)',
+                }}
+              >
+                {delta > 0 ? '+' : ''}{Math.round(delta)}
+              </span>
+            )}
             <span style={{ fontSize: '17px', lineHeight: 1 }}>{gaugeDef.icon}</span>
             <div
               style={{

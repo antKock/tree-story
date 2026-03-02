@@ -5,6 +5,7 @@ import type { StoryConfig } from '@/engine/types'
 import { useStoryEngine } from '@/hooks/useStoryEngine'
 import GaugeStrip from './GaugeStrip'
 import ParagraphDisplay from './ParagraphDisplay'
+import ResultBlock from './ResultBlock'
 import ChoiceCards from './ChoiceCards'
 import CharacterSheet from './CharacterSheet'
 import EndScreen from './EndScreen'
@@ -16,7 +17,7 @@ interface StoryReaderProps {
 }
 
 export default function StoryReader({ config, initialStats, onReplay }: StoryReaderProps) {
-  const { engineState, resolveChoice, applyDecay, resetEngine, setStats } = useStoryEngine(config)
+  const { engineState, resolveChoice, applyDecay, resetEngine, setStats, animKey } = useStoryEngine(config)
   const [sheetOpen, setSheetOpen] = useState(false)
   const prevParagraphId = useRef(engineState.paragraphId)
   const statsApplied = useRef(false)
@@ -49,6 +50,8 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
           gauges={engineState.gauges}
           config={config}
           onOpenCharacterSheet={() => setSheetOpen(true)}
+          gaugeDeltas={engineState.lastGaugeDeltas}
+          animKey={animKey}
         />
         <EndScreen
           engineState={engineState}
@@ -84,10 +87,13 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
         gauges={engineState.gauges}
         config={config}
         onOpenCharacterSheet={() => setSheetOpen(true)}
+        gaugeDeltas={engineState.lastGaugeDeltas}
+        animKey={animKey}
       />
 
       <main style={{ flex: 1, paddingTop: '1.5rem' }}>
         <ParagraphDisplay content={currentParagraph.content} />
+        <ResultBlock text={engineState.lastOutcomeText} />
         <ChoiceCards choices={currentParagraph.choices} onChoose={resolveChoice} />
       </main>
 

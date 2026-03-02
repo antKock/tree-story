@@ -50,11 +50,49 @@ export interface DecayRule {
   probabilityChance?: number
 }
 
+export interface OutcomeBranch {
+  id: string
+  label?: string
+  maxRisk: number
+  text: string
+  effects: GaugeEffect[]
+}
+
 export interface WeightedOutcome {
   gaugeId: string
   statId: string
-  goodEffects: GaugeEffect[]
-  badEffects: GaugeEffect[]
+  outcomes: OutcomeBranch[]
+}
+
+export interface GaugeCondition {
+  gaugeId: string
+  min?: number
+  max?: number
+}
+
+export interface ScoreMultiplierRule {
+  conditions: GaugeCondition[]
+  multiplier: number
+}
+
+export interface ContextualGameOver {
+  gaugeId: string
+  threshold: number
+  condition: 'above' | 'below'
+  probability?: number
+  targetParagraphId: string
+}
+
+export interface ConditionalBranch {
+  probability: number
+  targetParagraphId: string
+}
+
+export interface CompositeGameOverRule {
+  paragraphScope?: string[]
+  conditions: GaugeCondition[]
+  probability?: number
+  targetParagraphId: string
 }
 
 export interface Choice {
@@ -65,6 +103,7 @@ export interface Choice {
   weightedOutcome?: WeightedOutcome
   inventoryAdd?: string[]
   inventoryRemove?: string[]
+  conditionalBranch?: ConditionalBranch
 }
 
 export interface Paragraph {
@@ -73,6 +112,7 @@ export interface Paragraph {
   choices: Choice[]
   isGameOver?: boolean
   isComplete?: boolean
+  contextualGameOver?: ContextualGameOver[]
 }
 
 export interface ActDefinition {
@@ -115,6 +155,8 @@ export interface StoryConfig {
   decayRules: DecayRule[]
   paragraphs: Record<string, Paragraph>
   endStateTiers: EndStateTier[]
+  scoreMultipliers?: ScoreMultiplierRule[]
+  compositeGameOverRules?: CompositeGameOverRule[]
 }
 
 export interface EngineState {
@@ -128,6 +170,8 @@ export interface EngineState {
   isGameOver: boolean
   gameOverParagraphId: string | null
   isComplete: boolean
+  lastOutcomeText: string | null
+  lastGaugeDeltas: Record<string, number> | null
 }
 
 export interface SaveState {

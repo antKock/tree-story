@@ -159,3 +159,21 @@
   line-height: var(--prose-line-height);
   color: var(--color-text-primary);
 }
+
+@keyframes pill-fade {
+  0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  70% { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+}
+
+.gauge-delta-pill {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+  animation: pill-fade 2s ease forwards;
+  pointer-events: none;
+}

@@ -1,12 +1,12 @@
 // Pure engine module — zero imports from components/, hooks/, or app/
-import type { WeightedOutcome, StoryConfig } from './types'
+import type { WeightedOutcome, OutcomeBranch, StoryConfig } from './types'
 
 export function resolveOutcome(
   outcome: WeightedOutcome,
   gauges: Record<string, number>,
   stats: Record<string, number>,
   _config: StoryConfig
-): 'good' | 'bad' {
+): OutcomeBranch {
   const gaugeLevel = gauges[outcome.gaugeId] ?? 0
   const statValue = stats[outcome.statId] ?? 0
 
@@ -17,6 +17,16 @@ export function resolveOutcome(
 
   const goodProbability = risk < 30 ? 0.9 : risk <= 55 ? 0.6 : risk <= 75 ? 0.4 : 0.2
 
-  const roll = Math.random()
-  return roll < goodProbability ? 'good' : 'bad'
+  const r = Math.random()
+  const n = outcome.outcomes.length
+
+  if (n === 1) return outcome.outcomes[0]
+
+  // outcome[0] occupies [0, goodProbability)
+  if (r < goodProbability) return outcome.outcomes[0]
+
+  // Remaining outcomes[1..n-1] split [goodProbability, 1) equally
+  const badZoneWidth = (1 - goodProbability) / (n - 1)
+  const badIndex = 1 + Math.floor((r - goodProbability) / badZoneWidth)
+  return outcome.outcomes[Math.min(badIndex, n - 1)]
 }

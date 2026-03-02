@@ -17,6 +17,7 @@ export function useStoryEngine(config: StoryConfig) {
   const [engineState, setEngineState] = useState<EngineState>(
     () => engineRef.current!.getState()
   )
+  const [animKey, setAnimKey] = useState(0)
 
   useEffect(() => {
     themeManager.apply(engineState.act, config)
@@ -33,17 +34,20 @@ export function useStoryEngine(config: StoryConfig) {
   const resolveChoice = useCallback((choiceId: string) => {
     engineRef.current!.resolveChoice(choiceId)
     commitState()
+    setAnimKey(k => k + 1)
   }, [commitState])
 
   const applyDecay = useCallback(() => {
     engineRef.current!.applyDecay()
     commitState()
+    // applyDecay does NOT increment animKey — decay changes gauges silently
   }, [commitState])
 
   const resetEngine = useCallback(() => {
     persistence.clear()
     engineRef.current!.reset()
     commitState()
+    // animKey intentionally not reset — keeps incrementing across sessions
   }, [commitState])
 
   const setStats = useCallback((stats: Record<string, number>) => {
@@ -51,5 +55,5 @@ export function useStoryEngine(config: StoryConfig) {
     commitState()
   }, [commitState])
 
-  return { engineState, resolveChoice, applyDecay, resetEngine, setStats }
+  return { engineState, resolveChoice, applyDecay, resetEngine, setStats, animKey }
 }

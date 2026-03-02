@@ -19,7 +19,10 @@ export function applyGaugeEffects(
     let delta = effect.delta
     if (effect.statInfluence) {
       const statValue = stats[effect.statInfluence.statId] ?? 0
-      delta = delta * (1 - statValue * effect.statInfluence.multiplier)
+      const adjusted = delta + (statValue * effect.statInfluence.multiplier)
+      // Negative delta (cost): stat reduces cost toward zero but never flips sign
+      // Positive delta (gain): stat amplifies gain freely
+      delta = delta < 0 ? Math.min(0, adjusted) : adjusted
     }
 
     result[effect.gaugeId] = clamp(result[effect.gaugeId] + delta, 0, 100)

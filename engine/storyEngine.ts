@@ -1,5 +1,5 @@
 // Pure engine module — zero imports from components/, hooks/, or app/
-import type { StoryConfig, EngineState, SaveState } from './types'
+import type { StoryConfig, EngineState, SaveState, GaugeCondition } from './types'
 import { EngineError } from './types'
 import { applyGaugeEffects, applyDecay as applyDecayRules } from './gaugeSystem'
 import { resolveOutcome } from './weightedOutcome'
@@ -39,6 +39,7 @@ function deepCopyState(state: EngineState): EngineState {
     gauges: { ...state.gauges },
     stats: { ...state.stats },
     inventory: [...state.inventory],
+    lastGaugeDeltas: state.lastGaugeDeltas ? { ...state.lastGaugeDeltas } : null,
   }
 }
 
@@ -65,11 +66,16 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
       isGameOver: false,
       gameOverParagraphId: null,
       isComplete: false,
+      lastOutcomeText: null,
+      lastGaugeDeltas: null,
     }
   }
 
   if (savedState && isValidSavedState(savedState, config)) {
     _state = deepCopyState(savedState.engineState)
+    // Ensure new fields exist for old saves
+    if (_state.lastOutcomeText === undefined) _state.lastOutcomeText = null
+    if (_state.lastGaugeDeltas === undefined) _state.lastGaugeDeltas = null
   } else {
     _state = freshState()
   }
@@ -80,6 +86,12 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
     }
   }
 
+  function checkGaugeCondition(gaugeValue: number, condition: GaugeCondition): boolean {
+    if (condition.min !== undefined && gaugeValue < condition.min) return false
+    if (condition.max !== undefined && gaugeValue > condition.max) return false
+    return true
+  }
+
   function evaluateGameOver(): boolean {
     for (const gauge of config.gauges) {
       if (gauge.gameOverThreshold === undefined || gauge.gameOverCondition === undefined) continue
@@ -87,9 +99,6 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
       const value = _state.gauges[gauge.id]
       if (value === undefined) continue
 
-      // Uses >= / <= (not strict > / <) because gauge clamping to [0, 100]
-      // makes strict inequality unreachable at boundaries (e.g., energie clamped
-      // to 0 can never be < 0). Intentional deviation from story spec wording.
       const triggered =
         gauge.gameOverCondition === 'above'
           ? value >= gauge.gameOverThreshold
@@ -105,6 +114,69 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
       }
     }
     return false
+  }
+
+  function evaluateContextualGameOver(paragraphId: string): boolean {
+    const paragraph = config.paragraphs[paragraphId]
+    if (!paragraph?.contextualGameOver) return false
+
+    for (const rule of paragraph.contextualGameOver) {
+      const value = _state.gauges[rule.gaugeId]
+      if (value === undefined) continue
+
+      const conditionMet =
+        rule.condition === 'above'
+          ? value >= rule.threshold
+          : value <= rule.threshold
+
+      if (!conditionMet) continue
+
+      if (rule.probability !== undefined && Math.random() >= rule.probability) continue
+
+      _state.isGameOver = true
+      _state.gameOverParagraphId = rule.targetParagraphId
+      _state.paragraphId = rule.targetParagraphId
+      return true
+    }
+    return false
+  }
+
+  function evaluateCompositeGameOverRules(paragraphId: string): boolean {
+    if (!config.compositeGameOverRules) return false
+
+    for (const rule of config.compositeGameOverRules) {
+      if (rule.paragraphScope && !rule.paragraphScope.includes(paragraphId)) continue
+
+      const allConditionsMet = rule.conditions.every(cond => {
+        const value = _state.gauges[cond.gaugeId]
+        if (value === undefined) return false
+        return checkGaugeCondition(value, cond)
+      })
+
+      if (!allConditionsMet) continue
+
+      if (rule.probability !== undefined && Math.random() >= rule.probability) continue
+
+      _state.isGameOver = true
+      _state.gameOverParagraphId = rule.targetParagraphId
+      _state.paragraphId = rule.targetParagraphId
+      return true
+    }
+    return false
+  }
+
+  function applyScoreMultiplier(delta: number, preChoiceGauges: Record<string, number>): number {
+    if (!config.scoreMultipliers) return delta
+
+    for (const rule of config.scoreMultipliers) {
+      const allMet = rule.conditions.every(cond => {
+        const value = preChoiceGauges[cond.gaugeId]
+        if (value === undefined) return false
+        return checkGaugeCondition(value, cond)
+      })
+      if (allMet) return delta * rule.multiplier
+    }
+    return delta
   }
 
   function evaluateActTransition(paragraphId: string): void {
@@ -135,21 +207,37 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
         )
       }
 
-      // Step 1: Apply choice gauge effects
+      // Step 0: Clear outcome text and deltas from previous choice
+      _state.lastOutcomeText = null
+      _state.lastGaugeDeltas = null
+
+      // Step 1: Snapshot pre-choice gauge values for delta computation and score multiplier evaluation
+      const prevGauges = { ..._state.gauges }
+
+      // Step 2: Apply choice.gaugeEffects (with score multiplier applied to score gauge delta)
       if (choice.gaugeEffects && choice.gaugeEffects.length > 0) {
-        _state.gauges = applyGaugeEffects(_state.gauges, choice.gaugeEffects, _state.stats, config)
+        const modifiedEffects = choice.gaugeEffects.map(effect => {
+          if (scoreGaugeId && effect.gaugeId === scoreGaugeId && effect.delta !== 0) {
+            return { ...effect, delta: applyScoreMultiplier(effect.delta, prevGauges) }
+          }
+          return effect
+        })
+        _state.gauges = applyGaugeEffects(_state.gauges, modifiedEffects, _state.stats, config)
       }
 
-      // Step 2: Resolve weighted outcome if present
+      // Step 3: Resolve choice.weightedOutcome → apply branch.effects (with score multiplier)
       if (choice.weightedOutcome) {
-        const result = resolveOutcome(choice.weightedOutcome, _state.gauges, _state.stats, config)
-        const effects = result === 'good'
-          ? choice.weightedOutcome.goodEffects
-          : choice.weightedOutcome.badEffects
-        _state.gauges = applyGaugeEffects(_state.gauges, effects, _state.stats, config)
-      }
+        const branch = resolveOutcome(choice.weightedOutcome, _state.gauges, _state.stats, config)
+        _state.lastOutcomeText = branch.text
 
-      // Step 3: Clamp already handled by applyGaugeEffects
+        const modifiedEffects = branch.effects.map(effect => {
+          if (scoreGaugeId && effect.gaugeId === scoreGaugeId && effect.delta !== 0) {
+            return { ...effect, delta: applyScoreMultiplier(effect.delta, prevGauges) }
+          }
+          return effect
+        })
+        _state.gauges = applyGaugeEffects(_state.gauges, modifiedEffects, _state.stats, config)
+      }
 
       // Step 4: Apply inventory changes
       if (choice.inventoryAdd) {
@@ -165,22 +253,49 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
         )
       }
 
+      // Step 5: Clamp already handled by applyGaugeEffects
+
+      // Step 6: Compute lastGaugeDeltas (diff prevGauges vs current after clamping)
+      const deltas: Record<string, number> = {}
+      for (const gaugeId of Object.keys(prevGauges)) {
+        const delta = (_state.gauges[gaugeId] ?? 0) - prevGauges[gaugeId]
+        if (delta !== 0) deltas[gaugeId] = delta
+      }
+      _state.lastGaugeDeltas = Object.keys(deltas).length > 0 ? deltas : null
+
       // Sync score after gauge changes
       syncScore()
 
-      // Step 5: Evaluate Game Over — if triggered, STOP
+      // Step 7: Evaluate contextualGameOver on current paragraph → if triggered: STOP
+      if (evaluateContextualGameOver(_state.paragraphId)) {
+        return engine.getState()
+      }
+
+      // Step 8: Evaluate global gameOver thresholds → if triggered: STOP
       if (evaluateGameOver()) {
         return engine.getState()
       }
 
-      // Step 6: Evaluate act transition
-      evaluateActTransition(choice.targetParagraphId)
+      // Step 9: Evaluate compositeGameOverRules → if triggered: STOP
+      if (evaluateCompositeGameOverRules(_state.paragraphId)) {
+        return engine.getState()
+      }
 
-      // Step 7: Advance paragraphId
-      _state.paragraphId = choice.targetParagraphId
+      // Step 10: Evaluate conditionalBranch → override targetId if roll succeeds
+      let targetId = choice.targetParagraphId
+      if (choice.conditionalBranch && Math.random() < choice.conditionalBranch.probability) {
+        targetId = choice.conditionalBranch.targetParagraphId
+      }
 
-      // Check if target paragraph is a completion paragraph
-      const targetParagraph = config.paragraphs[choice.targetParagraphId]
+      // Step 11: Evaluate act transition
+      evaluateActTransition(targetId)
+
+      // Step 12: Advance paragraphId
+      _state.paragraphId = targetId
+
+      // Step 13: Sync score; check isComplete
+      syncScore()
+      const targetParagraph = config.paragraphs[targetId]
       if (targetParagraph?.isComplete) {
         _state.isComplete = true
       }

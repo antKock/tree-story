@@ -6,7 +6,13 @@ import {
   StatDefinition,
   GaugeDefinition,
   GaugeEffect,
+  OutcomeBranch,
   WeightedOutcome,
+  GaugeCondition,
+  ScoreMultiplierRule,
+  ContextualGameOver,
+  ConditionalBranch,
+  CompositeGameOverRule,
   Choice,
   Paragraph,
   ActDefinition,
@@ -198,6 +204,13 @@ function validateGauge(data: unknown, index: number): GaugeDefinition {
     gameOverParagraphId = data['gameOverParagraphId']
   }
 
+  // M2: gameOverParagraphId is required when gameOverThreshold is set
+  if (gameOverThreshold !== undefined && !gameOverParagraphId) {
+    throw new StoryValidationError(
+      `Invalid story config: gauge '${id}' has gameOverThreshold but no gameOverParagraphId`
+    )
+  }
+
   return { id, name, icon, initialValue, isScore, isHidden, gameOverThreshold, gameOverCondition, gameOverParagraphId }
 }
 
@@ -227,23 +240,195 @@ function validateGaugeEffect(data: unknown, context: string): GaugeEffect {
   return { gaugeId, delta, statInfluence }
 }
 
+function validateOutcomeBranch(data: unknown, context: string): OutcomeBranch {
+  if (!isObject(data)) {
+    throw new StoryValidationError(
+      `Invalid story config: outcome branch in ${context} must be an object`
+    )
+  }
+  const id = requireString(data, 'id', context)
+  const maxRisk = requireNumber(data, 'maxRisk', context)
+  if (maxRisk < 0 || maxRisk > 100) {
+    throw new StoryValidationError(
+      `Invalid story config: 'maxRisk' in ${context} must be between 0 and 100`
+    )
+  }
+  const text = requireString(data, 'text', context)
+  const effectsRaw = requireArray(data, 'effects', context)
+  const effects = effectsRaw.map((e, i) =>
+    validateGaugeEffect(e, `${context}.effects[${i}]`)
+  )
+  const label = isString(data['label']) ? data['label'] : undefined
+  return { id, label, maxRisk, text, effects }
+}
+
 function validateWeightedOutcome(data: unknown, context: string): WeightedOutcome {
   if (!isObject(data)) {
     throw new StoryValidationError(
       `Invalid story config: weightedOutcome in ${context} must be an object`
     )
   }
+
+  // Reject old goodEffects/badEffects shape
+  if ('goodEffects' in data || 'badEffects' in data) {
+    throw new StoryValidationError(
+      `Invalid story config: weightedOutcome in ${context} uses deprecated goodEffects/badEffects — migrate to outcomes array`
+    )
+  }
+
   const gaugeId = requireString(data, 'gaugeId', context)
   const statId = requireString(data, 'statId', context)
-  const goodEffectsRaw = requireArray(data, 'goodEffects', context)
-  const badEffectsRaw = requireArray(data, 'badEffects', context)
-  const goodEffects = goodEffectsRaw.map((e, i) =>
-    validateGaugeEffect(e, `${context}.goodEffects[${i}]`)
+  const outcomesRaw = requireArray(data, 'outcomes', context)
+  if (outcomesRaw.length === 0) {
+    throw new StoryValidationError(
+      `Invalid story config: 'outcomes' in ${context} must have at least 1 entry`
+    )
+  }
+  const outcomes = outcomesRaw.map((o, i) =>
+    validateOutcomeBranch(o, `${context}.outcomes[${i}]`)
   )
-  const badEffects = badEffectsRaw.map((e, i) =>
-    validateGaugeEffect(e, `${context}.badEffects[${i}]`)
+  // Last outcome's maxRisk must be >= 100
+  if (outcomes[outcomes.length - 1].maxRisk < 100) {
+    throw new StoryValidationError(
+      `Invalid story config: last outcome branch in ${context} must have maxRisk >= 100`
+    )
+  }
+  return { gaugeId, statId, outcomes }
+}
+
+function validateGaugeCondition(data: unknown, context: string): GaugeCondition {
+  if (!isObject(data)) {
+    throw new StoryValidationError(
+      `Invalid story config: gauge condition in ${context} must be an object`
+    )
+  }
+  const gaugeId = requireString(data, 'gaugeId', context)
+  let min: number | undefined
+  let max: number | undefined
+  if ('min' in data) {
+    if (!isNumber(data['min'])) {
+      throw new StoryValidationError(
+        `Invalid story config: 'min' in ${context} must be a number`
+      )
+    }
+    min = data['min']
+  }
+  if ('max' in data) {
+    if (!isNumber(data['max'])) {
+      throw new StoryValidationError(
+        `Invalid story config: 'max' in ${context} must be a number`
+      )
+    }
+    max = data['max']
+  }
+  return { gaugeId, min, max }
+}
+
+function validateScoreMultiplierRule(data: unknown, context: string): ScoreMultiplierRule {
+  if (!isObject(data)) {
+    throw new StoryValidationError(
+      `Invalid story config: score multiplier rule in ${context} must be an object`
+    )
+  }
+  const conditionsRaw = requireArray(data, 'conditions', context)
+  const conditions = conditionsRaw.map((c, i) =>
+    validateGaugeCondition(c, `${context}.conditions[${i}]`)
   )
-  return { gaugeId, statId, goodEffects, badEffects }
+  const multiplier = requireNumber(data, 'multiplier', context)
+  if (multiplier <= 0) {
+    throw new StoryValidationError(
+      `Invalid story config: 'multiplier' in ${context} must be greater than 0`
+    )
+  }
+  return { conditions, multiplier }
+}
+
+function validateContextualGameOver(data: unknown, context: string): ContextualGameOver {
+  if (!isObject(data)) {
+    throw new StoryValidationError(
+      `Invalid story config: contextual game over in ${context} must be an object`
+    )
+  }
+  const gaugeId = requireString(data, 'gaugeId', context)
+  const threshold = requireNumber(data, 'threshold', context)
+  const conditionRaw = requireString(data, 'condition', context)
+  if (conditionRaw !== 'above' && conditionRaw !== 'below') {
+    throw new StoryValidationError(
+      `Invalid story config: 'condition' in ${context} must be 'above' or 'below'`
+    )
+  }
+  const condition = conditionRaw as 'above' | 'below'
+  const targetParagraphId = requireString(data, 'targetParagraphId', context)
+  let probability: number | undefined
+  if ('probability' in data) {
+    if (!isNumber(data['probability'])) {
+      throw new StoryValidationError(
+        `Invalid story config: 'probability' in ${context} must be a number`
+      )
+    }
+    probability = data['probability']
+    if (probability < 0 || probability > 1) {
+      throw new StoryValidationError(
+        `Invalid story config: 'probability' in ${context} must be between 0.0 and 1.0`
+      )
+    }
+  }
+  return { gaugeId, threshold, condition, probability, targetParagraphId }
+}
+
+function validateConditionalBranch(data: unknown, context: string): ConditionalBranch {
+  if (!isObject(data)) {
+    throw new StoryValidationError(
+      `Invalid story config: conditional branch in ${context} must be an object`
+    )
+  }
+  const probability = requireNumber(data, 'probability', context)
+  if (probability < 0 || probability > 1) {
+    throw new StoryValidationError(
+      `Invalid story config: 'probability' in ${context} must be between 0.0 and 1.0`
+    )
+  }
+  const targetParagraphId = requireString(data, 'targetParagraphId', context)
+  return { probability, targetParagraphId }
+}
+
+function validateCompositeGameOverRule(data: unknown, context: string): CompositeGameOverRule {
+  if (!isObject(data)) {
+    throw new StoryValidationError(
+      `Invalid story config: composite game over rule in ${context} must be an object`
+    )
+  }
+  let paragraphScope: string[] | undefined
+  if ('paragraphScope' in data && isArray(data['paragraphScope'])) {
+    paragraphScope = data['paragraphScope'].map((pid, i) => {
+      if (!isString(pid)) {
+        throw new StoryValidationError(
+          `Invalid story config: paragraphScope[${i}] in ${context} must be a string`
+        )
+      }
+      return pid
+    })
+  }
+  const conditionsRaw = requireArray(data, 'conditions', context)
+  const conditions = conditionsRaw.map((c, i) =>
+    validateGaugeCondition(c, `${context}.conditions[${i}]`)
+  )
+  const targetParagraphId = requireString(data, 'targetParagraphId', context)
+  let probability: number | undefined
+  if ('probability' in data) {
+    if (!isNumber(data['probability'])) {
+      throw new StoryValidationError(
+        `Invalid story config: 'probability' in ${context} must be a number`
+      )
+    }
+    probability = data['probability']
+    if (probability < 0 || probability > 1) {
+      throw new StoryValidationError(
+        `Invalid story config: 'probability' in ${context} must be between 0.0 and 1.0`
+      )
+    }
+  }
+  return { paragraphScope, conditions, probability, targetParagraphId }
 }
 
 function validateChoice(data: unknown, paragraphId: string, index: number): Choice {
@@ -303,7 +488,19 @@ function validateChoice(data: unknown, paragraphId: string, index: number): Choi
     })
   }
 
-  return { id, text, targetParagraphId, gaugeEffects, weightedOutcome, inventoryAdd, inventoryRemove }
+  let conditionalBranch: ConditionalBranch | undefined
+  if (
+    'conditionalBranch' in data &&
+    data['conditionalBranch'] !== null &&
+    data['conditionalBranch'] !== undefined
+  ) {
+    conditionalBranch = validateConditionalBranch(
+      data['conditionalBranch'],
+      `paragraph '${paragraphId}' choice '${id}' conditionalBranch`
+    )
+  }
+
+  return { id, text, targetParagraphId, gaugeEffects, weightedOutcome, inventoryAdd, inventoryRemove, conditionalBranch }
 }
 
 function validateParagraph(data: unknown, paragraphId: string): Paragraph {
@@ -322,7 +519,14 @@ function validateParagraph(data: unknown, paragraphId: string): Paragraph {
   const isComplete =
     'isComplete' in data && isBoolean(data['isComplete']) ? data['isComplete'] : undefined
 
-  return { id, content, choices, isGameOver, isComplete }
+  let contextualGameOver: ContextualGameOver[] | undefined
+  if ('contextualGameOver' in data && isArray(data['contextualGameOver'])) {
+    contextualGameOver = data['contextualGameOver'].map((cgo, i) =>
+      validateContextualGameOver(cgo, `paragraph '${paragraphId}' contextualGameOver[${i}]`)
+    )
+  }
+
+  return { id, content, choices, isGameOver, isComplete, contextualGameOver }
 }
 
 function validateAct(data: unknown, index: number): ActDefinition {
@@ -458,6 +662,11 @@ export function validateStoryConfig(data: unknown): StoryConfig {
   }
 
   const actsRaw = requireArray(data, 'acts', 'root')
+  if (actsRaw.length === 0) {
+    throw new StoryValidationError(
+      'Invalid story config: acts array must have at least 1 entry'
+    )
+  }
   const acts = actsRaw.map((a, i) => validateAct(a, i))
 
   const decayNodesRaw = requireArray(data, 'decayNodes', 'root')
@@ -482,8 +691,24 @@ export function validateStoryConfig(data: unknown): StoryConfig {
   const endStateTiersRaw = requireArray(data, 'endStateTiers', 'root')
   const endStateTiers = endStateTiersRaw.map((t, i) => validateEndStateTier(t, i))
 
+  let scoreMultipliers: ScoreMultiplierRule[] | undefined
+  if ('scoreMultipliers' in data && isArray(data['scoreMultipliers'])) {
+    scoreMultipliers = data['scoreMultipliers'].map((r, i) =>
+      validateScoreMultiplierRule(r, `scoreMultipliers[${i}]`)
+    )
+  }
+
+  let compositeGameOverRules: CompositeGameOverRule[] | undefined
+  if ('compositeGameOverRules' in data && isArray(data['compositeGameOverRules'])) {
+    compositeGameOverRules = data['compositeGameOverRules'].map((r, i) =>
+      validateCompositeGameOverRule(r, `compositeGameOverRules[${i}]`)
+    )
+  }
+
   // ── Referential integrity ────────────────────────────────────────────────
   const paragraphIdSet = new Set(Object.keys(paragraphs))
+  const gaugeIdSet = new Set(gauges.map(g => g.id))
+  const statIdSet = new Set(stats.map(s => s.id))
 
   // Every choice.targetParagraphId must reference an existing paragraph
   for (const [pid, paragraph] of Object.entries(paragraphs)) {
@@ -491,6 +716,33 @@ export function validateStoryConfig(data: unknown): StoryConfig {
       if (!paragraphIdSet.has(choice.targetParagraphId)) {
         throw new StoryValidationError(
           `Invalid story config: choice '${choice.id}' in paragraph '${pid}' references non-existent targetParagraphId '${choice.targetParagraphId}'`
+        )
+      }
+      // Validate conditionalBranch.targetParagraphId
+      if (choice.conditionalBranch && !paragraphIdSet.has(choice.conditionalBranch.targetParagraphId)) {
+        throw new StoryValidationError(
+          `Invalid story config: choice '${choice.id}' in paragraph '${pid}' conditionalBranch references non-existent targetParagraphId '${choice.conditionalBranch.targetParagraphId}'`
+        )
+      }
+    }
+    // Validate contextualGameOver.targetParagraphId
+    if (paragraph.contextualGameOver) {
+      for (const cgo of paragraph.contextualGameOver) {
+        if (!paragraphIdSet.has(cgo.targetParagraphId)) {
+          throw new StoryValidationError(
+            `Invalid story config: contextualGameOver in paragraph '${pid}' references non-existent targetParagraphId '${cgo.targetParagraphId}'`
+          )
+        }
+      }
+    }
+  }
+
+  // Validate compositeGameOverRules targetParagraphIds
+  if (compositeGameOverRules) {
+    for (const [i, rule] of compositeGameOverRules.entries()) {
+      if (!paragraphIdSet.has(rule.targetParagraphId)) {
+        throw new StoryValidationError(
+          `Invalid story config: compositeGameOverRules[${i}] references non-existent targetParagraphId '${rule.targetParagraphId}'`
         )
       }
     }
@@ -523,6 +775,69 @@ export function validateStoryConfig(data: unknown): StoryConfig {
     )
   }
 
+  // H2: Every gauge.gameOverParagraphId must reference an existing paragraph
+  for (const gauge of gauges) {
+    if (gauge.gameOverParagraphId && !paragraphIdSet.has(gauge.gameOverParagraphId)) {
+      throw new StoryValidationError(
+        `Invalid story config: gauge '${gauge.id}' gameOverParagraphId '${gauge.gameOverParagraphId}' references non-existent paragraph`
+      )
+    }
+  }
+
+  // M3: Validate GaugeCondition gaugeIds in scoreMultipliers
+  if (scoreMultipliers) {
+    for (const [i, rule] of scoreMultipliers.entries()) {
+      for (const [j, cond] of rule.conditions.entries()) {
+        if (!gaugeIdSet.has(cond.gaugeId)) {
+          throw new StoryValidationError(
+            `Invalid story config: scoreMultipliers[${i}].conditions[${j}] references non-existent gauge '${cond.gaugeId}'`
+          )
+        }
+      }
+    }
+  }
+
+  // M3: Validate GaugeCondition gaugeIds in compositeGameOverRules
+  if (compositeGameOverRules) {
+    for (const [i, rule] of compositeGameOverRules.entries()) {
+      for (const [j, cond] of rule.conditions.entries()) {
+        if (!gaugeIdSet.has(cond.gaugeId)) {
+          throw new StoryValidationError(
+            `Invalid story config: compositeGameOverRules[${i}].conditions[${j}] references non-existent gauge '${cond.gaugeId}'`
+          )
+        }
+      }
+    }
+  }
+
+  // M3: Validate WeightedOutcome gaugeId/statId and ContextualGameOver gaugeId in paragraphs
+  for (const [pid, paragraph] of Object.entries(paragraphs)) {
+    for (const choice of paragraph.choices) {
+      if (choice.weightedOutcome) {
+        const wo = choice.weightedOutcome
+        if (!gaugeIdSet.has(wo.gaugeId)) {
+          throw new StoryValidationError(
+            `Invalid story config: weightedOutcome in choice '${choice.id}' paragraph '${pid}' references non-existent gauge '${wo.gaugeId}'`
+          )
+        }
+        if (!statIdSet.has(wo.statId)) {
+          throw new StoryValidationError(
+            `Invalid story config: weightedOutcome in choice '${choice.id}' paragraph '${pid}' references non-existent stat '${wo.statId}'`
+          )
+        }
+      }
+    }
+    if (paragraph.contextualGameOver) {
+      for (const [i, cgo] of paragraph.contextualGameOver.entries()) {
+        if (!gaugeIdSet.has(cgo.gaugeId)) {
+          throw new StoryValidationError(
+            `Invalid story config: contextualGameOver[${i}] in paragraph '${pid}' references non-existent gauge '${cgo.gaugeId}'`
+          )
+        }
+      }
+    }
+  }
+
   return {
     id,
     version,
@@ -536,5 +851,7 @@ export function validateStoryConfig(data: unknown): StoryConfig {
     decayRules,
     paragraphs,
     endStateTiers,
+    scoreMultipliers,
+    compositeGameOverRules,
   }
 }

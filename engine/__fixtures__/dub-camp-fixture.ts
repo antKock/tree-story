@@ -4,7 +4,8 @@ import type { StoryConfig } from '../types'
  * Minimal Dub Camp story config fixture for testing all engine mechanics.
  * Not a full 53-paragraph translation — just enough to exercise:
  * - 4 stats, 5 gauges, decay nodes, all 4 Game Over paths
- * - Weighted outcomes, inventory, act transitions, completion
+ * - Weighted outcomes (outcomes[] shape), inventory, act transitions, completion
+ * - Score multipliers, contextual game over, composite game over, conditional branching
  */
 export const dubCampFixture: StoryConfig = {
   id: 'dub-camp-test',
@@ -70,9 +71,7 @@ export const dubCampFixture: StoryConfig = {
       initialValue: 50,
       isScore: false,
       isHidden: false,
-      gameOverThreshold: 5,
-      gameOverCondition: 'below' as const,
-      gameOverParagraphId: 's203',
+      // No gameOverThreshold — food GO is via compositeGameOverRules
     },
     {
       id: 'kiff',
@@ -99,7 +98,7 @@ export const dubCampFixture: StoryConfig = {
     {
       id: 'act3',
       name: 'Journée',
-      paragraphIds: ['s40', 's41', 's50', 'sEVT1'],
+      paragraphIds: ['s40', 's41', 's50', 'sEVT1', 'sAlt'],
       theme: { '--color-bg': '#1a1a1a', '--color-accent': '#533483' },
     },
     {
@@ -123,6 +122,25 @@ export const dubCampFixture: StoryConfig = {
       gaugeId: 'energie',
       amount: -8,
       probabilityChance: 0.06,
+    },
+  ],
+  scoreMultipliers: [
+    {
+      conditions: [
+        { gaugeId: 'alcool', min: 20, max: 55 },
+        { gaugeId: 'fumette', min: 20, max: 55 },
+      ],
+      multiplier: 1.4,
+    },
+  ],
+  compositeGameOverRules: [
+    {
+      conditions: [
+        { gaugeId: 'alcool', min: 60 },
+        { gaugeId: 'nourriture', max: 20 },
+      ],
+      probability: 0.22,
+      targetParagraphId: 's203',
     },
   ],
   paragraphs: {
@@ -163,14 +181,27 @@ export const dubCampFixture: StoryConfig = {
           targetParagraphId: 's20',
           gaugeEffects: [
             { gaugeId: 'alcool', delta: 15 },
-            { gaugeId: 'energie', delta: -5 },
+            { gaugeId: 'energie', delta: -5, statInfluence: { statId: 'endurance', multiplier: 2 } },
           ],
           weightedOutcome: {
             gaugeId: 'alcool',
             statId: 'resistanceAlcool',
-            goodEffects: [{ gaugeId: 'kiff', delta: 5 }],
-            badEffects: [{ gaugeId: 'alcool', delta: 10 }],
+            outcomes: [
+              {
+                id: 'a',
+                maxRisk: 60,
+                text: 'Good outcome.',
+                effects: [{ gaugeId: 'kiff', delta: 5 }],
+              },
+              {
+                id: 'b',
+                maxRisk: 100,
+                text: 'Bad outcome.',
+                effects: [{ gaugeId: 'alcool', delta: 10 }],
+              },
+            ],
           },
+          conditionalBranch: { probability: 0.33, targetParagraphId: 'sAlt' },
         },
       ],
     },
@@ -261,7 +292,7 @@ export const dubCampFixture: StoryConfig = {
     },
     s50: {
       id: 's50',
-      content: 'L\'après-midi bat son plein. Chaleur étouffante.',
+      content: "L'après-midi bat son plein. Chaleur étouffante.",
       choices: [
         {
           id: 'c50a',
@@ -294,14 +325,32 @@ export const dubCampFixture: StoryConfig = {
           weightedOutcome: {
             gaugeId: 'alcool',
             statId: 'resistanceAlcool',
-            goodEffects: [{ gaugeId: 'kiff', delta: 8 }],
-            badEffects: [
-              { gaugeId: 'alcool', delta: 15 },
-              { gaugeId: 'energie', delta: -10 },
+            outcomes: [
+              {
+                id: 'a',
+                maxRisk: 60,
+                text: 'Super soirée !',
+                effects: [{ gaugeId: 'kiff', delta: 8 }],
+              },
+              {
+                id: 'b',
+                maxRisk: 100,
+                text: 'Trop de pression...',
+                effects: [
+                  { gaugeId: 'alcool', delta: 15 },
+                  { gaugeId: 'energie', delta: -10 },
+                ],
+              },
             ],
           },
         },
       ],
+    },
+    sAlt: {
+      id: 'sAlt',
+      content: 'Tu bifurques vers une scène alternative.',
+      choices: [],
+      isComplete: true,
     },
     s60: {
       id: 's60',
@@ -352,7 +401,7 @@ export const dubCampFixture: StoryConfig = {
     // Game Over paragraphs
     s201: {
       id: 's201',
-      content: 'Trop bu trop tôt... Tu t\'effondres.',
+      content: "Trop bu trop tôt... Tu t'effondres.",
       choices: [],
       isGameOver: true,
     },
@@ -364,13 +413,13 @@ export const dubCampFixture: StoryConfig = {
     },
     s203: {
       id: 's203',
-      content: 'Pas assez mangé... Tu ne tiens plus.',
+      content: "Pas assez mangé... Tu ne tiens plus.",
       choices: [],
       isGameOver: true,
     },
     s204: {
       id: 's204',
-      content: 'Épuisement total. Tu t\'endors sur place.',
+      content: "Épuisement total. Tu t'endors sur place.",
       choices: [],
       isGameOver: true,
     },
