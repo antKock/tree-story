@@ -257,33 +257,7 @@
         {
           "id": "s10-a",
           "text": "Tu vas te baigner au lac",
-          "targetParagraphId": "s11"
-        },
-        {
-          "id": "s10-b",
-          "text": "Tu pars manger un truc aux stands",
-          "targetParagraphId": "s12"
-        },
-        {
-          "id": "s10-c",
-          "text": "Tu t'allonges à l'ombre",
-          "targetParagraphId": "s13"
-        },
-        {
-          "id": "s10-d",
-          "text": "Tu rejoins Brian dans son transat",
-          "targetParagraphId": "s14"
-        }
-      ]
-    },
-    "s11": {
-      "id": "s11",
-      "content": "Cinq minutes de marche et te voilà au bord du lac. L'eau est fraîche, les gens sont détendus, quelqu'un a sorti une enceinte qui crache du roots tranquille.",
-      "choices": [
-        {
-          "id": "s11-a",
-          "text": "Tu rentres au camp, satisfait",
-          "targetParagraphId": "s15",
+          "targetParagraphId": "s11",
           "weightedOutcome": {
             "gaugeId": "energie",
             "statId": "endurance",
@@ -329,6 +303,32 @@
             ],
             "hungerGaugeId": "nourriture"
           }
+        },
+        {
+          "id": "s10-b",
+          "text": "Tu pars manger un truc aux stands",
+          "targetParagraphId": "s12"
+        },
+        {
+          "id": "s10-c",
+          "text": "Tu t'allonges à l'ombre",
+          "targetParagraphId": "s13"
+        },
+        {
+          "id": "s10-d",
+          "text": "Tu rejoins Brian dans son transat",
+          "targetParagraphId": "s14"
+        }
+      ]
+    },
+    "s11": {
+      "id": "s11",
+      "content": "Cinq minutes de marche et te voilà au bord du lac. L'eau est fraîche, les gens sont détendus, quelqu'un a sorti une enceinte qui crache du roots tranquille.",
+      "choices": [
+        {
+          "id": "s11-a",
+          "text": "Tu rentres au camp, satisfait",
+          "targetParagraphId": "s15"
         }
       ]
     },
@@ -418,23 +418,7 @@
         {
           "id": "s15-a",
           "text": "« Ouais, allez »",
-          "targetParagraphId": "s15a"
-        },
-        {
-          "id": "s15-b",
-          "text": "« Non merci, je préfère être frais »",
-          "targetParagraphId": "s15b"
-        }
-      ]
-    },
-    "s15a": {
-      "id": "s15a",
-      "content": "Vous vous posez cinq minutes. Brian roule, vous allumez.",
-      "choices": [
-        {
-          "id": "s15a-a",
-          "text": "Tu te lèves et tu files vers les basses",
-          "targetParagraphId": "s16",
+          "targetParagraphId": "s15a",
           "weightedOutcome": {
             "gaugeId": "fumette",
             "statId": "resistanceFumette",
@@ -480,6 +464,22 @@
             ],
             "hungerGaugeId": "nourriture"
           }
+        },
+        {
+          "id": "s15-b",
+          "text": "« Non merci, je préfère être frais »",
+          "targetParagraphId": "s15b"
+        }
+      ]
+    },
+    "s15a": {
+      "id": "s15a",
+      "content": "Vous vous posez cinq minutes. Brian roule, vous allumez.",
+      "choices": [
+        {
+          "id": "s15a-a",
+          "text": "Tu te lèves et tu files vers les basses",
+          "targetParagraphId": "s16"
         }
       ]
     },
@@ -599,28 +599,7 @@
         {
           "id": "s20-a",
           "text": "Dub Club Arena — NOFA Sound System",
-          "targetParagraphId": "s31"
-        },
-        {
-          "id": "s20-b",
-          "text": "Outernational Arena — Siren Sisters",
-          "targetParagraphId": "s32"
-        },
-        {
-          "id": "s20-c",
-          "text": "T'as encore faim, dernier tour bouffe",
-          "targetParagraphId": "s33"
-        }
-      ]
-    },
-    "s31": {
-      "id": "s31",
-      "content": "Le son te prend aux tripes dès l'entrée. NOFA balance des riddims lourds, la foule est dense.",
-      "choices": [
-        {
-          "id": "s31-a",
-          "text": "Tu sors du concert",
-          "targetParagraphId": "s40",
+          "targetParagraphId": "s31",
           "weightedOutcome": {
             "gaugeId": "energie",
             "statId": "endurance",
@@ -666,6 +645,27 @@
             ],
             "hungerGaugeId": "nourriture"
           }
+        },
+        {
+          "id": "s20-b",
+          "text": "Outernational Arena — Siren Sisters",
+          "targetParagraphId": "s32"
+        },
+        {
+          "id": "s20-c",
+          "text": "T'as encore faim, dernier tour bouffe",
+          "targetParagraphId": "s33"
+        }
+      ]
+    },
+    "s31": {
+      "id": "s31",
+      "content": "Le son te prend aux tripes dès l'entrée. NOFA balance des riddims lourds, la foule est dense.",
+      "choices": [
+        {
+          "id": "s31-a",
+          "text": "Tu sors du concert",
+          "targetParagraphId": "s40"
         }
       ]
     },
@@ -726,38 +726,7 @@
         {
           "id": "s40-a",
           "text": "Une bière",
-          "targetParagraphId": "s40a"
-        },
-        {
-          "id": "s40-b",
-          "text": "De l'eau",
-          "targetParagraphId": "s40b"
-        },
-        {
-          "id": "s40-c",
-          "text": "T'as assez kiffé pour aujourd'hui, tu rentres dormir",
-          "targetParagraphId": "s41",
-          "gaugeEffects": [
-            {
-              "gaugeId": "kiff",
-              "delta": 5
-            }
-          ]
-        }
-      ]
-    },
-    "s40a": {
-      "id": "s40a",
-      "content": "Tu prends une pression au bar.",
-      "choices": [
-        {
-          "id": "s40a-a",
-          "text": "Tu rejoins les autres",
-          "targetParagraphId": "s40c",
-          "conditionalBranch": {
-            "probability": 0.33,
-            "targetParagraphId": "sEVT1"
-          },
+          "targetParagraphId": "s40a",
           "weightedOutcome": {
             "gaugeId": "alcool",
             "statId": "resistanceAlcool",
@@ -795,6 +764,37 @@
             ],
             "hungerGaugeId": "nourriture"
           }
+        },
+        {
+          "id": "s40-b",
+          "text": "De l'eau",
+          "targetParagraphId": "s40b"
+        },
+        {
+          "id": "s40-c",
+          "text": "T'as assez kiffé pour aujourd'hui, tu rentres dormir",
+          "targetParagraphId": "s41",
+          "gaugeEffects": [
+            {
+              "gaugeId": "kiff",
+              "delta": 5
+            }
+          ]
+        }
+      ]
+    },
+    "s40a": {
+      "id": "s40a",
+      "content": "Tu prends une pression au bar.",
+      "choices": [
+        {
+          "id": "s40a-a",
+          "text": "Tu rejoins les autres",
+          "targetParagraphId": "s40c",
+          "conditionalBranch": {
+            "probability": 0.33,
+            "targetParagraphId": "sEVT1"
+          }
         }
       ]
     },
@@ -830,23 +830,7 @@
         {
           "id": "s40c-a",
           "text": "« Ouais, donne »",
-          "targetParagraphId": "s40d"
-        },
-        {
-          "id": "s40c-b",
-          "text": "« Non, je garde la tête claire »",
-          "targetParagraphId": "s40e"
-        }
-      ]
-    },
-    "s40d": {
-      "id": "s40d",
-      "content": "Tu tires quelques taffes. Les basses des scènes voisines filtrent dans l'air chaud.",
-      "choices": [
-        {
-          "id": "s40d-a",
-          "text": "Tu te mets en route pour Dubkasm",
-          "targetParagraphId": "s50",
+          "targetParagraphId": "s40d",
           "weightedOutcome": {
             "gaugeId": "fumette",
             "statId": "resistanceFumette",
@@ -892,6 +876,22 @@
             ],
             "hungerGaugeId": "nourriture"
           }
+        },
+        {
+          "id": "s40c-b",
+          "text": "« Non, je garde la tête claire »",
+          "targetParagraphId": "s40e"
+        }
+      ]
+    },
+    "s40d": {
+      "id": "s40d",
+      "content": "Tu tires quelques taffes. Les basses des scènes voisines filtrent dans l'air chaud.",
+      "choices": [
+        {
+          "id": "s40d-a",
+          "text": "Tu te mets en route pour Dubkasm",
+          "targetParagraphId": "s50"
         }
       ]
     },
@@ -975,40 +975,7 @@
               "gaugeId": "energie",
               "delta": -10
             }
-          ]
-        },
-        {
-          "id": "s50-b",
-          "text": "Tu restes en retrait, tu savoures sans te cramer",
-          "targetParagraphId": "s52",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": -10
-            }
-          ]
-        },
-        {
-          "id": "s50-c",
-          "text": "T'as besoin d'air, tu prends l'air quelques instants",
-          "targetParagraphId": "s53",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": -10
-            }
-          ]
-        }
-      ]
-    },
-    "s51": {
-      "id": "s51",
-      "content": "Tu te laisses emporter.",
-      "choices": [
-        {
-          "id": "s51-a",
-          "text": "Tu sors du concert",
-          "targetParagraphId": "s60",
+          ],
           "weightedOutcome": {
             "gaugeId": "energie",
             "statId": "endurance",
@@ -1054,6 +1021,39 @@
             ],
             "hungerGaugeId": "nourriture"
           }
+        },
+        {
+          "id": "s50-b",
+          "text": "Tu restes en retrait, tu savoures sans te cramer",
+          "targetParagraphId": "s52",
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": -10
+            }
+          ]
+        },
+        {
+          "id": "s50-c",
+          "text": "T'as besoin d'air, tu prends l'air quelques instants",
+          "targetParagraphId": "s53",
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": -10
+            }
+          ]
+        }
+      ]
+    },
+    "s51": {
+      "id": "s51",
+      "content": "Tu te laisses emporter.",
+      "choices": [
+        {
+          "id": "s51-a",
+          "text": "Tu sors du concert",
+          "targetParagraphId": "s60"
         }
       ]
     },
@@ -1110,23 +1110,7 @@
         {
           "id": "s60-a",
           "text": "« Ouais, dernier un »",
-          "targetParagraphId": "s60a"
-        },
-        {
-          "id": "s60-b",
-          "text": "« Non, j'arrête là pour ce soir »",
-          "targetParagraphId": "s60b"
-        }
-      ]
-    },
-    "s60a": {
-      "id": "s60a",
-      "content": "Vous l'allumez ensemble.",
-      "choices": [
-        {
-          "id": "s60a-a",
-          "text": "Voir la suite de la soirée",
-          "targetParagraphId": "s61c",
+          "targetParagraphId": "s60a",
           "weightedOutcome": {
             "gaugeId": "fumette",
             "statId": "resistanceFumette",
@@ -1164,6 +1148,22 @@
             ],
             "hungerGaugeId": "nourriture"
           }
+        },
+        {
+          "id": "s60-b",
+          "text": "« Non, j'arrête là pour ce soir »",
+          "targetParagraphId": "s60b"
+        }
+      ]
+    },
+    "s60a": {
+      "id": "s60a",
+      "content": "Vous l'allumez ensemble.",
+      "choices": [
+        {
+          "id": "s60a-a",
+          "text": "Voir la suite de la soirée",
+          "targetParagraphId": "s61c"
         }
       ]
     },
@@ -1185,33 +1185,7 @@
         {
           "id": "s61c-a",
           "text": "Tu vas voir Channel One, c'est la légende",
-          "targetParagraphId": "s61"
-        },
-        {
-          "id": "s61c-b",
-          "text": "Tu manges un truc d'abord",
-          "targetParagraphId": "s63"
-        },
-        {
-          "id": "s61c-c",
-          "text": "Tu restes avec Brian, il a l'air vraiment à plat",
-          "targetParagraphId": "s62"
-        },
-        {
-          "id": "s61c-d",
-          "text": "T'en as eu assez, tu rentres dormir",
-          "targetParagraphId": "s70"
-        }
-      ]
-    },
-    "s61": {
-      "id": "s61",
-      "content": "Tu files à l'Outernational. Channel One est déjà lancé. Le son est cristallin, les sélections impeccables.",
-      "choices": [
-        {
-          "id": "s61-a",
-          "text": "Tu rentres au camping, sourire aux lèvres",
-          "targetParagraphId": "s70",
+          "targetParagraphId": "s61",
           "weightedOutcome": {
             "gaugeId": "energie",
             "statId": "endurance",
@@ -1257,6 +1231,32 @@
             ],
             "hungerGaugeId": "nourriture"
           }
+        },
+        {
+          "id": "s61c-b",
+          "text": "Tu manges un truc d'abord",
+          "targetParagraphId": "s63"
+        },
+        {
+          "id": "s61c-c",
+          "text": "Tu restes avec Brian, il a l'air vraiment à plat",
+          "targetParagraphId": "s62"
+        },
+        {
+          "id": "s61c-d",
+          "text": "T'en as eu assez, tu rentres dormir",
+          "targetParagraphId": "s70"
+        }
+      ]
+    },
+    "s61": {
+      "id": "s61",
+      "content": "Tu files à l'Outernational. Channel One est déjà lancé. Le son est cristallin, les sélections impeccables.",
+      "choices": [
+        {
+          "id": "s61-a",
+          "text": "Tu rentres au camping, sourire aux lèvres",
+          "targetParagraphId": "s70"
         }
       ]
     },
@@ -1273,7 +1273,52 @@
               "gaugeId": "kiff",
               "delta": 8
             }
-          ]
+          ],
+          "weightedOutcome": {
+            "gaugeId": "energie",
+            "statId": "endurance",
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "Channel One est en feu ce soir. Les deux heures passent comme vingt minutes. Tu ressors avec des étoiles dans les yeux.",
+                "effects": [
+                  {
+                    "gaugeId": "energie",
+                    "delta": -18,
+                    "statInfluence": {
+                      "statId": "endurance",
+                      "multiplier": 2
+                    }
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 25
+                  }
+                ]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "Le set est bon mais t'as plus assez d'énergie pour vraiment kiffer. Tu pars au bout d'une heure, un peu frustré.",
+                "effects": [
+                  {
+                    "gaugeId": "energie",
+                    "delta": -25,
+                    "statInfluence": {
+                      "statId": "endurance",
+                      "multiplier": 2
+                    }
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 13
+                  }
+                ]
+              }
+            ],
+            "hungerGaugeId": "nourriture"
+          }
         },
         {
           "id": "s62-b",
@@ -1313,7 +1358,52 @@
               "gaugeId": "kiff",
               "delta": 12
             }
-          ]
+          ],
+          "weightedOutcome": {
+            "gaugeId": "energie",
+            "statId": "endurance",
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "Channel One est en feu ce soir. Les deux heures passent comme vingt minutes. Tu ressors avec des étoiles dans les yeux.",
+                "effects": [
+                  {
+                    "gaugeId": "energie",
+                    "delta": -18,
+                    "statInfluence": {
+                      "statId": "endurance",
+                      "multiplier": 2
+                    }
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 25
+                  }
+                ]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "Le set est bon mais t'as plus assez d'énergie pour vraiment kiffer. Tu pars au bout d'une heure, un peu frustré.",
+                "effects": [
+                  {
+                    "gaugeId": "energie",
+                    "delta": -25,
+                    "statInfluence": {
+                      "statId": "endurance",
+                      "multiplier": 2
+                    }
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 13
+                  }
+                ]
+              }
+            ],
+            "hungerGaugeId": "nourriture"
+          }
         },
         {
           "id": "s63-b",
