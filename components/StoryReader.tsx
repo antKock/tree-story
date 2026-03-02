@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import type { StoryConfig } from '@/engine/types'
 import { useStoryEngine } from '@/hooks/useStoryEngine'
 import GaugeStrip from './GaugeStrip'
@@ -39,9 +39,9 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
     }
   }, [engineState.paragraphId, config.decayNodes, applyDecay])
 
-  // Scroll to top on every paragraph transition
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
+  // Scroll to top on every paragraph transition (useLayoutEffect fires before paint)
+  useLayoutEffect(() => {
+    document.documentElement.scrollTop = 0
   }, [engineState.paragraphId])
 
   const currentParagraph = config.paragraphs[engineState.paragraphId]
