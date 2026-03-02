@@ -134,7 +134,7 @@
         "--color-surface": "#e6dbb8",
         "--color-text-primary": "#1a1a08",
         "--color-accent": "#2a7a18",
-        "--color-gauge-bg": "#f0e8cc",
+        "--color-gauge-bg": "#c8b078",
         "--color-gauge-track": "#a89060",
         "--color-gauge-bar": "#2a7a18"
       }
