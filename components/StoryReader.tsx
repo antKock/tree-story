@@ -16,7 +16,7 @@ interface StoryReaderProps {
 }
 
 export default function StoryReader({ config, initialStats, onReplay }: StoryReaderProps) {
-  const { engineState, resolveChoice, applyDecay, resetEngine, setStats, animKey } = useStoryEngine(config)
+  const { engineState, resolveChoice, applyDecay, resetEngine, setStats } = useStoryEngine(config)
   const [sheetOpen, setSheetOpen] = useState(false)
   const prevParagraphId = useRef(engineState.paragraphId)
   const statsApplied = useRef(false)
@@ -54,9 +54,7 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
           gauges={engineState.gauges}
           config={config}
           onOpenCharacterSheet={() => setSheetOpen(true)}
-          gaugeDeltas={engineState.lastGaugeDeltas}
-          animKey={animKey}
-        />
+          />
         <EndScreen
           engineState={engineState}
           config={config}
@@ -91,8 +89,6 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
         gauges={engineState.gauges}
         config={config}
         onOpenCharacterSheet={() => setSheetOpen(true)}
-        gaugeDeltas={engineState.lastGaugeDeltas}
-        animKey={animKey}
       />
 
       <main style={{ flex: 1, paddingTop: '1.5rem' }}>

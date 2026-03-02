@@ -6,11 +6,9 @@ interface GaugeStripProps {
   gauges: Record<string, number>
   config: StoryConfig
   onOpenCharacterSheet: () => void
-  gaugeDeltas?: Record<string, number> | null
-  animKey?: number
 }
 
-export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gaugeDeltas, animKey }: GaugeStripProps) {
+export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: GaugeStripProps) {
   const visibleGauges = config.gauges.filter(g => !g.isHidden)
 
   return (
@@ -37,8 +35,6 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gauge
     >
       {visibleGauges.map(gaugeDef => {
         const value = gauges[gaugeDef.id] ?? 0
-        const delta = gaugeDeltas ? (gaugeDeltas[gaugeDef.id] ?? 0) : 0
-        const showPill = gaugeDeltas !== null && gaugeDeltas !== undefined && delta !== 0
 
         return (
           <div
@@ -50,27 +46,15 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gauge
               gap: '6px',
               flex: 1,
               maxWidth: '80px',
-              position: 'relative',
             }}
           >
-            {showPill && (
-              <span
-                key={animKey}
-                className="gauge-delta-pill"
-                style={{
-                  color: delta > 0 ? 'var(--color-accent)' : 'var(--color-danger)',
-                }}
-              >
-                {delta > 0 ? '+' : ''}{Math.round(delta)}
-              </span>
-            )}
             <span style={{ fontSize: '17px', lineHeight: 1 }}>{gaugeDef.icon}</span>
             <div
               style={{
                 width: '100%',
                 height: '10px',
                 borderRadius: '5px',
-                background: 'rgba(255,255,255,0.08)',
+                background: 'var(--color-surface)',
                 overflow: 'hidden',
               }}
             >
