@@ -293,7 +293,28 @@ function validateWeightedOutcome(data: unknown, context: string): WeightedOutcom
       `Invalid story config: last outcome branch in ${context} must have maxRisk >= 100`
     )
   }
-  return { gaugeId, statId, outcomes }
+
+  let statMultiplier: number | undefined
+  if ('statMultiplier' in data) {
+    if (!isNumber(data['statMultiplier'])) {
+      throw new StoryValidationError(
+        `Invalid story config: 'statMultiplier' in ${context} must be a number`
+      )
+    }
+    if ((data['statMultiplier'] as number) <= 0) {
+      throw new StoryValidationError(
+        `Invalid story config: 'statMultiplier' in ${context} must be greater than 0`
+      )
+    }
+    statMultiplier = data['statMultiplier'] as number
+  }
+
+  let hungerGaugeId: string | undefined
+  if ('hungerGaugeId' in data && isString(data['hungerGaugeId'])) {
+    hungerGaugeId = data['hungerGaugeId']
+  }
+
+  return { gaugeId, statId, outcomes, statMultiplier, hungerGaugeId }
 }
 
 function validateGaugeCondition(data: unknown, context: string): GaugeCondition {
@@ -823,6 +844,11 @@ export function validateStoryConfig(data: unknown): StoryConfig {
         if (!statIdSet.has(wo.statId)) {
           throw new StoryValidationError(
             `Invalid story config: weightedOutcome in choice '${choice.id}' paragraph '${pid}' references non-existent stat '${wo.statId}'`
+          )
+        }
+        if (wo.hungerGaugeId !== undefined && !gaugeIdSet.has(wo.hungerGaugeId)) {
+          throw new StoryValidationError(
+            `Invalid story config: weightedOutcome in choice '${choice.id}' paragraph '${pid}' hungerGaugeId references non-existent gauge '${wo.hungerGaugeId}'`
           )
         }
       }

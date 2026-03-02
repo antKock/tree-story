@@ -32,7 +32,14 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
   }
 
   function applyProfile(profileStats: Record<string, number>) {
-    setStats({ ...profileStats })
+    // Only copy stat IDs that exist in the config, and clamp each value to [0, maxPerStat].
+    // This guards against example profiles with unknown stat IDs or totals that don't match the budget.
+    const sanitized: Record<string, number> = {}
+    for (const stat of config.stats) {
+      const v = profileStats[stat.id]
+      sanitized[stat.id] = typeof v === 'number' ? Math.max(0, Math.min(stat.maxPerStat, v)) : 0
+    }
+    setStats(sanitized)
   }
 
   return (

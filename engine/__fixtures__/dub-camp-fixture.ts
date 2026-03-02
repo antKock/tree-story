@@ -186,6 +186,7 @@ export const dubCampFixture: StoryConfig = {
           weightedOutcome: {
             gaugeId: 'alcool',
             statId: 'resistanceAlcool',
+            hungerGaugeId: 'nourriture',
             outcomes: [
               {
                 id: 'a',
@@ -325,6 +326,7 @@ export const dubCampFixture: StoryConfig = {
           weightedOutcome: {
             gaugeId: 'alcool',
             statId: 'resistanceAlcool',
+            hungerGaugeId: 'nourriture',
             outcomes: [
               {
                 id: 'a',

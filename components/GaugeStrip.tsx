@@ -30,9 +30,8 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gauge
         gap: '12px',
         padding: '6px 16px',
         background: 'var(--color-bg)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
         border: 'none',
-        borderBlockEnd: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
         cursor: 'pointer',
       }}
     >

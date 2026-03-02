@@ -234,8 +234,9 @@ describe('Weighted Outcome Resolution', () => {
 
   it('applies hunger modifier when nourriture is low', () => {
     const spy = vi.spyOn(Math, 'random').mockReturnValue(0.55)
+    const outcomeWithHunger = { ...outcome, hungerGaugeId: 'nourriture' }
     const result = resolveOutcome(
-      outcome,
+      outcomeWithHunger,
       { alcool: 60, nourriture: 10 }, // < 25 → +25 modifier
       { resistanceAlcool: 2 },
       config
@@ -243,6 +244,36 @@ describe('Weighted Outcome Resolution', () => {
     // risk = 60 - (2*15) + 25 = 60 - 30 + 25 = 55 → <= 55 → 60% good
     // roll 0.55 < 0.6 → outcome a
     expect(result.id).toBe('a')
+    spy.mockRestore()
+  })
+
+  it('does NOT apply hunger modifier when hungerGaugeId is absent', () => {
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.55)
+    // No hungerGaugeId: hunger modifier = 0. risk = 60 - (2*15) + 0 = 30 → 30–55 range → 60% good
+    // roll 0.55 < 0.6 → outcome a (same tier, different path)
+    const result = resolveOutcome(
+      outcome, // no hungerGaugeId
+      { alcool: 60, nourriture: 10 }, // nourriture low but ignored
+      { resistanceAlcool: 2 },
+      config
+    )
+    // risk = 30 → 60% good; roll 0.55 < 0.6 → outcome a
+    expect(result.id).toBe('a')
+    spy.mockRestore()
+  })
+
+  it('uses custom statMultiplier when provided', () => {
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.85)
+    const outcomeWithMultiplier = { ...outcome, statMultiplier: 5 }
+    // risk = 70 - (3 * 5) + 0 = 70 - 15 = 55 → <= 55 → 60% good
+    // roll 0.85 >= 0.6 → outcome b
+    const result = resolveOutcome(
+      outcomeWithMultiplier,
+      { alcool: 70, nourriture: 60 },
+      { resistanceAlcool: 3 },
+      config
+    )
+    expect(result.id).toBe('b')
     spy.mockRestore()
   })
 
@@ -665,6 +696,26 @@ describe('Core Story Engine', () => {
       vi.spyOn(Math, 'random').mockReturnValue(0.99) // no passive risk
       const state = engine.applyDecay()
       expect(state.gauges.nourriture).toBe(40) // 50 - 10
+      vi.restoreAllMocks()
+    })
+
+    it('applyDecay does NOT apply at non-decay nodes', () => {
+      const engine = makeEngineAt('s1', { energie: 80, nourriture: 50 }, { estomac: 0 }, { act: 'act1' })
+
+      vi.spyOn(Math, 'random').mockReturnValue(0.99)
+      const state = engine.applyDecay()
+      expect(state.gauges.nourriture).toBe(50) // unchanged — s1 is not a decay node
+      vi.restoreAllMocks()
+    })
+
+    it('applyDecay triggers global game-over when gauge crosses threshold', () => {
+      // energie at 5, passive energy risk (prob 0.06) fires → energie = 5 - 8 = clamped 0 → Game Over
+      const engine = makeEngineAt('s20', { energie: 5, nourriture: 50 }, { estomac: 0 }, { act: 'act2' })
+
+      vi.spyOn(Math, 'random').mockReturnValue(0.01) // < 0.06 → passive risk fires; also < nourriture decay threshold
+      const state = engine.applyDecay()
+      expect(state.isGameOver).toBe(true)
+      expect(state.gameOverParagraphId).toBe('s204') // energie <= 0 → s204
       vi.restoreAllMocks()
     })
 

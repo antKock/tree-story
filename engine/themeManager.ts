@@ -2,6 +2,9 @@
 // This is the ONLY file in the codebase that calls document.documentElement.style.setProperty
 import type { StoryConfig } from './types'
 
+// Track every property that has been set so resetToDefaults() can clear exactly those — no hardcoded list.
+const appliedProperties = new Set<string>()
+
 export function apply(actId: string, config: StoryConfig): void {
   if (typeof document === 'undefined') return
 
@@ -10,15 +13,16 @@ export function apply(actId: string, config: StoryConfig): void {
 
   for (const [propertyName, value] of Object.entries(act.theme)) {
     document.documentElement.style.setProperty(propertyName, value)
+    appliedProperties.add(propertyName)
   }
 }
 
 export function resetToDefaults(): void {
   if (typeof document === 'undefined') return
 
-  // Remove all act theme inline overrides so :root CSS custom properties take effect
-  const themeProperties = ['--color-bg', '--color-surface', '--color-text-primary', '--color-text-muted', '--color-accent', '--color-danger']
-  for (const prop of themeProperties) {
+  // Remove every inline override that was applied via apply(), so :root CSS vars take effect.
+  for (const prop of appliedProperties) {
     document.documentElement.style.removeProperty(prop)
   }
+  appliedProperties.clear()
 }

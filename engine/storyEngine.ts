@@ -266,7 +266,9 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
       // Sync score after gauge changes
       syncScore()
 
-      // Step 7: Evaluate contextualGameOver on current paragraph → if triggered: STOP
+      // Step 7: Evaluate contextualGameOver on the DEPARTURE paragraph (the one the choice was made
+      // from, not the target). This allows "if you drink here and alcool is too high → game over"
+      // rules scoped to specific departure points.
       if (evaluateContextualGameOver(_state.paragraphId)) {
         return engine.getState()
       }
@@ -293,8 +295,7 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
       // Step 12: Advance paragraphId
       _state.paragraphId = targetId
 
-      // Step 13: Sync score; check isComplete
-      syncScore()
+      // Step 13: Check isComplete
       const targetParagraph = config.paragraphs[targetId]
       if (targetParagraph?.isComplete) {
         _state.isComplete = true
@@ -315,8 +316,14 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
       // Sync score
       syncScore()
 
-      // Evaluate Game Over
+      // Evaluate all game-over systems — decay can push any gauge past any threshold
+      if (evaluateContextualGameOver(_state.paragraphId)) {
+        return engine.getState()
+      }
       if (evaluateGameOver()) {
+        return engine.getState()
+      }
+      if (evaluateCompositeGameOverRules(_state.paragraphId)) {
         return engine.getState()
       }
 

@@ -9,11 +9,18 @@ export function resolveOutcome(
 ): OutcomeBranch {
   const gaugeLevel = gauges[outcome.gaugeId] ?? 0
   const statValue = stats[outcome.statId] ?? 0
+  const statMultiplier = outcome.statMultiplier ?? 15
 
-  const nourriture = gauges['nourriture'] ?? 50
-  const hungerModifier = nourriture > 50 ? 0 : nourriture >= 25 ? 10 : 25
+  // Hunger modifier: story-specific, only applied when hungerGaugeId is configured on this outcome.
+  // NOTE: The modifier thresholds (50/25 → 0/10/25) are fixed design constants for the current engine.
+  // A future multi-story engine supporting custom modifier curves would need a formula field.
+  let hungerModifier = 0
+  if (outcome.hungerGaugeId) {
+    const hungerValue = gauges[outcome.hungerGaugeId] ?? 50
+    hungerModifier = hungerValue > 50 ? 0 : hungerValue >= 25 ? 10 : 25
+  }
 
-  const risk = gaugeLevel - (statValue * 15) + hungerModifier
+  const risk = gaugeLevel - (statValue * statMultiplier) + hungerModifier
 
   const goodProbability = risk < 30 ? 0.9 : risk <= 55 ? 0.6 : risk <= 75 ? 0.4 : 0.2
 

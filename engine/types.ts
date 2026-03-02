@@ -62,6 +62,10 @@ export interface WeightedOutcome {
   gaugeId: string
   statId: string
   outcomes: OutcomeBranch[]
+  /** Multiplier applied to statValue in the risk formula: risk = gaugeLevel - (statValue * statMultiplier). Defaults to 15. */
+  statMultiplier?: number
+  /** Gauge ID to read for hunger modifier. When set, low values increase risk. Story-specific (e.g. 'nourriture'). */
+  hungerGaugeId?: string
 }
 
 export interface GaugeCondition {

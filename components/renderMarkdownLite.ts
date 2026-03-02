@@ -3,6 +3,10 @@ import React from 'react'
 /**
  * Minimal inline markdown renderer supporting **bold** and *italic*.
  * Bold is processed before italic to avoid ambiguity with adjacent asterisks.
+ *
+ * Known limitation: mixed bold+italic constructs (***text***, *foo**bar**baz*)
+ * are not supported and will produce unexpected output. Adjacent italic spans
+ * (*word1* *word2*) and adjacent bold spans work correctly.
  */
 export function renderMarkdownLite(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = []

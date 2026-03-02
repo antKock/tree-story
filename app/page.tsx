@@ -5,10 +5,12 @@ import GameShell from '@/components/GameShell'
 import { validateStoryConfig } from '@/engine/storyValidator'
 import { StoryValidationError } from '@/engine/types'
 
+const STORY_FILE = 'public/stories/dub-camp.json'
+
 export default async function Home() {
   let storyConfig
   try {
-    const filePath = path.join(process.cwd(), 'public/stories/dub-camp.json')
+    const filePath = path.join(process.cwd(), STORY_FILE)
     const raw = await readFile(filePath, 'utf-8')
     const data: unknown = JSON.parse(raw)
     storyConfig = validateStoryConfig(data)
