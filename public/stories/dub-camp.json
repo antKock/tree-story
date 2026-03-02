@@ -3,7 +3,7 @@
   "version": 1,
   "startParagraphId": "s1",
   "meta": {
-    "title": "Dub Camp",
+    "title": "Dub Crampe",
     "author": "Anthony",
     "version": "v1.5",
     "description": "Le Dub Camp. Pas besoin d'en dire plus à ceux qui y sont déjà allés.\n\nTu joues le rôle du troisième larron — ni le stratège (c'est Bastien), ni le fêtard invétéré (c'est Brian). Ton objectif : passer la meilleure soirée possible sans te planter.\n\nAvant de commencer, répartis tes points de caractéristiques. Ils influenceront l'impact des activités sur ton énergie, ta résistance à l'alcool et à la fumette, et ta capacité à te ravitailler.",
@@ -12,10 +12,10 @@
         "name": "Le Bastien",
         "description": "fêtard endurant",
         "stats": {
-          "endurance": 4,
+          "endurance": 3,
           "estomac": 0,
           "resistanceAlcool": 2,
-          "resistanceFumette": 2
+          "resistanceFumette": 1
         }
       },
       {
@@ -24,8 +24,8 @@
         "stats": {
           "endurance": 1,
           "estomac": 1,
-          "resistanceAlcool": 3,
-          "resistanceFumette": 3
+          "resistanceAlcool": 2,
+          "resistanceFumette": 2
         }
       },
       {
@@ -33,14 +33,14 @@
         "description": "premier festival",
         "stats": {
           "endurance": 2,
-          "estomac": 2,
+          "estomac": 1,
           "resistanceAlcool": 2,
-          "resistanceFumette": 2
+          "resistanceFumette": 1
         }
       }
     ]
   },
-  "statPointBudget": 8,
+  "statPointBudget": 6,
   "stats": [
     {
       "id": "endurance",
@@ -57,7 +57,7 @@
     {
       "id": "resistanceAlcool",
       "name": "Résistance alcool",
-      "description": "Tu supportes plus avant que l'alcool te joue des tours",
+      "description": "Plus tu en as, plus tu tiens avant de sentir les effets de l'alcool",
       "maxPerStat": 4
     },
     {
@@ -126,10 +126,11 @@
         "s10"
       ],
       "theme": {
-        "--color-bg": "#f5edd4",
-        "--color-surface": "#ede3c0",
-        "--color-text": "#1a1208",
-        "--color-accent": "#2d7a1f"
+        "--color-bg": "#1e1a08",
+        "--color-surface": "#2a2410",
+        "--color-text": "#f0e8cc",
+        "--color-text-primary": "#f0e8cc",
+        "--color-accent": "#d4a820"
       }
     },
     {
@@ -139,10 +140,11 @@
         "s40"
       ],
       "theme": {
-        "--color-bg": "#0d1a0d",
-        "--color-surface": "#132213",
-        "--color-text": "#e8dfc8",
-        "--color-accent": "#c4421a"
+        "--color-bg": "#1a0c05",
+        "--color-surface": "#261408",
+        "--color-text": "#f0e0c0",
+        "--color-text-primary": "#f0e0c0",
+        "--color-accent": "#e06020"
       }
     },
     {
@@ -155,6 +157,7 @@
         "--color-bg": "#0d1a0d",
         "--color-surface": "#0f1f0f",
         "--color-text": "#e8dfc8",
+        "--color-text-primary": "#e8dfc8",
         "--color-accent": "#c4421a"
       }
     },
@@ -165,9 +168,10 @@
         "s70"
       ],
       "theme": {
-        "--color-bg": "#0d1a0d",
-        "--color-surface": "#0f1f0f",
+        "--color-bg": "#0a1410",
+        "--color-surface": "#0d1a14",
         "--color-text": "#e8dfc8",
+        "--color-text-primary": "#e8dfc8",
         "--color-accent": "#c4421a"
       }
     }
