@@ -27,7 +27,7 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: Gau
         justifyContent: 'center',
         gap: '12px',
         padding: '6px 16px',
-        background: 'var(--color-bg)',
+        background: 'var(--color-gauge-bg)',
         border: 'none',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         cursor: 'pointer',
@@ -54,7 +54,7 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: Gau
                 width: '100%',
                 height: '10px',
                 borderRadius: '5px',
-                background: 'var(--color-surface)',
+                background: 'var(--color-gauge-track)',
                 overflow: 'hidden',
               }}
             >
@@ -63,7 +63,7 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: Gau
                   width: `${Math.max(0, Math.min(100, value))}%`,
                   height: '100%',
                   borderRadius: '5px',
-                  background: 'var(--color-accent)',
+                  background: 'var(--color-gauge-bar)',
                   transition: 'width 150ms ease',
                 }}
               />

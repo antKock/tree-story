@@ -86,7 +86,7 @@
       "initialValue": 0,
       "isScore": false,
       "isHidden": false,
-      "gameOverThreshold": 85,
+      "gameOverThreshold": 90,
       "gameOverCondition": "above",
       "gameOverParagraphId": "s201"
     },
@@ -107,7 +107,10 @@
       "icon": "🍔",
       "initialValue": 50,
       "isScore": false,
-      "isHidden": false
+      "isHidden": false,
+      "gameOverThreshold": 5,
+      "gameOverCondition": "below",
+      "gameOverParagraphId": "s205"
     },
     {
       "id": "kiff",
@@ -115,7 +118,8 @@
       "icon": "🎉",
       "initialValue": 0,
       "isScore": true,
-      "isHidden": true
+      "isHidden": true,
+      "maxValue": 200
     }
   ],
   "acts": [
@@ -129,7 +133,10 @@
         "--color-bg": "#f0e8cc",
         "--color-surface": "#e6dbb8",
         "--color-text-primary": "#1a1a08",
-        "--color-accent": "#2a7a18"
+        "--color-accent": "#2a7a18",
+        "--color-gauge-bg": "#f0e8cc",
+        "--color-gauge-track": "#a89060",
+        "--color-gauge-bar": "#2a7a18"
       }
     },
     {
@@ -142,7 +149,10 @@
         "--color-bg": "#2a1505",
         "--color-surface": "#361c08",
         "--color-text-primary": "#f0d8a0",
-        "--color-accent": "#e06020"
+        "--color-accent": "#e06020",
+        "--color-gauge-bg": "#2a1505",
+        "--color-gauge-track": "#5a3418",
+        "--color-gauge-bar": "#e06020"
       }
     },
     {
@@ -155,7 +165,10 @@
         "--color-bg": "#0d1a0d",
         "--color-surface": "#0f2010",
         "--color-text-primary": "#e8dfc8",
-        "--color-accent": "#c4421a"
+        "--color-accent": "#c4421a",
+        "--color-gauge-bg": "#0d1a0d",
+        "--color-gauge-track": "#1e3a1e",
+        "--color-gauge-bar": "#c4421a"
       }
     },
     {
@@ -168,7 +181,10 @@
         "--color-bg": "#080f08",
         "--color-surface": "#0a140a",
         "--color-text-primary": "#c8c0a8",
-        "--color-accent": "#a03418"
+        "--color-accent": "#a03418",
+        "--color-gauge-bg": "#080f08",
+        "--color-gauge-track": "#141e14",
+        "--color-gauge-bar": "#a03418"
       }
     }
   ],
@@ -177,16 +193,36 @@
       "conditions": [
         {
           "gaugeId": "alcool",
-          "min": 20,
-          "max": 55
+          "min": 15,
+          "max": 60
         },
         {
           "gaugeId": "fumette",
-          "min": 20,
-          "max": 55
+          "min": 15,
+          "max": 60
         }
       ],
-      "multiplier": 1.4
+      "multiplier": 1.25
+    },
+    {
+      "conditions": [
+        {
+          "gaugeId": "alcool",
+          "min": 15,
+          "max": 60
+        }
+      ],
+      "multiplier": 1.15
+    },
+    {
+      "conditions": [
+        {
+          "gaugeId": "fumette",
+          "min": 15,
+          "max": 60
+        }
+      ],
+      "multiplier": 1.15
     },
     {
       "conditions": [
@@ -346,7 +382,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "alcool",
-              "delta": 25
+              "delta": 15
             },
             {
               "gaugeId": "fumette",
@@ -455,7 +491,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 10
+                    "delta": 14
                   }
                 ]
               },
@@ -474,7 +510,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 4
+                    "delta": 6
                   }
                 ]
               }
@@ -528,7 +564,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "nourriture",
-              "delta": 35,
+              "delta": 50,
               "statInfluence": {
                 "statId": "estomac",
                 "multiplier": 3
@@ -741,7 +777,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "nourriture",
-              "delta": 20,
+              "delta": 30,
               "statInfluence": {
                 "statId": "estomac",
                 "multiplier": 3
@@ -834,7 +870,13 @@
               }
             ],
             "hungerGaugeId": "nourriture"
-          }
+          },
+          "gaugeEffects": [
+            {
+              "gaugeId": "kiff",
+              "delta": 8
+            }
+          ]
         },
         {
           "id": "s40-b",
@@ -1469,7 +1511,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "nourriture",
-              "delta": 25,
+              "delta": 35,
               "statInfluence": {
                 "statId": "estomac",
                 "multiplier": 3
@@ -1537,7 +1579,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "nourriture",
-              "delta": 25,
+              "delta": 35,
               "statInfluence": {
                 "statId": "estomac",
                 "multiplier": 3
@@ -1691,7 +1733,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 5
+                    "delta": 8
                   }
                 ]
               },
@@ -1711,6 +1753,10 @@
                   {
                     "gaugeId": "energie",
                     "delta": -5
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 3
                   }
                 ]
               }
@@ -1721,7 +1767,12 @@
           "id": "s40f-b",
           "text": "Tu prends un joint avec Brian",
           "targetParagraphId": "s40c",
-          "gaugeEffects": []
+          "gaugeEffects": [
+            {
+              "gaugeId": "kiff",
+              "delta": 10
+            }
+          ]
         },
         {
           "id": "s40f-c",
@@ -1764,7 +1815,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "nourriture",
-              "delta": 22,
+              "delta": 35,
               "statInfluence": {
                 "statId": "estomac",
                 "multiplier": 3
@@ -1789,7 +1840,7 @@
           "gaugeEffects": [
             {
               "gaugeId": "nourriture",
-              "delta": 18,
+              "delta": 30,
               "statInfluence": {
                 "statId": "estomac",
                 "multiplier": 3
@@ -1802,6 +1853,12 @@
           ]
         }
       ]
+    },
+    "s205": {
+      "id": "s205",
+      "content": "Ça fait des heures que t'as rien avalé. Pas un sandwich, pas une frite, rien. T'as tenu par la musique et l'adrénaline, mais là ton corps décide d'arrêter de négocier.\n\nTu t'assieds sur un muret, les jambes en coton. Bastien te tend une barre de céréales qu'il avait dans sa poche depuis le matin — trop tard. Le monde tourne légèrement.\n\nUn bénévole te repère et t'escorte au poste médical avec la bienveillance professionnelle de quelqu'un qui a déjà fait ça vingt fois ce soir.\n\n**FIN DE PARTIE** — Dub Crampe pour de vrai.",
+      "choices": [],
+      "isGameOver": true
     }
   },
   "endStateTiers": [

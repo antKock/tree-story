@@ -12,6 +12,9 @@
   /* Tree-story app shell tokens */
   --color-bg: var(--ts-bg);
   --color-surface: var(--ts-surface);
+  --color-gauge-bg: var(--ts-gauge-bg);
+  --color-gauge-track: var(--ts-gauge-track);
+  --color-gauge-bar: var(--ts-gauge-bar);
   --color-text-primary: var(--ts-text-primary);
   --color-text-muted: var(--ts-text-muted);
   --color-accent: var(--ts-accent);
@@ -64,6 +67,9 @@
   /* Tree-story app shell colors — dark mode as primary/default */
   --ts-bg: #0f0f0f;
   --ts-surface: #1a1a1a;
+  --ts-gauge-bg: #0f0f0f;
+  --ts-gauge-track: #1a1a1a;
+  --ts-gauge-bar: #d4935a;
   --ts-text-primary: #f0ece4;
   --ts-text-muted: #7a7672;
   --ts-accent: #d4935a;

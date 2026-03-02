@@ -312,8 +312,11 @@ interface ActDefinition {
   - `--color-surface` — card/surface background
   - `--color-text-primary` — main prose text
   - `--color-text-muted` — secondary/muted text
-  - `--color-accent` — accent color (gauge bars, interactive elements)
+  - `--color-accent` — accent color (interactive elements)
   - `--color-danger` — danger/warning color
+  - `--color-gauge-bg` — background of the sticky gauge strip bar
+  - `--color-gauge-track` — empty (unfilled) portion of each gauge bar
+  - `--color-gauge-bar` — filled portion of each gauge bar
 
 Dub Camp act definitions (with theme palette):
 ```json
@@ -322,25 +325,57 @@ Dub Camp act definitions (with theme palette):
     "id": "afternoon",
     "name": "Afternoon",
     "paragraphIds": ["s10"],
-    "theme": { "--color-bg": "#1a1208", "--color-accent": "#e8a42a" }
+    "theme": {
+      "--color-bg": "#f0e8cc",
+      "--color-surface": "#e6dbb8",
+      "--color-gauge-bg": "#f0e8cc",
+      "--color-gauge-track": "#e6dbb8",
+      "--color-gauge-bar": "#2a7a18",
+      "--color-text-primary": "#1a1a08",
+      "--color-accent": "#2a7a18"
+    }
   },
   {
     "id": "goldenHour",
-    "name": "Golden hour",
+    "name": "Golden Hour",
     "paragraphIds": ["s40"],
-    "theme": { "--color-bg": "#160e0a", "--color-accent": "#e8622a" }
+    "theme": {
+      "--color-bg": "#2a1505",
+      "--color-surface": "#361c08",
+      "--color-gauge-bg": "#2a1505",
+      "--color-gauge-track": "#361c08",
+      "--color-gauge-bar": "#e06020",
+      "--color-text-primary": "#f0d8a0",
+      "--color-accent": "#e06020"
+    }
   },
   {
     "id": "night",
     "name": "Night",
     "paragraphIds": ["s60"],
-    "theme": { "--color-bg": "#080810", "--color-accent": "#7c5cbf" }
+    "theme": {
+      "--color-bg": "#0d1a0d",
+      "--color-surface": "#0f2010",
+      "--color-gauge-bg": "#0d1a0d",
+      "--color-gauge-track": "#0f2010",
+      "--color-gauge-bar": "#c4421a",
+      "--color-text-primary": "#e8dfc8",
+      "--color-accent": "#c4421a"
+    }
   },
   {
     "id": "lateNight",
-    "name": "Late night",
+    "name": "Late Night",
     "paragraphIds": ["s70"],
-    "theme": { "--color-bg": "#0a0c0e", "--color-accent": "#4a7a8a" }
+    "theme": {
+      "--color-bg": "#080f08",
+      "--color-surface": "#0a140a",
+      "--color-gauge-bg": "#080f08",
+      "--color-gauge-track": "#0a140a",
+      "--color-gauge-bar": "#a03418",
+      "--color-text-primary": "#c8c0a8",
+      "--color-accent": "#a03418"
+    }
   }
 ]
 ```
