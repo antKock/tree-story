@@ -308,29 +308,22 @@
           "id": "s10-b",
           "text": "Tu pars manger un truc aux stands",
           "targetParagraphId": "s12",
-          "gaugeEffects": [
-            {
-              "gaugeId": "nourriture",
-              "delta": 40,
-              "statInfluence": {
-                "statId": "estomac",
-                "multiplier": 3
-              }
-            },
-            {
-              "gaugeId": "energie",
-              "delta": 5
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 10
-            }
-          ]
+          "gaugeEffects": []
         },
         {
           "id": "s10-c",
           "text": "Tu t'allonges à l'ombre",
-          "targetParagraphId": "s13"
+          "targetParagraphId": "s13",
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": 30
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 3
+            }
+          ]
         },
         {
           "id": "s10-d",
@@ -376,7 +369,24 @@
           "id": "s12-a",
           "text": "Tu rentres au camp, le ventre plein",
           "targetParagraphId": "s15",
-          "gaugeEffects": []
+          "gaugeEffects": [
+            {
+              "gaugeId": "nourriture",
+              "delta": 40,
+              "statInfluence": {
+                "statId": "estomac",
+                "multiplier": 3
+              }
+            },
+            {
+              "gaugeId": "energie",
+              "delta": 5
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 10
+            }
+          ]
         }
       ]
     },
@@ -388,16 +398,7 @@
           "id": "s13-a",
           "text": "Tu te lèves, bien reposé",
           "targetParagraphId": "s15",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": 30
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 3
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
@@ -447,7 +448,7 @@
               {
                 "id": "b",
                 "maxRisk": 100,
-                "text": "Le mélange chaleur + joint te monte plus que prévu. T'es un peu dans le coton en arrivant sur le site.",
+                "text": "Le mélange chaleur + joint te monte bien plus que prévu. T'arrives sur le site dans un état cotonneux et flottant — les basses te semblent lointaines, les gens bougent trop vite. Pas idéal pour la suite.",
                 "effects": [
                   {
                     "gaugeId": "fumette",
@@ -509,12 +510,40 @@
         {
           "id": "s16-a",
           "text": "Tu manges un truc solide",
-          "targetParagraphId": "s16a"
+          "targetParagraphId": "s16a",
+          "gaugeEffects": [
+            {
+              "gaugeId": "nourriture",
+              "delta": 35,
+              "statInfluence": {
+                "statId": "estomac",
+                "multiplier": 3
+              }
+            },
+            {
+              "gaugeId": "energie",
+              "delta": 5
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 9
+            }
+          ]
         },
         {
           "id": "s16-b",
           "text": "Tu passes par les douches",
-          "targetParagraphId": "s16b"
+          "targetParagraphId": "s16b",
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": 15
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 5
+            }
+          ]
         },
         {
           "id": "s16-c",
@@ -541,24 +570,7 @@
           "id": "s16a-a",
           "text": "Tu files vers les scènes",
           "targetParagraphId": "s20",
-          "gaugeEffects": [
-            {
-              "gaugeId": "nourriture",
-              "delta": 35,
-              "statInfluence": {
-                "statId": "estomac",
-                "multiplier": 3
-              }
-            },
-            {
-              "gaugeId": "energie",
-              "delta": 5
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 9
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
@@ -570,16 +582,7 @@
           "id": "s16b-a",
           "text": "Tu files vers les scènes",
           "targetParagraphId": "s20",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": 15
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 5
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
@@ -652,12 +655,40 @@
         {
           "id": "s20-b",
           "text": "Outernational Arena — Siren Sisters",
-          "targetParagraphId": "s32"
+          "targetParagraphId": "s32",
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": -8,
+              "statInfluence": {
+                "statId": "endurance",
+                "multiplier": 2
+              }
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 11
+            }
+          ]
         },
         {
           "id": "s20-c",
           "text": "T'as encore faim, dernier tour bouffe",
-          "targetParagraphId": "s33"
+          "targetParagraphId": "s33",
+          "gaugeEffects": [
+            {
+              "gaugeId": "nourriture",
+              "delta": 20,
+              "statInfluence": {
+                "statId": "estomac",
+                "multiplier": 3
+              }
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 8
+            }
+          ]
         }
       ]
     },
@@ -680,20 +711,7 @@
           "id": "s32-a",
           "text": "Tu sors du concert",
           "targetParagraphId": "s40",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": -8,
-              "statInfluence": {
-                "statId": "endurance",
-                "multiplier": 2
-              }
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 11
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
@@ -705,20 +723,7 @@
           "id": "s33-a",
           "text": "Tu files vers les scènes",
           "targetParagraphId": "s40",
-          "gaugeEffects": [
-            {
-              "gaugeId": "nourriture",
-              "delta": 20,
-              "statInfluence": {
-                "statId": "estomac",
-                "multiplier": 3
-              }
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 8
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
@@ -841,7 +846,7 @@
               {
                 "id": "a",
                 "maxRisk": 60,
-                "text": "Le timing est idéal. T'es dans un état de grâce, les sons autour de toi prennent une profondeur incroyable. Bastien vient vous rejoindre et vous passez une demi-heure à juste écouter les basses qui filtrent des scènes.",
+                "text": "Le timing est idéal. T'es dans un état de grâce, les sons autour de toi prennent une profondeur incroyable. Bastien arrête cinq minutes de parler de Dubkasm et se laisse porter lui aussi. Vous restez là à juste écouter les basses qui filtrent des scènes.",
                 "effects": [
                   {
                     "gaugeId": "fumette",
@@ -860,7 +865,7 @@
               {
                 "id": "b",
                 "maxRisk": 100,
-                "text": "T'as pas bien évalué l'effet cumulé avec ce que t'as déjà dans le sang. Ça monte vite. T'es assis par terre et t'as plus trop envie de bouger.",
+                "text": "T'as mal évalué l'effet cumulé avec ce que t'as déjà dans le sang. Ça monte fort. Tu tiens debout mais le monde autour de toi tourne en slow motion — Dubkasm va être une expérience, c'est sûr.",
                 "effects": [
                   {
                     "gaugeId": "fumette",
@@ -889,7 +894,7 @@
     },
     "s40d": {
       "id": "s40d",
-      "content": "Tu tires quelques taffes. Les basses des scènes voisines filtrent dans l'air chaud.",
+      "content": "Tu tires quelques taffes. Les basses des scènes voisines filtrent dans l'air chaud. La lumière a changé — le ciel est passé du violet au noir, les éclairages de scène découpent des halos dans la nuit. Dubkasm dans une heure.",
       "choices": [
         {
           "id": "s40d-a",
@@ -1032,7 +1037,15 @@
           "gaugeEffects": [
             {
               "gaugeId": "energie",
-              "delta": -5
+              "delta": -12,
+              "statInfluence": {
+                "statId": "endurance",
+                "multiplier": 2
+              }
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 20
             }
           ]
         },
@@ -1043,7 +1056,11 @@
           "gaugeEffects": [
             {
               "gaugeId": "energie",
-              "delta": -5
+              "delta": 8
+            },
+            {
+              "gaugeId": "kiff",
+              "delta": 9
             }
           ]
         }
@@ -1068,20 +1085,7 @@
           "id": "s52-a",
           "text": "Tu sors du concert",
           "targetParagraphId": "s60",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": -12,
-              "statInfluence": {
-                "statId": "endurance",
-                "multiplier": 2
-              }
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 20
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
@@ -1093,22 +1097,13 @@
           "id": "s53-a",
           "text": "Tu sors du concert",
           "targetParagraphId": "s60",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": 8
-            },
-            {
-              "gaugeId": "kiff",
-              "delta": 9
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
     "s60": {
       "id": "s60",
-      "content": "Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux — le genre de regard qui fixe un point à six kilomètres de distance. Brian a disparu — vous le retrouvez assis contre une barrière, un gobelet vide à la main. « Les gars, j'crois que j'ai un peu trop bu. »\n\nIl est 23h. Channel One passe à l'Outernational jusqu'à 3h du mat.\n\nBrian sort machinalement son matos, par réflexe. « Dernier petit truc ? »",
+      "content": "Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux — le genre de regard qui fixe un point à six kilomètres de distance. Brian a disparu — vous le retrouvez assis contre une barrière, un gobelet vide à la main. « Les gars, j'crois que j'ai un peu trop bu. »\n\nIl est passé minuit. Channel One passe à l'Outernational jusqu'à 3h du mat.\n\nBrian sort machinalement son matos, par réflexe. « Dernier petit truc ? »",
       "choices": [
         {
           "id": "s60-a",
@@ -1183,7 +1178,7 @@
     },
     "s61c": {
       "id": "s61c",
-      "content": "Maintenant qu'est-ce que tu fais ?",
+      "content": "Il est passé minuit, l'air s'est un peu rafraîchi. Les scènes tournent encore à plein régime. Bastien a disparu dans la foule depuis vingt minutes. Brian est là, silencieux pour une fois, les yeux dans le vide — dans le bon sens du terme.\n\nQu'est-ce que tu fais ?",
       "choices": [
         {
           "id": "s61c-a",
@@ -1265,7 +1260,7 @@
     },
     "s62": {
       "id": "s62",
-      "content": "Tu accompagnes Brian jusqu'au camping. Il s'effondre sur son sac de couchage en marmonnant un « merci mec » sincère. Tu restes assis dehors sous les étoiles, les basses du festival en fond sonore. Quelqu'un au loin joue une flûte. Personne lui a rien demandé mais c'est pas déplaisant.\n\nT'as encore de l'énergie. Tu repars ?",
+      "content": "Tu accompagnes Brian jusqu'au camping. Il s'effondre sur son sac de couchage en marmonnant un « merci mec » sincère. Tu restes assis dehors sous les étoiles, les basses du festival en fond sonore. Quelqu'un au loin joue une flûte. Personne lui a rien demandé mais c'est pas déplaisant.\n\nTu repars ?",
       "choices": [
         {
           "id": "s62-a",
@@ -1284,7 +1279,7 @@
               {
                 "id": "a",
                 "maxRisk": 60,
-                "text": "Channel One est en feu ce soir. Les deux heures passent comme vingt minutes. Tu ressors avec des étoiles dans les yeux.",
+                "text": "T'arrives pour la dernière heure mais c'est amplement suffisant. Channel One est en feu. Tu ressors avec des étoiles dans les yeux et le regret de ne pas être arrivé plus tôt.",
                 "effects": [
                   {
                     "gaugeId": "energie",
@@ -1303,7 +1298,7 @@
               {
                 "id": "b",
                 "maxRisk": 100,
-                "text": "Le set est bon mais t'as plus assez d'énergie pour vraiment kiffer. Tu pars au bout d'une heure, un peu frustré.",
+                "text": "T'arrives trop tard et trop fatigué pour vraiment te laisser emporter. Tu restes debout jusqu'à la fin par principe. C'était bien, mais t'en tireras pas grand chose.",
                 "effects": [
                   {
                     "gaugeId": "energie",
@@ -1441,7 +1436,7 @@
     },
     "s201": {
       "id": "s201",
-      "content": "Il est 17h et t'as déjà du mal à marcher droit. Bastien te regarde avec un mélange d'amusement et d'inquiétude sincère. « Mec… on vient d'arriver. » Brian essaie de t'expliquer que c'est les mojitos. Il a peut-être raison. Il a probablement tort.\n\nLes pompiers du festival sont très sympas — ils t'ont vu d'autres, et ça se voit. Ils te posent sur un brancard, te mettent sous sérum, et t'expliquent que tu pourras reprendre demain matin avec un sourire professionnel qui ne dit pas tout.\n\nLa nuit, tu l'entends de loin. Dubkasm, Channel One — à travers la toile de la tente médicale.\n\n**FIN DE PARTIE** — Trop bu trop tôt.",
+      "content": "T'as déjà du mal à marcher droit. Bastien te regarde avec un mélange d'amusement et d'inquiétude sincère. « Mec… on vient d'arriver. » Brian essaie de t'expliquer que c'est les mojitos. Il a peut-être raison. Il a probablement tort.\n\nLes pompiers du festival sont très sympas — ils t'ont vu d'autres, et ça se voit. Ils te posent sur un brancard, te mettent sous sérum, et t'expliquent que tu pourras reprendre demain matin avec un sourire professionnel qui ne dit pas tout.\n\nLa nuit, tu l'entends de loin. Dubkasm, Channel One — à travers la toile de la tente médicale.\n\n**FIN DE PARTIE** — Trop bu trop tôt.",
       "choices": [],
       "isGameOver": true
     },
