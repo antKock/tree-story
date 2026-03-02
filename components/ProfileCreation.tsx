@@ -44,31 +44,6 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
 
   return (
     <div className="reading-column" style={{ paddingTop: '3rem', paddingBottom: '3rem' }}>
-      <h1
-        style={{
-          fontFamily: 'var(--font-ui)',
-          fontSize: '1.5rem',
-          fontWeight: 700,
-          marginBottom: '0.5rem',
-          color: 'var(--color-text-primary)',
-        }}
-      >
-        {config.meta.title}
-      </h1>
-      {config.meta.description && (
-        <p
-          style={{
-            fontFamily: 'var(--font-ui)',
-            fontSize: '0.95rem',
-            color: 'var(--color-text-muted)',
-            marginBottom: '2rem',
-            lineHeight: 1.5,
-          }}
-        >
-          {config.meta.description}
-        </p>
-      )}
-
       <h2
         style={{
           fontFamily: 'var(--font-ui)',
