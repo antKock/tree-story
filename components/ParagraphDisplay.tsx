@@ -31,7 +31,7 @@ export default function ParagraphDisplay({ content, outcomeText, gaugeDeltas, ga
       {hasResult && (
         <>
           {outcomeParagraphs.map((para, i) => (
-            <p key={`outcome-${i}`} style={{ marginBottom: '1.25em', marginTop: 0, fontStyle: 'italic' }}>
+            <p key={`outcome-${i}`} style={{ marginBottom: '1.25em', marginTop: 0 }}>
               {renderMarkdownLite(para.trim())}
             </p>
           ))}

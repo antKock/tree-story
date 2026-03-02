@@ -6,7 +6,7 @@
     "title": "Dub Camp",
     "author": "Anthony",
     "version": "v1.5",
-    "description": "Dub Camp, un festival quelque part en France. Trois jours, deux potes, une glacière et un programme chargé.\n\nTu joues le rôle du troisième larron — ni le stratège (c'est Bastien), ni le fêtard invétéré (c'est Brian). Ton objectif : passer la meilleure soirée possible sans te planter.\n\nAvant de commencer, répartis tes points de caractéristiques. Ils influenceront l'impact des activités sur ton énergie, ta résistance à l'alcool et à la fumette, et ta capacité à te ravitailler.",
+    "description": "Le Dub Camp. Pas besoin d'en dire plus à ceux qui y sont déjà allés.\n\nTu joues le rôle du troisième larron — ni le stratège (c'est Bastien), ni le fêtard invétéré (c'est Brian). Ton objectif : passer la meilleure soirée possible sans te planter.\n\nAvant de commencer, répartis tes points de caractéristiques. Ils influenceront l'impact des activités sur ton énergie, ta résistance à l'alcool et à la fumette, et ta capacité à te ravitailler.",
     "exampleProfiles": [
       {
         "name": "Le Bastien",
@@ -126,19 +126,23 @@
         "s10"
       ],
       "theme": {
-        "--color-bg": "#1a1208",
-        "--color-accent": "#e8a42a"
+        "--color-bg": "#f5edd4",
+        "--color-surface": "#ede3c0",
+        "--color-text": "#1a1208",
+        "--color-accent": "#2d7a1f"
       }
     },
     {
       "id": "goldenHour",
-      "name": "Golden hour",
+      "name": "Golden Hour",
       "paragraphIds": [
         "s40"
       ],
       "theme": {
-        "--color-bg": "#160e0a",
-        "--color-accent": "#e8622a"
+        "--color-bg": "#0d1a0d",
+        "--color-surface": "#132213",
+        "--color-text": "#e8dfc8",
+        "--color-accent": "#c4421a"
       }
     },
     {
@@ -148,19 +152,23 @@
         "s60"
       ],
       "theme": {
-        "--color-bg": "#080810",
-        "--color-accent": "#7c5cbf"
+        "--color-bg": "#0d1a0d",
+        "--color-surface": "#0f1f0f",
+        "--color-text": "#e8dfc8",
+        "--color-accent": "#c4421a"
       }
     },
     {
       "id": "lateNight",
-      "name": "Late night",
+      "name": "Late Night",
       "paragraphIds": [
         "s70"
       ],
       "theme": {
-        "--color-bg": "#0a0c0e",
-        "--color-accent": "#4a7a8a"
+        "--color-bg": "#0d1a0d",
+        "--color-surface": "#0f1f0f",
+        "--color-text": "#e8dfc8",
+        "--color-accent": "#c4421a"
       }
     }
   ],
@@ -302,7 +310,13 @@
               }
             ],
             "hungerGaugeId": "nourriture"
-          }
+          },
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": -8
+            }
+          ]
         },
         {
           "id": "s10-b",
@@ -352,7 +366,7 @@
     },
     "s11": {
       "id": "s11",
-      "content": "Cinq minutes de marche et te voilà au bord du lac. L'eau est fraîche, les gens sont détendus, quelqu'un a sorti une enceinte qui crache du roots tranquille. Deux gamins construisent un château de sable à côté d'un sound system. C'est le Dub Camp.",
+      "content": "Quarante minutes de marche, mais ça valait le coup. Te voilà au bord du lac, loin du bruit des scènes. L'eau est fraîche, les gens sont détendus, quelqu'un a sorti une enceinte qui crache du roots tranquille. Deux gamins construisent un château de sable à côté d'un sound system. C'est le Dub Camp.",
       "choices": [
         {
           "id": "s11-a",
@@ -437,7 +451,7 @@
                   },
                   {
                     "gaugeId": "energie",
-                    "delta": -5
+                    "delta": -10
                   },
                   {
                     "gaugeId": "kiff",
@@ -456,7 +470,7 @@
                   },
                   {
                     "gaugeId": "energie",
-                    "delta": -10
+                    "delta": -20
                   },
                   {
                     "gaugeId": "kiff",
@@ -559,6 +573,55 @@
               "delta": 12
             }
           ]
+        },
+        {
+          "id": "s16-d",
+          "text": "Tu prends une bière au bar du camping",
+          "targetParagraphId": "s16d",
+          "weightedOutcome": {
+            "gaugeId": "alcool",
+            "statId": "resistanceAlcool",
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "Fraîche, bien dosée. L'ambiance commence à monter, c'est exactement le bon rythme.",
+                "effects": [
+                  {
+                    "gaugeId": "alcool",
+                    "delta": 20
+                  },
+                  {
+                    "gaugeId": "nourriture",
+                    "delta": -5
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 7
+                  }
+                ]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "Un peu rapide, un peu fort. Tu pars vers les scènes avec les joues légèrement roses.",
+                "effects": [
+                  {
+                    "gaugeId": "alcool",
+                    "delta": 35
+                  },
+                  {
+                    "gaugeId": "nourriture",
+                    "delta": -10
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -5
+                  }
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -625,7 +688,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 18
+                    "delta": 26
                   }
                 ]
               },
@@ -644,7 +707,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 11
+                    "delta": 16
                   }
                 ]
               }
@@ -667,7 +730,7 @@
             },
             {
               "gaugeId": "kiff",
-              "delta": 11
+              "delta": 18
             }
           ]
         },
@@ -746,7 +809,7 @@
                 "effects": [
                   {
                     "gaugeId": "alcool",
-                    "delta": 22
+                    "delta": 30
                   },
                   {
                     "gaugeId": "nourriture",
@@ -761,7 +824,7 @@
                 "effects": [
                   {
                     "gaugeId": "alcool",
-                    "delta": 42
+                    "delta": 52
                   },
                   {
                     "gaugeId": "nourriture",
@@ -798,7 +861,7 @@
         {
           "id": "s40a-a",
           "text": "Tu rejoins les autres",
-          "targetParagraphId": "s40c",
+          "targetParagraphId": "s40f",
           "conditionalBranch": {
             "probability": 0.33,
             "targetParagraphId": "sEVT1"
@@ -813,7 +876,7 @@
         {
           "id": "s40b-a",
           "text": "Tu rejoins les autres",
-          "targetParagraphId": "s40c",
+          "targetParagraphId": "s40f",
           "conditionalBranch": {
             "probability": 0.33,
             "targetParagraphId": "sEVT1"
@@ -854,7 +917,7 @@
                   },
                   {
                     "gaugeId": "energie",
-                    "delta": -5
+                    "delta": -10
                   },
                   {
                     "gaugeId": "kiff",
@@ -873,7 +936,7 @@
                   },
                   {
                     "gaugeId": "energie",
-                    "delta": -12
+                    "delta": -22
                   },
                   {
                     "gaugeId": "kiff",
@@ -933,7 +996,7 @@
         {
           "id": "sEVT1-a",
           "text": "Vous vous approchez",
-          "targetParagraphId": "s40c",
+          "targetParagraphId": "s40f",
           "weightedOutcome": {
             "gaugeId": "energie",
             "statId": "endurance",
@@ -1003,7 +1066,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 28
+                    "delta": 36
                   }
                 ]
               },
@@ -1022,7 +1085,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 16
+                    "delta": 22
                   }
                 ]
               }
@@ -1045,7 +1108,7 @@
             },
             {
               "gaugeId": "kiff",
-              "delta": 20
+              "delta": 27
             }
           ]
         },
@@ -1060,7 +1123,7 @@
             },
             {
               "gaugeId": "kiff",
-              "delta": 9
+              "delta": 13
             }
           ]
         }
@@ -1091,13 +1154,62 @@
     },
     "s53": {
       "id": "s53",
-      "content": "T'as besoin de souffler. Tu sors, tu trouves un coin calme, tu bois de l'eau. Au loin les basses de Dubkasm continuent. Tu y retournes vingt minutes plus tard, requinqué.",
+      "content": "T'as besoin de souffler. Tu sors, tu trouves un coin calme, tu bois de l'eau. Au loin les basses de Dubkasm continuent. Brian est là lui aussi, assis sur un muret. Il t'adresse un signe de tête et sort son matos sans rien demander.",
       "choices": [
         {
           "id": "s53-a",
-          "text": "Tu sors du concert",
+          "text": "Tu ignores et tu rentres dans le concert",
           "targetParagraphId": "s60",
           "gaugeEffects": []
+        },
+        {
+          "id": "s53-b",
+          "text": "T'acceptes, quelques taffes au calme",
+          "targetParagraphId": "s53b",
+          "weightedOutcome": {
+            "gaugeId": "fumette",
+            "statId": "resistanceFumette",
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "C'est exactement ce qu'il fallait. Calme, basses au loin, l'air du soir. Tu rentres dans le concert avec un regard neuf.",
+                "effects": [
+                  {
+                    "gaugeId": "fumette",
+                    "delta": 22
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -8
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 10
+                  }
+                ]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "Mauvaise idée avec la chaleur et la fatigue. Tu rentres dans le concert mais t'es plus vraiment là.",
+                "effects": [
+                  {
+                    "gaugeId": "fumette",
+                    "delta": 45
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -18
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 3
+                  }
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -1125,6 +1237,10 @@
                   {
                     "gaugeId": "kiff",
                     "delta": 8
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -8
                   }
                 ]
               },
@@ -1139,7 +1255,7 @@
                   },
                   {
                     "gaugeId": "energie",
-                    "delta": -12
+                    "delta": -20
                   }
                 ]
               }
@@ -1203,7 +1319,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 25
+                    "delta": 32
                   }
                 ]
               },
@@ -1222,7 +1338,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 13
+                    "delta": 18
                   }
                 ]
               }
@@ -1239,6 +1355,12 @@
           "id": "s61c-c",
           "text": "Tu restes avec Brian, il a l'air vraiment à plat",
           "targetParagraphId": "s62"
+        },
+        {
+          "id": "s61c-e",
+          "text": "Tu prends une dernière bière au bar",
+          "targetParagraphId": "s61d",
+          "gaugeEffects": []
         },
         {
           "id": "s61c-d",
@@ -1291,7 +1413,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 25
+                    "delta": 32
                   }
                 ]
               },
@@ -1310,7 +1432,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 13
+                    "delta": 18
                   }
                 ]
               }
@@ -1376,7 +1498,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 25
+                    "delta": 32
                   }
                 ]
               },
@@ -1395,7 +1517,7 @@
                   },
                   {
                     "gaugeId": "kiff",
-                    "delta": 13
+                    "delta": 18
                   }
                 ]
               }
@@ -1457,6 +1579,169 @@
       "content": "T'as pas vu venir. T'étais tellement dans la musique que t'as pas senti ton corps négocier en coulisses depuis une heure. En sortant du concert, tes jambes ont une opinion différente de la tienne sur la suite des événements.\n\nTu t'assieds par terre, les yeux mi-clos. Un bénévole s'approche. « Ça va ? » La question est rhétorique mais il la pose quand même, sympa.\n\nTu passes la fin de nuit à récupérer au poste médical pendant que Bastien envoie des photos depuis la Dub Club. Il en envoie sept. Dont trois floues.\n\n**FIN DE PARTIE** — Épuisement.",
       "choices": [],
       "isGameOver": true
+    },
+    "s61d": {
+      "id": "s61d",
+      "content": "T'avises un bar encore ouvert sur le côté. Dernière occasion de la soirée. Le barman range tranquillement ses bouteilles, mais il t'en sort une dernière sans rien dire.",
+      "choices": [
+        {
+          "id": "s61d-a",
+          "text": "Tu pars voir Channel One",
+          "targetParagraphId": "s61",
+          "weightedOutcome": {
+            "gaugeId": "alcool",
+            "statId": "resistanceAlcool",
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "Elle passe bien. Un petit boost pour tenir jusqu'à la fin.",
+                "effects": [
+                  {
+                    "gaugeId": "alcool",
+                    "delta": 28
+                  },
+                  {
+                    "gaugeId": "nourriture",
+                    "delta": -8
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 6
+                  }
+                ]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "Une de trop. T'arrives à Channel One avec les jambes un peu molles et la tête qui tourne doucement.",
+                "effects": [
+                  {
+                    "gaugeId": "alcool",
+                    "delta": 48
+                  },
+                  {
+                    "gaugeId": "nourriture",
+                    "delta": -15
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -8
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "s53b": {
+      "id": "s53b",
+      "content": "Vous restez là dix minutes à rien faire, à juste écouter les basses filtrer à travers les murs du site. C'est bien aussi, ça.",
+      "choices": [
+        {
+          "id": "s53b-a",
+          "text": "Tu rentres voir la fin de Dubkasm",
+          "targetParagraphId": "s60",
+          "gaugeEffects": []
+        }
+      ]
+    },
+    "s16d": {
+      "id": "s16d",
+      "content": "Le bar du camping est encore calme avant la ruée. Le barman a l'air reposé — ça ne durera pas. Tu prends ta bière, tu t'installes deux minutes.",
+      "choices": [
+        {
+          "id": "s16d-a",
+          "text": "Tu files vers les scènes",
+          "targetParagraphId": "s20",
+          "gaugeEffects": []
+        }
+      ]
+    },
+    "s40f": {
+      "id": "s40f",
+      "content": "Il est encore tôt — Dubkasm commence à 23h. L'ambiance entre les deux scènes est suspendue, électrique. Quelques bières traînent, Brian a sorti son matos, Bastien pianote sur son téléphone.\n\nQu'est-ce que tu fais en attendant ?",
+      "choices": [
+        {
+          "id": "s40f-a",
+          "text": "Tu prends une bière",
+          "targetParagraphId": "s40g",
+          "weightedOutcome": {
+            "gaugeId": "alcool",
+            "statId": "resistanceAlcool",
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "Elle descend bien. Tu te sens bien calé pour la suite.",
+                "effects": [
+                  {
+                    "gaugeId": "alcool",
+                    "delta": 26
+                  },
+                  {
+                    "gaugeId": "nourriture",
+                    "delta": -6
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 5
+                  }
+                ]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "Un peu plus forte qu'attendu. Ça monte doucement.",
+                "effects": [
+                  {
+                    "gaugeId": "alcool",
+                    "delta": 44
+                  },
+                  {
+                    "gaugeId": "nourriture",
+                    "delta": -12
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -5
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "s40f-b",
+          "text": "Tu prends un joint avec Brian",
+          "targetParagraphId": "s40c",
+          "gaugeEffects": []
+        },
+        {
+          "id": "s40f-c",
+          "text": "Tu gardes la tête froide, direct Dubkasm",
+          "targetParagraphId": "s50",
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": 5
+            }
+          ]
+        }
+      ]
+    },
+    "s40g": {
+      "id": "s40g",
+      "content": "Tu bois tranquillement. Autour de toi le festival tourne à plein régime. Au loin, les premières notes de la soundcheck de Dubkasm filtrent dans l'air chaud.",
+      "choices": [
+        {
+          "id": "s40g-a",
+          "text": "Tu te mets en route pour Dubkasm",
+          "targetParagraphId": "s50",
+          "gaugeEffects": []
+        }
+      ]
     }
   },
   "endStateTiers": [
