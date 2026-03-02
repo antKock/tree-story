@@ -171,9 +171,22 @@
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.7rem;
+  font-size: 0.85rem;          /* was 0.7rem */
   font-weight: 700;
   white-space: nowrap;
   animation: pill-fade 2s ease forwards;
   pointer-events: none;
+  background: rgba(0, 0, 0, 0.55);   /* improves contrast */
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.result-gauge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  padding: 2px 6px;
+  background: color-mix(in srgb, currentColor 20%, transparent);
 }

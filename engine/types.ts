@@ -139,6 +139,7 @@ export interface StoryMeta {
   author: string
   version: string
   description?: string
+  introText?: string
   exampleProfiles: ExampleProfile[]
 }
 

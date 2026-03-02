@@ -40,6 +40,11 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
     }
   }, [engineState.paragraphId, config.decayNodes, applyDecay])
 
+  // Scroll to top on every paragraph transition
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [engineState.paragraphId])
+
   const currentParagraph = config.paragraphs[engineState.paragraphId]
 
   // Game over or story complete → show end screen
@@ -93,7 +98,11 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
 
       <main style={{ flex: 1, paddingTop: '1.5rem' }}>
         <ParagraphDisplay content={currentParagraph.content} />
-        <ResultBlock text={engineState.lastOutcomeText} />
+        <ResultBlock
+          text={engineState.lastOutcomeText}
+          gaugeDeltas={engineState.lastGaugeDeltas}
+          gauges={config.gauges}
+        />
         <ChoiceCards choices={currentParagraph.choices} onChoose={resolveChoice} />
       </main>
 

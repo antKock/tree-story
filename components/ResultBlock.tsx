@@ -1,22 +1,28 @@
 'use client'
 
 import { renderMarkdownLite } from './renderMarkdownLite'
+import type { GaugeDefinition } from '@/engine/types'
 
 interface ResultBlockProps {
   text: string | null
+  gaugeDeltas?: Record<string, number> | null
+  gauges?: GaugeDefinition[]
 }
 
-export default function ResultBlock({ text }: ResultBlockProps) {
-  if (!text) return null
+export default function ResultBlock({ text, gaugeDeltas, gauges }: ResultBlockProps) {
+  const visibleDeltas = (gaugeDeltas && gauges)
+    ? gauges.filter(g => !g.isHidden && gaugeDeltas[g.id] !== undefined && gaugeDeltas[g.id] !== 0)
+    : []
 
-  const paragraphs = text.split(/\n\n+/)
+  if (!text && visibleDeltas.length === 0) return null
+
+  const paragraphs = text ? text.split(/\n\n+/) : []
 
   return (
     <div
       className="reading-column"
       style={{
         borderLeft: '3px solid var(--color-accent)',
-        paddingLeft: '1rem',
         marginTop: '0.5rem',
         marginBottom: '1rem',
         background: 'var(--color-surface)',
@@ -24,18 +30,20 @@ export default function ResultBlock({ text }: ResultBlockProps) {
         padding: '0.75rem 1rem',
       }}
     >
-      <p
-        style={{
-          fontSize: '0.72rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          color: 'var(--color-accent)',
-          margin: '0 0 0.5rem 0',
-          fontFamily: 'var(--font-ui)',
-        }}
-      >
-        Résultat
-      </p>
+      {text && (
+        <p
+          style={{
+            fontSize: '0.72rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: 'var(--color-accent)',
+            margin: '0 0 0.5rem 0',
+            fontFamily: 'var(--font-ui)',
+          }}
+        >
+          Résultat
+        </p>
+      )}
       {paragraphs.map((para, i) => (
         <p
           key={i}
@@ -49,6 +57,22 @@ export default function ResultBlock({ text }: ResultBlockProps) {
           {renderMarkdownLite(para.trim())}
         </p>
       ))}
+      {visibleDeltas.length > 0 && gaugeDeltas && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: text ? '0.75rem' : 0 }}>
+          {visibleDeltas.map(g => {
+            const delta = gaugeDeltas[g.id]
+            return (
+              <span
+                key={g.id}
+                className="result-gauge-chip"
+                style={{ color: delta > 0 ? 'var(--color-accent)' : 'var(--color-danger)' }}
+              >
+                {g.icon} {delta > 0 ? '+' : ''}{Math.round(delta)}
+              </span>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

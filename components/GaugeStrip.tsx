@@ -23,7 +23,7 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gauge
         top: 0,
         zIndex: 10,
         width: '100%',
-        minHeight: '44px',
+        minHeight: '48px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -48,7 +48,7 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gauge
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '3px',
+              gap: '6px',
               flex: 1,
               maxWidth: '80px',
               position: 'relative',
@@ -69,8 +69,8 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gauge
             <div
               style={{
                 width: '100%',
-                height: '7px',
-                borderRadius: '4px',
+                height: '10px',
+                borderRadius: '5px',
                 background: 'rgba(255,255,255,0.08)',
                 overflow: 'hidden',
               }}
@@ -79,7 +79,7 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet, gauge
                 style={{
                   width: `${Math.max(0, Math.min(100, value))}%`,
                   height: '100%',
-                  borderRadius: '4px',
+                  borderRadius: '5px',
                   background: 'var(--color-accent)',
                   transition: 'width 150ms ease',
                 }}

@@ -40,7 +40,10 @@ export function useStoryEngine(config: StoryConfig) {
   const applyDecay = useCallback(() => {
     engineRef.current!.applyDecay()
     commitState()
-    // applyDecay does NOT increment animKey — decay changes gauges silently
+    // Increment animKey so the delta pill remounts and re-animates after decay.
+    // The pill continues to show the most recent choice's lastGaugeDeltas (not decay amounts),
+    // which is intentional — decay is a silent background process.
+    setAnimKey(k => k + 1)
   }, [commitState])
 
   const resetEngine = useCallback(() => {
