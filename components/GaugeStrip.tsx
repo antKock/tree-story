@@ -48,7 +48,7 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: Gau
               maxWidth: '80px',
             }}
           >
-            <span style={{ fontSize: '17px', lineHeight: 1 }}>{gaugeDef.icon}</span>
+            <span style={{ fontSize: '34px', lineHeight: 1 }}>{gaugeDef.icon}</span>
             <div
               style={{
                 width: '100%',
