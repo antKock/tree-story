@@ -78,7 +78,11 @@ export default function GameShell({ config }: GameShellProps) {
   const [pendingStats, setPendingStats] = useState<Record<string, number> | null>(null)
 
   useEffect(() => {
-    setPhase(hasActiveGame(config) ? 'story' : 'landing')
+    const active = hasActiveGame(config)
+    if (!active) {
+      themeManager.apply(config.acts[0].id, config)
+    }
+    setPhase(active ? 'story' : 'landing')
   }, [config])
 
   function handleBegin() {
@@ -92,6 +96,7 @@ export default function GameShell({ config }: GameShellProps) {
 
   function handleReplay() {
     themeManager.resetToDefaults()
+    themeManager.apply(config.acts[0].id, config)
     setPendingStats(null)
     setPhase('landing')
   }
