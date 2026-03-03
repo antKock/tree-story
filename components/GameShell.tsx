@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { StoryConfig } from '@/engine/types'
+import * as persistence from '@/engine/persistence'
 import * as themeManager from '@/engine/themeManager'
 import ProfileCreation from './ProfileCreation'
 import StoryReader from './StoryReader'
@@ -63,9 +64,22 @@ function LandingScreen({ config, onBegin }: { config: StoryConfig; onBegin: () =
   )
 }
 
+function hasActiveGame(config: StoryConfig): boolean {
+  const saved = persistence.load()
+  if (!saved) return false
+  if (saved.storyId !== config.id) return false
+  const es = saved.engineState
+  if (es.isGameOver || es.isComplete) return false
+  return true
+}
+
 export default function GameShell({ config }: GameShellProps) {
-  const [phase, setPhase] = useState<'landing' | 'profile' | 'story'>('landing')
+  const [phase, setPhase] = useState<'landing' | 'profile' | 'story' | 'loading'>('loading')
   const [pendingStats, setPendingStats] = useState<Record<string, number> | null>(null)
+
+  useEffect(() => {
+    setPhase(hasActiveGame(config) ? 'story' : 'landing')
+  }, [config])
 
   function handleBegin() {
     setPhase('profile')
@@ -80,6 +94,10 @@ export default function GameShell({ config }: GameShellProps) {
     themeManager.resetToDefaults()
     setPendingStats(null)
     setPhase('landing')
+  }
+
+  if (phase === 'loading') {
+    return null
   }
 
   if (phase === 'landing') {

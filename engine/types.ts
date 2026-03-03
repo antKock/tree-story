@@ -28,6 +28,7 @@ export interface GaugeDefinition {
   initialValue: number
   isScore: boolean
   isHidden: boolean
+  maxValue?: number
   gameOverThreshold?: number
   gameOverCondition?: 'above' | 'below'
   gameOverParagraphId?: string

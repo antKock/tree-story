@@ -9,6 +9,7 @@ interface ProfileCreationProps {
 }
 
 export default function ProfileCreation({ config, onStart }: ProfileCreationProps) {
+  const [mode, setMode] = useState<'choose' | 'custom'>('choose')
   const [stats, setStats] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {}
     for (const stat of config.stats) {
@@ -31,19 +32,103 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
     setStats(prev => ({ ...prev, [statId]: prev[statId] - 1 }))
   }
 
-  function applyProfile(profileStats: Record<string, number>) {
-    // Only copy stat IDs that exist in the config, and clamp each value to [0, maxPerStat].
-    // This guards against example profiles with unknown stat IDs or totals that don't match the budget.
+  function sanitizeProfile(profileStats: Record<string, number>): Record<string, number> {
     const sanitized: Record<string, number> = {}
     for (const stat of config.stats) {
       const v = profileStats[stat.id]
       sanitized[stat.id] = typeof v === 'number' ? Math.max(0, Math.min(stat.maxPerStat, v)) : 0
     }
-    setStats(sanitized)
+    return sanitized
   }
 
+  function selectProfile(profileStats: Record<string, number>) {
+    onStart(sanitizeProfile(profileStats))
+  }
+
+  function enterCustomMode() {
+    setMode('custom')
+  }
+
+  const cardStyle = {
+    width: '100%',
+    padding: '16px 20px',
+    borderRadius: '8px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'var(--color-surface)',
+    color: 'var(--color-text-primary)',
+    fontFamily: 'var(--font-ui)',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    textAlign: 'left' as const,
+    transition: 'border-color 150ms ease',
+  }
+
+  // --- Profile selection screen ---
+  if (mode === 'choose') {
+    return (
+      <div className="reading-column" style={{ paddingTop: '3rem', paddingBottom: '3rem' }}>
+        <h2
+          style={{
+            fontFamily: 'var(--font-ui)',
+            fontSize: '1.1rem',
+            fontWeight: 600,
+            marginBottom: '1.5rem',
+            color: 'var(--color-text-primary)',
+          }}
+        >
+          Choisis ton profil
+        </h2>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {config.meta.exampleProfiles.map(profile => (
+            <button
+              key={profile.name}
+              type="button"
+              onClick={() => selectProfile(profile.stats)}
+              style={cardStyle}
+            >
+              <div style={{ fontWeight: 600, marginBottom: '4px' }}>{profile.name}</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+                {profile.description}
+              </div>
+            </button>
+          ))}
+
+          <button
+            type="button"
+            onClick={enterCustomMode}
+            style={cardStyle}
+          >
+            <div style={{ fontWeight: 600, marginBottom: '4px' }}>Personnaliser</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+              Répartis tes points toi-même
+            </div>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // --- Custom stat allocator ---
   return (
     <div className="reading-column" style={{ paddingTop: '3rem', paddingBottom: '3rem' }}>
+      <button
+        type="button"
+        onClick={() => setMode('choose')}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: 'var(--color-text-muted)',
+          fontFamily: 'var(--font-ui)',
+          fontSize: '0.85rem',
+          cursor: 'pointer',
+          padding: 0,
+          marginBottom: '1rem',
+        }}
+      >
+        ← Retour aux profils
+      </button>
+
       <h2
         style={{
           fontFamily: 'var(--font-ui)',
@@ -167,49 +252,6 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
           </div>
         ))}
       </div>
-
-      {config.meta.exampleProfiles.length > 0 && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h3
-            style={{
-              fontFamily: 'var(--font-ui)',
-              fontSize: '0.85rem',
-              fontWeight: 500,
-              color: 'var(--color-text-muted)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              marginBottom: '0.75rem',
-            }}
-          >
-            Profils suggérés
-          </h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {config.meta.exampleProfiles.map(profile => (
-              <button
-                key={profile.name}
-                type="button"
-                onClick={() => applyProfile(profile.stats)}
-                style={{
-                  minHeight: '44px',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  background: 'var(--color-surface)',
-                  color: 'var(--color-text-primary)',
-                  fontFamily: 'var(--font-ui)',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                }}
-              >
-                <div style={{ fontWeight: 500 }}>{profile.name}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                  {profile.description}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <button
         type="button"

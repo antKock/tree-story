@@ -5,11 +5,16 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
 }
 
+function getMaxValue(gaugeId: string, config: StoryConfig): number {
+  const gauge = config.gauges.find(g => g.id === gaugeId)
+  return gauge?.maxValue ?? 100
+}
+
 export function applyGaugeEffects(
   gauges: Record<string, number>,
   effects: GaugeEffect[],
   stats: Record<string, number>,
-  _config: StoryConfig
+  config: StoryConfig
 ): Record<string, number> {
   const result = { ...gauges }
 
@@ -25,7 +30,7 @@ export function applyGaugeEffects(
       delta = delta < 0 ? Math.min(0, adjusted) : adjusted
     }
 
-    result[effect.gaugeId] = clamp(result[effect.gaugeId] + delta, 0, 100)
+    result[effect.gaugeId] = clamp(result[effect.gaugeId] + delta, 0, getMaxValue(effect.gaugeId, config))
   }
 
   return result
@@ -35,7 +40,7 @@ export function applyDecay(
   gauges: Record<string, number>,
   decayRules: DecayRule[],
   stats: Record<string, number>,
-  _config: StoryConfig
+  config: StoryConfig
 ): Record<string, number> {
   const result = { ...gauges }
 
@@ -45,7 +50,7 @@ export function applyDecay(
     // Probabilistic decay (e.g., 6% passive energy risk)
     if (rule.probabilityChance !== undefined) {
       if (Math.random() < rule.probabilityChance) {
-        result[rule.gaugeId] = clamp(result[rule.gaugeId] + rule.amount, 0, 100)
+        result[rule.gaugeId] = clamp(result[rule.gaugeId] + rule.amount, 0, getMaxValue(rule.gaugeId, config))
       }
       continue
     }
@@ -61,7 +66,7 @@ export function applyDecay(
       amount = -Math.max(3, Math.abs(rule.amount) - statValue * 1.5)
     }
 
-    result[rule.gaugeId] = clamp(result[rule.gaugeId] + amount, 0, 100)
+    result[rule.gaugeId] = clamp(result[rule.gaugeId] + amount, 0, getMaxValue(rule.gaugeId, config))
   }
 
   return result
