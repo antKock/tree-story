@@ -199,6 +199,17 @@ function validateGauge(data: unknown, index: number): GaugeDefinition {
     gameOverCondition = c
   }
 
+  let maxValue: number | undefined
+  if ('maxValue' in data) {
+    const mv = data['maxValue']
+    if (!isNumber(mv) || mv <= 0) {
+      throw new StoryValidationError(
+        `Invalid story config: 'maxValue' in gauges[${index}] (id: '${id}') must be a positive number`
+      )
+    }
+    maxValue = mv
+  }
+
   let gameOverParagraphId: string | undefined
   if ('gameOverParagraphId' in data && isString(data['gameOverParagraphId'])) {
     gameOverParagraphId = data['gameOverParagraphId']
@@ -211,7 +222,7 @@ function validateGauge(data: unknown, index: number): GaugeDefinition {
     )
   }
 
-  return { id, name, icon, initialValue, isScore, isHidden, gameOverThreshold, gameOverCondition, gameOverParagraphId }
+  return { id, name, icon, initialValue, isScore, isHidden, maxValue, gameOverThreshold, gameOverCondition, gameOverParagraphId }
 }
 
 function validateGaugeEffect(data: unknown, context: string): GaugeEffect {

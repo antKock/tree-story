@@ -69,7 +69,12 @@ function hasActiveGame(config: StoryConfig): boolean {
   if (!saved) return false
   if (saved.storyId !== config.id) return false
   const es = saved.engineState
-  if (es.isGameOver || es.isComplete) return false
+  if (es.isGameOver || es.isComplete) {
+    // Clear stale completed/game-over saves so they don't get restored
+    // when the player starts a new game
+    persistence.clear()
+    return false
+  }
   return true
 }
 
