@@ -78,7 +78,7 @@ export default function EndScreen({ engineState, config, onReplay }: EndScreenPr
                   color: 'var(--color-accent)',
                 }}
               >
-                {engineState.score}
+                {Math.round(engineState.score)}
               </div>
             </div>
           </div>
