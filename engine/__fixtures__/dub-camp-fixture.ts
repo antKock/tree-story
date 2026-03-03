@@ -80,6 +80,7 @@ export const dubCampFixture: StoryConfig = {
       initialValue: 0,
       isScore: true,
       isHidden: true,
+      maxValue: 200,
     },
   ],
   acts: [
@@ -427,9 +428,9 @@ export const dubCampFixture: StoryConfig = {
     },
   },
   endStateTiers: [
-    { minScore: 0, maxScore: 20, text: 'Bof, pas terrible...' },
-    { minScore: 21, maxScore: 40, text: 'Pas mal, mais peut mieux faire.' },
-    { minScore: 41, maxScore: 60, text: 'Bon festival !' },
-    { minScore: 61, maxScore: 100, text: 'Légendaire !' },
+    { minScore: 0, maxScore: 39, text: 'Bof, pas terrible...' },
+    { minScore: 40, maxScore: 69, text: 'Pas mal, mais peut mieux faire.' },
+    { minScore: 70, maxScore: 99, text: 'Bon festival !' },
+    { minScore: 100, maxScore: 9999, text: 'Légendaire !' },
   ],
 }
