@@ -47,9 +47,10 @@ export function useStoryEngine(config: StoryConfig) {
   const resetEngine = useCallback(() => {
     persistence.clear()
     engineRef.current!.reset()
-    commitState()
-    // animKey intentionally not reset — keeps incrementing across sessions
-  }, [commitState])
+    setEngineState(engineRef.current!.getState())
+    // Do NOT call commitState() here — it would re-save a fresh state to localStorage,
+    // causing a refresh to skip the landing/profile screens and jump straight into the story.
+  }, [])
 
   const setStats = useCallback((stats: Record<string, number>) => {
     engineRef.current!.setStats(stats)
