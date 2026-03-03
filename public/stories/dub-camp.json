@@ -9,8 +9,8 @@
     "description": "Le Dub Camp. Pas besoin d'en dire plus à ceux qui y sont déjà allés.\n\nTu joues le rôle du troisième larron — ni le stratège (c'est Bastien), ni le fêtard invétéré (c'est Brian). Ton objectif : passer la meilleure soirée possible sans te planter.\n\nAvant de commencer, répartis tes points de caractéristiques. Ils influenceront l'impact des activités sur ton énergie, ta résistance à l'alcool et à la fumette, et ta capacité à te ravitailler.",
     "exampleProfiles": [
       {
-        "name": "Le Bastien",
-        "description": "fêtard endurant",
+        "name": "Le Fêtard",
+        "description": "Résiste bien à l'effort, tient la distance en concert",
         "stats": {
           "endurance": 3,
           "estomac": 0,
@@ -19,8 +19,8 @@
         }
       },
       {
-        "name": "Le Brian",
-        "description": "vieux routard",
+        "name": "Le Routard",
+        "description": "Supporte bien l'alcool et la fumette, fatigue vite",
         "stats": {
           "endurance": 1,
           "estomac": 1,
@@ -29,8 +29,8 @@
         }
       },
       {
-        "name": "L'équilibré",
-        "description": "premier festival",
+        "name": "L'Équilibré",
+        "description": "Profil polyvalent, bon compromis sur toutes les jauges",
         "stats": {
           "endurance": 2,
           "estomac": 1,
@@ -478,7 +478,7 @@
               {
                 "id": "a",
                 "maxRisk": 60,
-                "text": "C'est léger et agréable. Vous repartez vers le site avec le sourire et les sens en éveil.",
+                "text": "C'est léger et agréable. Les sons prennent une profondeur différente, les sens en éveil. T'es prêt.",
                 "effects": [
                   {
                     "gaugeId": "fumette",
@@ -730,7 +730,7 @@
               {
                 "id": "b",
                 "maxRisk": 100,
-                "text": "T'es coincé, il fait chaud, tu peux pas vraiment bouger. C'est bien quand même mais t'en ressors épuisé.",
+                "text": "La foule est dense, il fait chaud, tu peux pas vraiment bouger. Mais les basses te traversent quand même de la tête aux pieds. T'en ressors épuisé, et pourtant tu souris.",
                 "effects": [
                   {
                     "gaugeId": "energie",
@@ -840,7 +840,7 @@
               {
                 "id": "a",
                 "maxRisk": 60,
-                "text": "Légère et fraîche, elle descend bien sans trop monter.",
+                "text": "Tu la descends tranquillement. Le bruit des scènes, l'air du soir, le verre froid — t'es exactement où il faut être.",
                 "effects": [
                   {
                     "gaugeId": "alcool",
@@ -855,7 +855,7 @@
               {
                 "id": "b",
                 "maxRisk": 100,
-                "text": "Plus forte que prévu, ou t'avais le ventre moins plein que tu croyais.",
+                "text": "Ça monte plus vite que prévu. Tu rejoins les autres avec les joues légèrement roses et un plan mental de plus en plus flou.",
                 "effects": [
                   {
                     "gaugeId": "alcool",
@@ -880,7 +880,17 @@
         {
           "id": "s40-b",
           "text": "De l'eau",
-          "targetParagraphId": "s40b"
+          "targetParagraphId": "s40b",
+          "gaugeEffects": [
+            {
+              "gaugeId": "energie",
+              "delta": 10
+            },
+            {
+              "gaugeId": "nourriture",
+              "delta": 5
+            }
+          ]
         },
         {
           "id": "s40-c",
@@ -922,77 +932,7 @@
             "probability": 0.33,
             "targetParagraphId": "sEVT1"
           },
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": 10
-            },
-            {
-              "gaugeId": "nourriture",
-              "delta": 5
-            }
-          ]
-        }
-      ]
-    },
-    "s40c": {
-      "id": "s40c",
-      "content": "Brian te tend le joint qu'il vient de rouler. « Allez, c'est Dubkasm dans deux heures… »\n\nTu prends ?",
-      "choices": [
-        {
-          "id": "s40c-a",
-          "text": "« Ouais, donne »",
-          "targetParagraphId": "s40d",
-          "weightedOutcome": {
-            "gaugeId": "fumette",
-            "statId": "resistanceFumette",
-            "outcomes": [
-              {
-                "id": "a",
-                "maxRisk": 60,
-                "text": "Le timing est idéal. T'es dans un état de grâce, les sons autour de toi prennent une profondeur incroyable. Bastien arrête cinq minutes de parler de Dubkasm et se laisse porter lui aussi. Vous restez là à juste écouter les basses qui filtrent des scènes.",
-                "effects": [
-                  {
-                    "gaugeId": "fumette",
-                    "delta": 30
-                  },
-                  {
-                    "gaugeId": "energie",
-                    "delta": -10
-                  },
-                  {
-                    "gaugeId": "kiff",
-                    "delta": 12
-                  }
-                ]
-              },
-              {
-                "id": "b",
-                "maxRisk": 100,
-                "text": "T'as mal évalué l'effet cumulé avec ce que t'as déjà dans le sang. Ça monte fort. Tu tiens debout mais le monde autour de toi tourne en slow motion — Dubkasm va être une expérience, c'est sûr.",
-                "effects": [
-                  {
-                    "gaugeId": "fumette",
-                    "delta": 65
-                  },
-                  {
-                    "gaugeId": "energie",
-                    "delta": -22
-                  },
-                  {
-                    "gaugeId": "kiff",
-                    "delta": 4
-                  }
-                ]
-              }
-            ],
-            "hungerGaugeId": "nourriture"
-          }
-        },
-        {
-          "id": "s40c-b",
-          "text": "« Non, je garde la tête claire »",
-          "targetParagraphId": "s40e"
+          "gaugeEffects": []
         }
       ]
     },
@@ -1004,23 +944,6 @@
           "id": "s40d-a",
           "text": "Tu te mets en route pour Dubkasm",
           "targetParagraphId": "s50"
-        }
-      ]
-    },
-    "s40e": {
-      "id": "s40e",
-      "content": "« Respect » dit Bastien. Brian hausse les épaules et finit le joint tout seul.",
-      "choices": [
-        {
-          "id": "s40e-a",
-          "text": "Tu te mets en route pour Dubkasm",
-          "targetParagraphId": "s50",
-          "gaugeEffects": [
-            {
-              "gaugeId": "energie",
-              "delta": 5
-            }
-          ]
         }
       ]
     },
@@ -1199,7 +1122,7 @@
       "choices": [
         {
           "id": "s53-a",
-          "text": "Tu ignores et tu rentres dans le concert",
+          "text": "Tu rentres voir la fin du concert",
           "targetParagraphId": "s60",
           "gaugeEffects": []
         },
@@ -1261,7 +1184,7 @@
     },
     "s60": {
       "id": "s60",
-      "content": "Le concert est terminé. Bastien est toujours debout mais ses yeux sont vitreux — le genre de regard qui fixe un point à six kilomètres de distance. Brian a disparu — vous le retrouvez assis contre une barrière, un gobelet vide à la main. « Les gars, j'crois que j'ai un peu trop bu. »\n\nIl est passé minuit. Channel One passe à l'Outernational jusqu'à 3h du mat.\n\nBrian sort machinalement son matos, par réflexe. « Dernier petit truc ? »",
+      "content": "Dubkasm joue ses dernières mesures. La foule est encore dense mais quelques-uns commencent à refluer. Bastien est toujours debout mais ses yeux sont vitreux — le genre de regard qui fixe un point à six kilomètres de distance. Brian a disparu — vous le retrouvez assis contre une barrière, un gobelet vide à la main. « Les gars, j'crois que j'ai un peu trop bu. »\n\nIl est passé minuit. Channel One passe à l'Outernational jusqu'à 3h du mat.\n\nBrian sort machinalement son matos, par réflexe. « Dernier petit truc ? »",
       "choices": [
         {
           "id": "s60-a",
@@ -1406,7 +1329,51 @@
           "id": "s61c-e",
           "text": "Tu prends une dernière bière au bar",
           "targetParagraphId": "s61d",
-          "gaugeEffects": []
+          "gaugeEffects": [],
+          "weightedOutcome": {
+            "gaugeId": "alcool",
+            "statId": "resistanceAlcool",
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "Elle passe bien. Un petit boost pour tenir jusqu'à la fin.",
+                "effects": [
+                  {
+                    "gaugeId": "alcool",
+                    "delta": 28
+                  },
+                  {
+                    "gaugeId": "nourriture",
+                    "delta": -8
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 6
+                  }
+                ]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "Une de trop. T'arrives à Channel One avec les jambes un peu molles et la tête qui tourne doucement.",
+                "effects": [
+                  {
+                    "gaugeId": "alcool",
+                    "delta": 48
+                  },
+                  {
+                    "gaugeId": "nourriture",
+                    "delta": -15
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -8
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "id": "s61c-d",
@@ -1434,12 +1401,7 @@
           "id": "s62-a",
           "text": "Tu repars voir la fin de Channel One",
           "targetParagraphId": "s61",
-          "gaugeEffects": [
-            {
-              "gaugeId": "kiff",
-              "delta": 8
-            }
-          ],
+          "gaugeEffects": [],
           "weightedOutcome": {
             "gaugeId": "energie",
             "statId": "endurance",
@@ -1532,7 +1494,7 @@
               {
                 "id": "a",
                 "maxRisk": 60,
-                "text": "Channel One est en feu ce soir. Les deux heures passent comme vingt minutes. Tu ressors avec des étoiles dans les yeux.",
+                "text": "T'arrives à l'Outernational le ventre plein et la tête claire. Channel One est en feu. Tu encaisses les deux heures sans broncher, debout jusqu'à la dernière note.",
                 "effects": [
                   {
                     "gaugeId": "energie",
@@ -1551,7 +1513,7 @@
               {
                 "id": "b",
                 "maxRisk": 100,
-                "text": "Le set est bon mais t'as plus assez d'énergie pour vraiment kiffer. Tu pars au bout d'une heure, un peu frustré.",
+                "text": "Le set est bon mais la fatigue de la soirée rattrape tout. T'as bien fait de manger — sans ça t'aurais pas tenu une heure.",
                 "effects": [
                   {
                     "gaugeId": "energie",
@@ -1633,51 +1595,7 @@
         {
           "id": "s61d-a",
           "text": "Tu pars voir Channel One",
-          "targetParagraphId": "s61",
-          "weightedOutcome": {
-            "gaugeId": "alcool",
-            "statId": "resistanceAlcool",
-            "outcomes": [
-              {
-                "id": "a",
-                "maxRisk": 60,
-                "text": "Elle passe bien. Un petit boost pour tenir jusqu'à la fin.",
-                "effects": [
-                  {
-                    "gaugeId": "alcool",
-                    "delta": 28
-                  },
-                  {
-                    "gaugeId": "nourriture",
-                    "delta": -8
-                  },
-                  {
-                    "gaugeId": "kiff",
-                    "delta": 6
-                  }
-                ]
-              },
-              {
-                "id": "b",
-                "maxRisk": 100,
-                "text": "Une de trop. T'arrives à Channel One avec les jambes un peu molles et la tête qui tourne doucement.",
-                "effects": [
-                  {
-                    "gaugeId": "alcool",
-                    "delta": 48
-                  },
-                  {
-                    "gaugeId": "nourriture",
-                    "delta": -15
-                  },
-                  {
-                    "gaugeId": "energie",
-                    "delta": -8
-                  }
-                ]
-              }
-            ]
-          }
+          "targetParagraphId": "s61c"
         }
       ]
     },
@@ -1765,13 +1683,53 @@
         {
           "id": "s40f-b",
           "text": "Tu prends un joint avec Brian",
-          "targetParagraphId": "s40c",
-          "gaugeEffects": [
-            {
-              "gaugeId": "kiff",
-              "delta": 10
-            }
-          ]
+          "targetParagraphId": "s40d",
+          "gaugeEffects": [],
+          "weightedOutcome": {
+            "gaugeId": "fumette",
+            "statId": "resistanceFumette",
+            "outcomes": [
+              {
+                "id": "a",
+                "maxRisk": 60,
+                "text": "Le timing est idéal. T'es dans un état de grâce, les sons autour de toi prennent une profondeur incroyable. Bastien arrête cinq minutes de parler de Dubkasm et se laisse porter lui aussi. Vous restez là à juste écouter les basses qui filtrent des scènes.",
+                "effects": [
+                  {
+                    "gaugeId": "fumette",
+                    "delta": 30
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -10
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 12
+                  }
+                ]
+              },
+              {
+                "id": "b",
+                "maxRisk": 100,
+                "text": "T'as mal évalué l'effet cumulé avec ce que t'as déjà dans le sang. Ça monte fort. Tu tiens debout mais le monde autour de toi tourne en slow motion — Dubkasm va être une expérience, c'est sûr.",
+                "effects": [
+                  {
+                    "gaugeId": "fumette",
+                    "delta": 65
+                  },
+                  {
+                    "gaugeId": "energie",
+                    "delta": -22
+                  },
+                  {
+                    "gaugeId": "kiff",
+                    "delta": 4
+                  }
+                ]
+              }
+            ],
+            "hungerGaugeId": "nourriture"
+          }
         },
         {
           "id": "s40f-c",
@@ -1787,7 +1745,21 @@
         {
           "id": "s40f-d",
           "text": "Tu vas manger un truc avant le concert",
-          "targetParagraphId": "s40h"
+          "targetParagraphId": "s40h",
+          "gaugeEffects": [
+            {
+              "gaugeId": "nourriture",
+              "delta": 35,
+              "statInfluence": {
+                "statId": "estomac",
+                "multiplier": 3
+              }
+            },
+            {
+              "gaugeId": "energie",
+              "delta": -3
+            }
+          ]
         }
       ]
     },
@@ -1811,20 +1783,7 @@
           "id": "s40h-a",
           "text": "Tu files vers la Dub Club Arena",
           "targetParagraphId": "s50",
-          "gaugeEffects": [
-            {
-              "gaugeId": "nourriture",
-              "delta": 35,
-              "statInfluence": {
-                "statId": "estomac",
-                "multiplier": 3
-              }
-            },
-            {
-              "gaugeId": "energie",
-              "delta": -3
-            }
-          ]
+          "gaugeEffects": []
         }
       ]
     },
