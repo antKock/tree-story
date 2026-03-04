@@ -40,6 +40,8 @@ export default function CharacterSheet({ open, onClose, engineState, config }: C
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {config.gauges.map(gaugeDef => {
                 const value = engineState.gauges[gaugeDef.id] ?? 0
+                const maxValue = gaugeDef.maxValue ?? 100
+                const pct = Math.max(0, Math.min(100, (value / maxValue) * 100))
                 return (
                   <div key={gaugeDef.id} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '15px', width: '24px', textAlign: 'center' }}>
@@ -67,7 +69,7 @@ export default function CharacterSheet({ open, onClose, engineState, config }: C
                     >
                       <div
                         style={{
-                          width: `${Math.max(0, Math.min(100, value))}%`,
+                          width: `${pct}%`,
                           height: '100%',
                           borderRadius: '4px',
                           background: 'var(--color-accent)',

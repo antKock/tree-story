@@ -35,6 +35,8 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: Gau
     >
       {visibleGauges.map(gaugeDef => {
         const value = gauges[gaugeDef.id] ?? 0
+        const maxValue = gaugeDef.maxValue ?? 100
+        const pct = Math.max(0, Math.min(100, (value / maxValue) * 100))
 
         return (
           <div
@@ -60,7 +62,7 @@ export default function GaugeStrip({ gauges, config, onOpenCharacterSheet }: Gau
             >
               <div
                 style={{
-                  width: `${Math.max(0, Math.min(100, value))}%`,
+                  width: `${pct}%`,
                   height: '100%',
                   borderRadius: '5px',
                   background: 'var(--color-gauge-bar)',
