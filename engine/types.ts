@@ -118,6 +118,7 @@ export interface Paragraph {
   isGameOver?: boolean
   isComplete?: boolean
   contextualGameOver?: ContextualGameOver[]
+  gaugeEffects?: GaugeEffect[]
 }
 
 export interface ActDefinition {

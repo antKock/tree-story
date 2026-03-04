@@ -1330,3 +1330,126 @@ describe('Score can exceed 100 (maxValue: 200)', () => {
     expect(state.isComplete).toBe(true)
   })
 })
+
+describe('Paragraph-level gaugeEffects', () => {
+  it('applies gaugeEffects when navigating to a paragraph with effects', () => {
+    // Add gaugeEffects to s20: kiff -50
+    const customConfig: StoryConfig = {
+      ...config,
+      paragraphs: {
+        ...config.paragraphs,
+        s20: {
+          ...config.paragraphs['s20'],
+          gaugeEffects: [{ gaugeId: 'kiff', delta: -50 }],
+        },
+      },
+    }
+    const engine = createEngine(customConfig, {
+      storyId: 'dub-camp-test',
+      version: 1,
+      savedAt: Date.now(),
+      engineState: {
+        storyId: 'dub-camp-test',
+        paragraphId: 's10',
+        gauges: { energie: 100, alcool: 0, fumette: 0, nourriture: 50, kiff: 80 },
+        stats: defaultStats,
+        act: 'act1',
+        inventory: [],
+        score: 80,
+        isGameOver: false,
+        gameOverParagraphId: null,
+        isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
+      },
+    })
+    // c10a targets s20 — paragraph-level gaugeEffects should apply
+    const state = engine.resolveChoice('c10a')
+    expect(state.paragraphId).toBe('s20')
+    expect(state.gauges.kiff).toBe(30) // 80 - 50
+    expect(state.score).toBe(30)
+  })
+
+  it('clamps paragraph gaugeEffects to minValue (0)', () => {
+    const customConfig: StoryConfig = {
+      ...config,
+      paragraphs: {
+        ...config.paragraphs,
+        s20: {
+          ...config.paragraphs['s20'],
+          gaugeEffects: [{ gaugeId: 'kiff', delta: -50 }],
+        },
+      },
+    }
+    const engine = createEngine(customConfig, {
+      storyId: 'dub-camp-test',
+      version: 1,
+      savedAt: Date.now(),
+      engineState: {
+        storyId: 'dub-camp-test',
+        paragraphId: 's10',
+        gauges: { energie: 100, alcool: 0, fumette: 0, nourriture: 50, kiff: 20 },
+        stats: defaultStats,
+        act: 'act1',
+        inventory: [],
+        score: 20,
+        isGameOver: false,
+        gameOverParagraphId: null,
+        isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
+      },
+    })
+    const state = engine.resolveChoice('c10a')
+    expect(state.gauges.kiff).toBe(0) // 20 - 50 clamped to 0
+    expect(state.score).toBe(0)
+  })
+
+  it('applies gaugeEffects on game-over paragraph when GO is triggered', () => {
+    // Add gaugeEffects to GO paragraph s204: kiff -50
+    const customConfig: StoryConfig = {
+      ...config,
+      paragraphs: {
+        ...config.paragraphs,
+        s204: {
+          ...config.paragraphs['s204'],
+          gaugeEffects: [{ gaugeId: 'kiff', delta: -50 }],
+        },
+      },
+    }
+    // energie at 5 — choice c20a costs -20 energie → clamped to 0 → GO triggers → s204
+    const engine = createEngine(customConfig, {
+      storyId: 'dub-camp-test',
+      version: 1,
+      savedAt: Date.now(),
+      engineState: {
+        storyId: 'dub-camp-test',
+        paragraphId: 's20',
+        gauges: { energie: 5, alcool: 0, fumette: 0, nourriture: 50, kiff: 80 },
+        stats: defaultStats,
+        act: 'act2',
+        inventory: [],
+        score: 80,
+        isGameOver: false,
+        gameOverParagraphId: null,
+        isComplete: false,
+        lastOutcomeText: null,
+        lastGaugeDeltas: null,
+      },
+    })
+    const state = engine.resolveChoice('c20a')
+    expect(state.isGameOver).toBe(true)
+    expect(state.paragraphId).toBe('s204')
+    expect(state.gauges.kiff).toBe(35) // 80 + 5 (c20a kiff effect) - 50 (GO paragraph effect)
+    expect(state.score).toBe(35)
+  })
+
+  it('does not apply effects on paragraphs without gaugeEffects', () => {
+    // s20 has no gaugeEffects by default — kiff should only change from choice effects
+    const engine = makeEngineAt('s10', { energie: 100, alcool: 0, kiff: 50, nourriture: 50 })
+    const state = engine.resolveChoice('c10a')
+    expect(state.paragraphId).toBe('s20')
+    // c10a has no kiff effect — kiff should remain 50
+    expect(state.gauges.kiff).toBe(50)
+  })
+})

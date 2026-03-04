@@ -545,6 +545,7 @@ interface Paragraph {
   isGameOver?: boolean
   isComplete?: boolean
   contextualGameOver?: ContextualGameOver[]
+  gaugeEffects?: GaugeEffect[]
 }
 ```
 
@@ -575,6 +576,22 @@ interface Paragraph {
 
 ### `contextualGameOver`
 - **Type:** `ContextualGameOver[]`, optional — paragraph-level Game Over conditions checked before global gauge Game Over. See [ContextualGameOver](#contextualgameover).
+
+### `gaugeEffects`
+- **Type:** `GaugeEffect[]`, optional — gauge changes applied when this paragraph is loaded (before rendering), distinct from choice-level effects which apply on choice selection. Uses the same `GaugeEffect` schema as choice-level effects — respects `minValue`/`maxValue` clamping. Score multipliers are **not** applied to paragraph-level effects.
+- **Use case:** Game Over paragraphs with `choices: []` that need to apply a gauge penalty (e.g., kiff score penalty) regardless of which choice path triggered the Game Over.
+- **Example:**
+```json
+{
+  "id": "s201",
+  "content": "Game over text...",
+  "isGameOver": true,
+  "gaugeEffects": [
+    { "gaugeId": "kiff", "delta": -50 }
+  ],
+  "choices": []
+}
+```
 
 ---
 
@@ -886,7 +903,7 @@ Dub Camp end-state tiers:
 
 ## Evaluation Order
 
-The engine applies effects in this strict 14-step order at every choice node:
+The engine applies effects in this strict 15-step order at every choice node:
 
 1. **Clear** `lastOutcomeText` and `lastGaugeDeltas` to `null`
 2. **Snapshot** pre-choice gauges (`prevGauges`) for delta computation and score multiplier evaluation
@@ -895,13 +912,14 @@ The engine applies effects in this strict 14-step order at every choice node:
 5. **Apply** `choice.inventoryAdd` and `choice.inventoryRemove`
 6. *(Clamping is handled by `applyGaugeEffects` — all deltas are clamped to [0, 100] on apply)*
 7. **Compute** `lastGaugeDeltas` as `currentGauges - prevGauges` for each gauge
-8. **Evaluate contextual Game Over** (`paragraph.contextualGameOver[]`) — if triggered: set `isGameOver: true`, set paragraph to `targetParagraphId`, **STOP**
-9. **Evaluate global Game Over** (gauge-level thresholds in config order) — if triggered: **STOP**
-10. **Evaluate composite Game Over** (`config.compositeGameOverRules[]`) — if triggered: **STOP**
+8. **Evaluate contextual Game Over** (`paragraph.contextualGameOver[]`) — if triggered: set `isGameOver: true`, set paragraph to `targetParagraphId`, apply destination paragraph `gaugeEffects` if any, **STOP**
+9. **Evaluate global Game Over** (gauge-level thresholds in config order) — if triggered: apply destination paragraph `gaugeEffects` if any, **STOP**
+10. **Evaluate composite Game Over** (`config.compositeGameOverRules[]`) — if triggered: apply destination paragraph `gaugeEffects` if any, **STOP**
 11. **Evaluate conditional branch** (`choice.conditionalBranch`) — if `Math.random() < probability`: override `targetParagraphId`
 12. **Evaluate act transition** — if new `paragraphId` is in any act's `paragraphIds`, apply theme
 13. **Advance** `paragraphId` to (possibly overridden) `targetParagraphId`
-14. **Sync score** from score gauge; check `isComplete` if paragraph has that flag. Persist state.
+14. **Check** `isComplete` if destination paragraph has that flag
+15. **Apply destination paragraph `gaugeEffects`** if any — flat deltas (no score multiplier), clamped as usual. Sync score. Persist state.
 
 At **decay nodes**, after the above choice resolution, decay additionally fires:
 
@@ -914,9 +932,10 @@ At **decay nodes**, after the above choice resolution, decay additionally fires:
 **Critical invariants:**
 - Contextual Game Over fires **before** global Game Over (higher priority)
 - Composite Game Over fires **after** global Game Over
-- Score multipliers are always evaluated against **pre-choice** gauges
+- Score multipliers are always evaluated against **pre-choice** gauges — they do **not** apply to paragraph-level `gaugeEffects`
 - Conditional branching happens **after** all effects and Game Over checks
 - Decay fires **after** choice effects, never before
+- Paragraph-level `gaugeEffects` fire **last** — after navigation to the destination paragraph (or Game Over redirect)
 
 ---
 

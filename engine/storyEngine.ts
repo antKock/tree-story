@@ -179,6 +179,13 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
     return delta
   }
 
+  function applyParagraphGaugeEffects(paragraphId: string): void {
+    const paragraph = config.paragraphs[paragraphId]
+    if (!paragraph?.gaugeEffects || paragraph.gaugeEffects.length === 0) return
+    _state.gauges = applyGaugeEffects(_state.gauges, paragraph.gaugeEffects, _state.stats, config)
+    syncScore()
+  }
+
   function evaluateActTransition(paragraphId: string): void {
     for (const act of config.acts) {
       if (act.id === _state.act) continue
@@ -270,16 +277,19 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
       // from, not the target). This allows "if you drink here and alcool is too high → game over"
       // rules scoped to specific departure points.
       if (evaluateContextualGameOver(_state.paragraphId)) {
+        applyParagraphGaugeEffects(_state.paragraphId)
         return engine.getState()
       }
 
       // Step 8: Evaluate global gameOver thresholds → if triggered: STOP
       if (evaluateGameOver()) {
+        applyParagraphGaugeEffects(_state.paragraphId)
         return engine.getState()
       }
 
       // Step 9: Evaluate compositeGameOverRules → if triggered: STOP
       if (evaluateCompositeGameOverRules(_state.paragraphId)) {
+        applyParagraphGaugeEffects(_state.paragraphId)
         return engine.getState()
       }
 
@@ -301,6 +311,9 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
         _state.isComplete = true
       }
 
+      // Step 14: Apply paragraph-level gaugeEffects on the destination paragraph
+      applyParagraphGaugeEffects(targetId)
+
       return engine.getState()
     },
 
@@ -318,12 +331,15 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
 
       // Evaluate all game-over systems — decay can push any gauge past any threshold
       if (evaluateContextualGameOver(_state.paragraphId)) {
+        applyParagraphGaugeEffects(_state.paragraphId)
         return engine.getState()
       }
       if (evaluateGameOver()) {
+        applyParagraphGaugeEffects(_state.paragraphId)
         return engine.getState()
       }
       if (evaluateCompositeGameOverRules(_state.paragraphId)) {
+        applyParagraphGaugeEffects(_state.paragraphId)
         return engine.getState()
       }
 

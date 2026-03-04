@@ -558,7 +558,14 @@ function validateParagraph(data: unknown, paragraphId: string): Paragraph {
     )
   }
 
-  return { id, content, choices, isGameOver, isComplete, contextualGameOver }
+  let gaugeEffects: GaugeEffect[] | undefined
+  if ('gaugeEffects' in data && isArray(data['gaugeEffects'])) {
+    gaugeEffects = data['gaugeEffects'].map((e, i) =>
+      validateGaugeEffect(e, `paragraph '${paragraphId}' gaugeEffects[${i}]`)
+    )
+  }
+
+  return { id, content, choices, isGameOver, isComplete, contextualGameOver, gaugeEffects }
 }
 
 function validateAct(data: unknown, index: number): ActDefinition {
@@ -869,6 +876,15 @@ export function validateStoryConfig(data: unknown): StoryConfig {
         if (!gaugeIdSet.has(cgo.gaugeId)) {
           throw new StoryValidationError(
             `Invalid story config: contextualGameOver[${i}] in paragraph '${pid}' references non-existent gauge '${cgo.gaugeId}'`
+          )
+        }
+      }
+    }
+    if (paragraph.gaugeEffects) {
+      for (const [i, effect] of paragraph.gaugeEffects.entries()) {
+        if (!gaugeIdSet.has(effect.gaugeId)) {
+          throw new StoryValidationError(
+            `Invalid story config: gaugeEffects[${i}] in paragraph '${pid}' references non-existent gauge '${effect.gaugeId}'`
           )
         }
       }

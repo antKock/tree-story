@@ -595,3 +595,39 @@ describe('validateStoryConfig — meta', () => {
     expect(result.meta.description).toBe('A story.')
   })
 })
+
+describe('validateStoryConfig — paragraph gaugeEffects', () => {
+  it('accepts valid paragraph gaugeEffects', () => {
+    const result = validateStoryConfig(
+      minimalConfig({
+        paragraphs: {
+          p1: {
+            id: 'p1',
+            content: 'Start.',
+            choices: [],
+            isComplete: true,
+            gaugeEffects: [{ gaugeId: 'gauge1', delta: -10 }],
+          },
+        },
+      })
+    )
+    expect(result.paragraphs['p1'].gaugeEffects).toEqual([{ gaugeId: 'gauge1', delta: -10 }])
+  })
+
+  it('rejects paragraph gaugeEffects referencing non-existent gauge', () => {
+    assertValidationError(
+      minimalConfig({
+        paragraphs: {
+          p1: {
+            id: 'p1',
+            content: 'Start.',
+            choices: [],
+            isComplete: true,
+            gaugeEffects: [{ gaugeId: 'no-such-gauge', delta: -10 }],
+          },
+        },
+      }),
+      "references non-existent gauge 'no-such-gauge'"
+    )
+  })
+})
