@@ -98,5 +98,6 @@ All 5 gap fixes (G11, G12, G13, G14, G16) verified as implemented. Build passes,
 
 ## Change Log
 
+- 2026-03-05: Second code review — fixed 1 issue (L2: custom mode stats now sanitized via sanitizeProfile before onStart). All 5 gap fixes re-verified, status → done.
 - 2026-03-05: Code review — fixed 3 issues (M3, M5, L3 documented). All gap fixes verified, status → done.
 - 2026-03-05: Implemented name input screen polish — profile card selected state with Commencer button (G12), label-style heading (G13), transparent input background (G11), text link for Personnaliser (G14), generous input padding (G16).

@@ -196,6 +196,7 @@ All 5 tasks and 35 subtasks completed. Build passes, all 144 tests pass with no 
 - `components/LeaderboardSection.tsx` — modified (card container, removed delay, card header)
 - `components/LeaderboardEntry.tsx` — modified (rank prop, isLast prop, updated styling)
 - `components/StoryReader.tsx` — modified (removed GaugeStrip/CharacterSheet from end screen)
+- `app/api/stories/[id]/leaderboard/route.ts` — modified (added .limit(100) to query)
 
 ## Senior Developer Review (AI)
 
@@ -216,5 +217,6 @@ All 17 ACs verified as implemented. All tasks confirmed done. Build passes, 144 
 
 ## Change Log
 
+- 2026-03-05: Second code review — fixed 2 issues (M1: aria-label on end text main, M4: leaderboard query limit 100). 5 original findings dismissed after reassessment. All 17 ACs re-verified, status → done.
 - 2026-03-05: Code review — fixed 6 issues (M1, M2, M4, L1, L2, L4). All ACs verified, status → done.
 - 2026-03-05: Implemented two-step end flow (end text → leaderboard) with Variation B layout. Refactored LeaderboardSection into card container with internal scroll. Added rank numbers to leaderboard entries. Removed gauge strip from end screen for full-viewport layout.

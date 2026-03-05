@@ -24,6 +24,7 @@ export async function GET(
       .select('*')
       .eq('story_id', id)
       .order('score', { ascending: false })
+      .limit(100)
 
     if (error) {
       return Response.json({ error: 'Internal server error' }, { status: 500 })

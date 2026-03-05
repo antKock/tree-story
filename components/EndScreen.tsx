@@ -64,7 +64,7 @@ export default function EndScreen({ engineState, config, storyId, playerName, on
   // --- End Text Screen (Step 1) ---
   if (!showLeaderboard) {
     return (
-      <main style={{ flex: 1, paddingTop: '2rem', paddingBottom: '3rem' }}>
+      <main aria-label="Fin de l'histoire" style={{ flex: 1, paddingTop: '2rem', paddingBottom: '3rem' }}>
         {paragraphContent && <ParagraphDisplay content={paragraphContent} />}
         {tierContent && <ParagraphDisplay content={tierContent} />}
 

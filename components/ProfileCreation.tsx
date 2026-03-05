@@ -342,7 +342,7 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
 
       <button
         type="button"
-        onClick={() => onStart(stats, playerName.trim())}
+        onClick={() => onStart(sanitizeProfile(stats), playerName.trim())}
         disabled={remaining !== 0 || nameEmpty}
         style={{
           width: '100%',
