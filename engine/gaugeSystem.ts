@@ -1,5 +1,6 @@
 // Pure engine module — zero imports from components/, hooks/, app/, or lib/
 import type { GaugeEffect, DecayRule, StoryConfig } from './types'
+import { evaluateFormula } from './formulaParser'
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
@@ -58,12 +59,20 @@ export function applyDecay(
     let amount = rule.amount
 
     // Stat-reduction formula (e.g., Nourriture decay reduced by Estomac)
-    // NOTE: The formula is hardcoded to Dub Camp's max(3, base - stat * 1.5).
-    // The statReductionFormula string field is stored but not dynamically evaluated.
-    // A future story engine supporting multiple stories would need a formula parser.
+    // The formula is dynamically evaluated from the story JSON.
+    // Available variables: `base` (absolute decay amount), `stat` (stat value),
+    // and the stat name itself (e.g. `estomac`).
+    // Convention: `amount` in DecayRule is negative (decay). The formula returns
+    // the decay magnitude (positive). The result is negated to produce a negative delta.
+    // If the formula returns a negative value, Math.abs ensures decay never heals.
     if (rule.statReductionId && rule.statReductionFormula) {
       const statValue = stats[rule.statReductionId] ?? 0
-      amount = -Math.max(3, Math.abs(rule.amount) - statValue * 1.5)
+      const variables: Record<string, number> = {
+        base: Math.abs(rule.amount),
+        stat: statValue,
+        [rule.statReductionId]: statValue,
+      }
+      amount = -Math.abs(evaluateFormula(rule.statReductionFormula, variables))
     }
 
     result[rule.gaugeId] = clamp(result[rule.gaugeId] + amount, 0, getMaxValue(rule.gaugeId, config))

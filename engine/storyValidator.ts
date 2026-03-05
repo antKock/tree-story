@@ -20,6 +20,7 @@ import {
   EndStateTier,
   ExampleProfile,
 } from './types'
+import { evaluateFormula } from './formulaParser'
 
 // ─── Type guards ────────────────────────────────────────────────────────────
 
@@ -610,10 +611,28 @@ function validateDecayRule(data: unknown, index: number): DecayRule {
     'statReductionId' in data && isString(data['statReductionId'])
       ? data['statReductionId']
       : undefined
-  const statReductionFormula =
-    'statReductionFormula' in data && isString(data['statReductionFormula'])
-      ? data['statReductionFormula']
-      : undefined
+  let statReductionFormula: string | undefined
+  if ('statReductionFormula' in data && isString(data['statReductionFormula'])) {
+    const formulaStr = data['statReductionFormula']
+    if (formulaStr.trim() === '') {
+      throw new StoryValidationError(
+        `Invalid story config: 'statReductionFormula' in decayRules[${index}] must not be empty`
+      )
+    }
+    // Validate the formula parses correctly with dummy variables
+    const dummyVars: Record<string, number> = { base: 1, stat: 1 }
+    if (statReductionId) {
+      dummyVars[statReductionId] = 1
+    }
+    try {
+      evaluateFormula(formulaStr, dummyVars)
+    } catch (e) {
+      throw new StoryValidationError(
+        `Invalid story config: 'statReductionFormula' in decayRules[${index}] is not a valid formula: ${e instanceof Error ? e.message : String(e)}`
+      )
+    }
+    statReductionFormula = formulaStr
+  }
   let probabilityChance: number | undefined
   if ('probabilityChance' in data) {
     const pc = data['probabilityChance']
