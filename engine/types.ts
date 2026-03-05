@@ -179,6 +179,7 @@ export interface EngineState {
   isComplete: boolean
   lastOutcomeText: string | null
   lastGaugeDeltas: Record<string, number> | null
+  playerName: string
 }
 
 export interface SaveState {

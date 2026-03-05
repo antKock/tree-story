@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tree-story — Chosen Design Directions: Server Capabilities</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg: #0f0f0f;
+    --color-surface: #1a1a1a;
+    --color-text-primary: #f0ece4;
+    --color-text-muted: #7a7672;
+    --color-accent: #d4935a;
+    --color-danger: #c0392b;
+    --dub-bg: #080810;
+    --dub-accent: #7c5cbf;
+    --dub-golden-bg: #160e0a;
+    --dub-golden-accent: #e8622a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #050505;
+    color: var(--color-text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #0a0a0a;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 12px 20px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav button {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--color-text-muted);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .nav button.active {
+    background: var(--color-accent);
+    color: #0f0f0f;
+    border-color: var(--color-accent);
+    font-weight: 500;
+  }
+  .nav button:hover:not(.active) {
+    border-color: rgba(255,255,255,0.2);
+    color: var(--color-text-primary);
+  }
+
+  .section { display: none; padding: 20px; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .chosen-tag {
+    display: inline-block;
+    background: rgba(124, 92, 191, 0.15);
+    color: var(--dub-accent);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .design-note {
+    background: rgba(212, 147, 90, 0.08);
+    border: 1px solid rgba(212, 147, 90, 0.15);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    max-width: 500px;
+  }
+
+  .phone {
+    width: 375px;
+    max-width: 100%;
+    margin: 0 auto 40px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+  }
+
+  /* ─── LEADERBOARD V2: Highlighted Card Row ─── */
+  .lb-v2 {
+    background: var(--dub-bg);
+    padding: 24px 24px 32px;
+  }
+  .lb-v2 .lb-header {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .lb-v2 .lb-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+  }
+  .lb-v2 .lb-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--color-text-muted);
+  }
+  .lb-v2 .lb-score {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--color-text-muted);
+  }
+  .lb-v2 .lb-entry.me {
+    background: rgba(124, 92, 191, 0.12);
+    border: 1px solid rgba(124, 92, 191, 0.2);
+  }
+  .lb-v2 .lb-entry:not(.me) {
+    border: 1px solid transparent;
+  }
+  .lb-v2 .lb-entry.me .lb-name {
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+  .lb-v2 .lb-entry.me .lb-score {
+    color: var(--dub-accent);
+    font-weight: 600;
+  }
+
+  .end-screen-context {
+    padding: 40px 24px 0;
+    text-align: center;
+  }
+  .end-screen-context .tier-emoji { font-size: 48px; margin-bottom: 16px; }
+  .end-screen-context .tier-label {
+    font-family: 'Lora', serif;
+    font-size: 22px;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+  }
+  .end-screen-context .score-display {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .end-screen-context .score-value {
+    color: var(--dub-accent);
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .end-screen-context .tier-text {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    max-width: 300px;
+    margin: 12px auto 24px;
+  }
+  .end-screen-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,92,191,0.15), transparent);
+    margin: 0 24px;
+  }
+
+  /* ─── LANDING PAGE V3: Atmospheric Hero + Illustration ─── */
+  .lp-v3 {
+    background: var(--color-bg);
+    min-height: 700px;
+  }
+  .lp-v3 .lp-hero {
+    padding: 48px 24px 40px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(212,147,90,0.06) 0%, transparent 100%);
+  }
+  .lp-v3 .lp-illustration {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(212,147,90,0.15), rgba(124,92,191,0.15));
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+  }
+  .lp-v3 .lp-brand {
+    font-family: 'Lora', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 12px;
+  }
+  .lp-v3 .lp-pitch {
+    font-family: 'Lora', serif;
+    font-size: 17px;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 280px;
+    margin: 0 auto 24px;
+  }
+  .lp-v3 .lp-cta {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+    padding: 10px 24px;
+    border: 1px solid rgba(212,147,90,0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lp-v3 .lp-cta:hover {
+    background: rgba(212,147,90,0.08);
+    border-color: rgba(212,147,90,0.5);
+  }
+  .lp-v3 .lp-stories-section {
+    padding: 32px 24px 40px;
+  }
+  .lp-v3 .lp-stories-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+    margin-bottom: 20px;
+  }
+  .lp-v3 .lp-story {
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+  }
+  .lp-v3 .lp-story:first-child {
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .lp-v3 .lp-story-title {
+    font-family: 'Lora', serif;
+    font-size: 22px;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+  }
+  .lp-v3 .lp-story-desc {
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    font-style: italic;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .lp-v3 .lp-story-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: rgba(122, 118, 114, 0.6);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .lp-v3 .lp-badge {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  /* ─── NAME INPUT V1: Inline with Preset Profiles ─── */
+  .name-screen { padding: 40px 24px; }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .profile-header .story-title {
+    font-family: 'Lora', serif;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .profile-header .story-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .ni-v1 .ni-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .ni-v1 .ni-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: var(--color-text-primary);
+    outline: none;
+    margin-bottom: 28px;
+  }
+  .ni-v1 .ni-input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+  }
+  .ni-v1 .ni-input:focus {
+    border-color: var(--dub-golden-accent);
+  }
+  .ni-v1 .profiles-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .ni-v1 .profile-card {
+    width: 100%;
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s;
+    display: block;
+    font-family: 'Inter', sans-serif;
+    color: var(--color-text-primary);
+  }
+  .ni-v1 .profile-card:hover {
+    border-color: rgba(255,255,255,0.2);
+  }
+  .ni-v1 .profile-card.selected {
+    border-color: var(--dub-golden-accent);
+    background: rgba(232, 98, 42, 0.06);
+  }
+  .ni-v1 .profile-card .profile-name {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .ni-v1 .profile-card .profile-desc {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+  .ni-v1 .customize-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-top: 16px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .ni-v1 .customize-link:hover { color: var(--color-text-primary); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('leaderboard')">Leaderboard</button>
+  <button onclick="showSection('landing')">Landing Page</button>
+  <button onclick="showSection('name')">Name Input</button>
+</nav>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- LEADERBOARD — V2 Highlighted Card Row  -->
+<!-- ═══════════════════════════════════════ -->
+<div id="leaderboard" class="section active">
+  <div class="section-title">Leaderboard <span class="chosen-tag">V2 — Highlighted Card Row</span></div>
+
+  <div class="design-note">
+    Player's own entry has a subtle accent-tinted background and border. Other entries are flat. The leaderboard uses the story's end-state theme (here: Dub Camp "Night" act). Fades in asynchronously below the existing end screen.
+  </div>
+
+  <div class="phone">
+    <div class="end-screen-context" style="background: var(--dub-bg);">
+      <div class="tier-emoji">🎉</div>
+      <div class="tier-label">Festival Legend</div>
+      <div class="score-display">Score Kiff : <span class="score-value">87</span></div>
+      <div class="tier-text">T'as tout kiffé du début à la fin. Le Dub Camp n'a plus de secret pour toi.</div>
+    </div>
+    <div class="end-screen-divider"></div>
+    <div class="lb-v2">
+      <div class="lb-header">Ceux qui ont fini</div>
+      <div class="lb-entry"><span class="lb-name">Maxime</span><span class="lb-score">112</span></div>
+      <div class="lb-entry"><span class="lb-name">Clara</span><span class="lb-score">94</span></div>
+      <div class="lb-entry me"><span class="lb-name">Léa</span><span class="lb-score">87</span></div>
+      <div class="lb-entry"><span class="lb-name">Julien</span><span class="lb-score">73</span></div>
+      <div class="lb-entry"><span class="lb-name">Anaïs</span><span class="lb-score">65</span></div>
+      <div class="lb-entry"><span class="lb-name">Thomas</span><span class="lb-score">41</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- LANDING PAGE — V3 Atmospheric Hero     -->
+<!-- ═══════════════════════════════════════ -->
+<div id="landing" class="section">
+  <div class="section-title">Landing Page <span class="chosen-tag">V3 — Atmospheric Hero + Illustration</span></div>
+
+  <div class="design-note">
+    Hero section with illustration/logo placeholder, pitch copy, and CTA scrolling to story list. Uses app shell defaults for first-time visitors. Returning visitors see their last story's theme colors via localStorage. Story theme colors are reused when defined.
+  </div>
+
+  <div class="phone">
+    <div class="lp-v3">
+      <div class="lp-hero">
+        <div class="lp-illustration">🌳</div>
+        <div class="lp-brand">tree-story</div>
+        <div class="lp-pitch">Des histoires dont tu choisis la suite. Chaque choix compte. Chaque partie est différente.</div>
+        <div class="lp-cta">Découvrir les histoires ↓</div>
+      </div>
+      <div class="lp-stories-section">
+        <div class="lp-stories-label">Histoires disponibles</div>
+        <div class="lp-story">
+          <div class="lp-story-title">Dub Camp</div>
+          <div class="lp-story-desc">Trois jours de festival, des choix à chaque coin de scène. Jusqu'où iras-tu pour le kiff ?</div>
+          <div class="lp-story-meta"><span>une dizaine de joueurs</span><span>·</span><span>il y a 2 jours</span><span class="lp-badge">Terminé</span></div>
+        </div>
+        <div class="lp-story">
+          <div class="lp-story-title">La Coloc</div>
+          <div class="lp-story-desc">Quatre colocataires. Un appart. Tout peut basculer un mardi soir.</div>
+          <div class="lp-story-meta"><span>quelques joueurs</span><span>·</span><span>hier</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- NAME INPUT — V1 Inline + Presets       -->
+<!-- ═══════════════════════════════════════ -->
+<div id="name" class="section">
+  <div class="section-title">Name Input <span class="chosen-tag">V1 — Inline with Preset Profiles</span></div>
+
+  <div class="design-note">
+    Name field uses the same visual language as profile cards — same border treatment, same Inter font. Sits above preset profiles in the existing flow. "Commencer" requires both a name and a selected profile. Uses the story's starting theme (here: Dub Camp "Golden hour" act).
+  </div>
+
+  <div class="phone" style="background: var(--dub-golden-bg);">
+    <div class="name-screen ni-v1">
+      <div class="profile-header">
+        <div class="story-title" style="color: var(--dub-golden-accent);">Dub Camp</div>
+        <div class="story-subtitle">Crée ton personnage</div>
+      </div>
+      <div class="ni-label">Comment tu t'appelles ?</div>
+      <div><input type="text" class="ni-input" placeholder="Ton prénom" value="Léa" style="border-color: rgba(232,98,42,0.3);"></div>
+      <div class="profiles-label">Choisis ton profil</div>
+      <button class="profile-card selected">
+        <div class="profile-name">Le Fêtard</div>
+        <div class="profile-desc">Résiste bien à l'effort, tient la distance en concert</div>
+      </button>
+      <button class="profile-card">
+        <div class="profile-name">Le Routard</div>
+        <div class="profile-desc">Supporte bien l'alcool et la fumette, fatigue vite</div>
+      </button>
+      <button class="profile-card">
+        <div class="profile-name">L'Équilibré</div>
+        <div class="profile-desc">Profil polyvalent, bon compromis sur toutes les jauges</div>
+      </button>
+      <div class="customize-link">Personnaliser les stats →</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+
+</body>
+</html>

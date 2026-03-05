@@ -10,6 +10,7 @@ export interface Engine {
   applyDecay(): EngineState
   reset(): void
   setStats(stats: Record<string, number>): void
+  setPlayerName(name: string): void
   serialize(): SaveState
 }
 
@@ -68,6 +69,7 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
       isComplete: false,
       lastOutcomeText: null,
       lastGaugeDeltas: null,
+      playerName: '',
     }
   }
 
@@ -76,6 +78,7 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
     // Ensure new fields exist for old saves
     if (_state.lastOutcomeText === undefined) _state.lastOutcomeText = null
     if (_state.lastGaugeDeltas === undefined) _state.lastGaugeDeltas = null
+    if ((_state as unknown as Record<string, unknown>).playerName === undefined) _state.playerName = ''
   } else {
     _state = freshState()
   }
@@ -355,6 +358,10 @@ export function createEngine(config: StoryConfig, savedState?: SaveState): Engin
 
     setStats(stats: Record<string, number>): void {
       _state.stats = { ...stats }
+    },
+
+    setPlayerName(name: string): void {
+      _state.playerName = name
     },
 
     serialize(): SaveState {

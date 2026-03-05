@@ -57,5 +57,10 @@ export function useStoryEngine(config: StoryConfig) {
     commitState()
   }, [commitState])
 
-  return { engineState, resolveChoice, applyDecay, resetEngine, setStats, animKey }
+  const setPlayerName = useCallback((name: string) => {
+    engineRef.current!.setPlayerName(name)
+    commitState()
+  }, [commitState])
+
+  return { engineState, resolveChoice, applyDecay, resetEngine, setStats, setPlayerName, animKey }
 }

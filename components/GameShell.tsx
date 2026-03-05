@@ -81,6 +81,7 @@ function hasActiveGame(config: StoryConfig): boolean {
 export default function GameShell({ config }: GameShellProps) {
   const [phase, setPhase] = useState<'landing' | 'profile' | 'story' | 'loading'>('loading')
   const [pendingStats, setPendingStats] = useState<Record<string, number> | null>(null)
+  const [pendingPlayerName, setPendingPlayerName] = useState<string | null>(null)
 
   useEffect(() => {
     const active = hasActiveGame(config)
@@ -94,8 +95,9 @@ export default function GameShell({ config }: GameShellProps) {
     setPhase('profile')
   }
 
-  function handleStart(stats: Record<string, number>) {
+  function handleStart(stats: Record<string, number>, playerName: string) {
     setPendingStats(stats)
+    setPendingPlayerName(playerName)
     setPhase('story')
   }
 
@@ -103,6 +105,7 @@ export default function GameShell({ config }: GameShellProps) {
     themeManager.resetToDefaults()
     themeManager.apply(config.acts[0].id, config)
     setPendingStats(null)
+    setPendingPlayerName(null)
     setPhase('landing')
   }
 
@@ -118,5 +121,5 @@ export default function GameShell({ config }: GameShellProps) {
     return <ProfileCreation config={config} onStart={handleStart} />
   }
 
-  return <StoryReader config={config} initialStats={pendingStats} onReplay={handleReplay} />
+  return <StoryReader config={config} initialStats={pendingStats} playerName={pendingPlayerName} onReplay={handleReplay} />
 }

@@ -1,15 +1,32 @@
 'use client'
 
+import { useEffect } from 'react'
 import type { StoryConfig, EngineState } from '@/engine/types'
 import ParagraphDisplay from './ParagraphDisplay'
+import LeaderboardSection from './LeaderboardSection'
 
 interface EndScreenProps {
   engineState: EngineState
   config: StoryConfig
+  storyId: string
+  playerName: string
   onReplay: () => void
 }
 
-export default function EndScreen({ engineState, config, onReplay }: EndScreenProps) {
+export default function EndScreen({ engineState, config, storyId, playerName, onReplay }: EndScreenProps) {
+  // Fire-and-forget score submission
+  useEffect(() => {
+    fetch(`/api/stories/${storyId}/scores`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        playerName,
+        score: Math.round(engineState.score),
+        isGameOver: engineState.isGameOver,
+      }),
+    }).catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const scoreGauge = config.gauges.find(g => g.isScore)
 
   // Determine which content to show
@@ -106,6 +123,15 @@ export default function EndScreen({ engineState, config, onReplay }: EndScreenPr
         >
           Rejouer
         </button>
+      </div>
+
+      {/* Leaderboard — fades in when data arrives, invisible on failure */}
+      <div className="reading-column">
+        <LeaderboardSection
+          storyId={storyId}
+          playerName={playerName}
+          playerScore={engineState.score}
+        />
       </div>
     </main>
   )

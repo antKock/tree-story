@@ -12,14 +12,16 @@ import EndScreen from './EndScreen'
 interface StoryReaderProps {
   config: StoryConfig
   initialStats: Record<string, number> | null
+  playerName?: string | null
   onReplay: () => void
 }
 
-export default function StoryReader({ config, initialStats, onReplay }: StoryReaderProps) {
-  const { engineState, resolveChoice, applyDecay, resetEngine, setStats } = useStoryEngine(config)
+export default function StoryReader({ config, initialStats, playerName, onReplay }: StoryReaderProps) {
+  const { engineState, resolveChoice, applyDecay, resetEngine, setStats, setPlayerName } = useStoryEngine(config)
   const [sheetOpen, setSheetOpen] = useState(false)
   const prevParagraphId = useRef(engineState.paragraphId)
   const statsApplied = useRef(false)
+  const nameApplied = useRef(false)
 
   // Apply initial stats once on mount
   useEffect(() => {
@@ -28,6 +30,14 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
       statsApplied.current = true
     }
   }, [initialStats, setStats])
+
+  // Apply player name once on mount
+  useEffect(() => {
+    if (playerName && !nameApplied.current) {
+      setPlayerName(playerName)
+      nameApplied.current = true
+    }
+  }, [playerName, setPlayerName])
 
   // Apply decay when arriving at a decay node
   useEffect(() => {
@@ -58,6 +68,8 @@ export default function StoryReader({ config, initialStats, onReplay }: StoryRea
         <EndScreen
           engineState={engineState}
           config={config}
+          storyId={config.id}
+          playerName={engineState.playerName}
           onReplay={() => {
             resetEngine()
             onReplay()
