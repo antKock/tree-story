@@ -53,4 +53,9 @@ export function resetToDefaults(): void {
     document.documentElement.style.removeProperty(prop)
   }
   appliedProperties.clear()
+
+  // Clear persisted theme so it doesn't get restored later
+  if (typeof globalThis.localStorage !== 'undefined') {
+    localStorage.removeItem(THEME_STORAGE_KEY)
+  }
 }

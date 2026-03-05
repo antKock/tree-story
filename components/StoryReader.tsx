@@ -49,9 +49,12 @@ export default function StoryReader({ config, initialStats, playerName, onReplay
     }
   }, [engineState.paragraphId, config.decayNodes, applyDecay])
 
-  // Scroll to top on every paragraph transition (useLayoutEffect fires before paint)
+  // Scroll to top on every paragraph transition (useLayoutEffect fires before paint).
+  // Use behavior:'instant' to bypass CSS scroll-behavior:smooth — otherwise the
+  // animated scroll races with the React render and content starts hidden behind
+  // the sticky GaugeStrip.
   useLayoutEffect(() => {
-    document.documentElement.scrollTop = 0
+    window.scrollTo({ top: 0, behavior: 'instant' })
   }, [engineState.paragraphId])
 
   const currentParagraph = config.paragraphs[engineState.paragraphId]

@@ -42,7 +42,7 @@ export default function StoryListClient({ stories }: StoryListClientProps) {
 
   useEffect(() => {
     setCompletedStories(getCompletedStories(stories))
-    themeManager.restoreFromStorage()
+    themeManager.resetToDefaults()
   }, [stories])
 
   return (
