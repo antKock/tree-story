@@ -71,7 +71,7 @@ export default async function StoryPage({ params }: PageProps) {
   }
 
   if (result.kind === 'validation-error') {
-    return <DevErrorScreen error={result.error} />
+    return <DevErrorScreen message={result.error.message} />
   }
 
   const message = result.kind === 'not-found'

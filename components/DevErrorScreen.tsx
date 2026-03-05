@@ -4,10 +4,10 @@
 // Displays story configuration errors caught at startup before any player UI loads.
 
 interface DevErrorScreenProps {
-  error: Error
+  message: string
 }
 
-export default function DevErrorScreen({ error }: DevErrorScreenProps) {
+export default function DevErrorScreen({ message }: DevErrorScreenProps) {
   return (
     <div
       style={{
@@ -52,7 +52,7 @@ export default function DevErrorScreen({ error }: DevErrorScreenProps) {
             margin: 0,
           }}
         >
-          {error.message}
+          {message}
         </pre>
       </div>
     </div>

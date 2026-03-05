@@ -1,6 +1,6 @@
 # Story 1.2: Player Name Capture at Profile Creation
 
-Status: review
+Status: done
 
 ## Story
 

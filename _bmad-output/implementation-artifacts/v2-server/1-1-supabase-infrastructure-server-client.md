@@ -1,6 +1,6 @@
 # Story 1.1: Supabase Infrastructure & Server Client
 
-Status: review
+Status: done
 
 ## Story
 

@@ -1,6 +1,6 @@
 # Story 4.2: End-to-End Validation & Mobile Play Test
 
-Status: ready-for-dev
+Status: skipped
 
 ## Story
 

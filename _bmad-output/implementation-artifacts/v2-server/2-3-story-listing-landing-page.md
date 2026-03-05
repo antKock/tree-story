@@ -1,6 +1,6 @@
 # Story 2.3: Story Listing Landing Page
 
-Status: review
+Status: done
 
 ## Story
 

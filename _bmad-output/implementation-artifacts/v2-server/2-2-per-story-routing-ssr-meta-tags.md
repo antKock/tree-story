@@ -1,6 +1,6 @@
 # Story 2.2: Per-Story Routing with SSR Meta Tags
 
-Status: review
+Status: done
 
 ## Story
 

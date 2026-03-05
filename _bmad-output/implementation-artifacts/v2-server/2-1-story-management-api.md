@@ -1,6 +1,6 @@
 # Story 2.1: Story Management API
 
-Status: review
+Status: done
 
 ## Story
 

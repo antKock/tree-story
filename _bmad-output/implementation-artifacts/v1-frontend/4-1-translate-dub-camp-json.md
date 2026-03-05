@@ -1,6 +1,6 @@
 # Story 4.1: Translate Dub Camp to JSON
 
-Status: review
+Status: done
 
 ## Story
 

@@ -1,6 +1,6 @@
 # Story 1.3: Score Submission API
 
-Status: review
+Status: done
 
 ## Story
 

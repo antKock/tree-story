@@ -1,6 +1,6 @@
 # Story 1.5: Leaderboard Display on End Screen
 
-Status: review
+Status: done
 
 ## Story
 

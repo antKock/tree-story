@@ -1,6 +1,6 @@
 # Story 1.4: Leaderboard API
 
-Status: review
+Status: done
 
 ## Story
 
