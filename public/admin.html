@@ -127,6 +127,37 @@
     }
     .btn-cancel { background: var(--border); color: var(--text); }
     .btn-confirm-delete { background: var(--danger); color: #fff; }
+
+    /* Editor overlay */
+    .editor-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: var(--bg);
+      flex-direction: column;
+    }
+    .editor-overlay.active { display: flex; }
+    .editor-toolbar {
+      flex-shrink: 0; display: flex; align-items: center;
+      padding: 0.6rem 1rem; gap: 0.75rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .editor-title {
+      flex: 1; font-size: 0.9rem; font-weight: 600;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .editor-status {
+      font-size: 0.75rem; color: var(--muted); white-space: nowrap;
+    }
+    .editor-status.error { color: var(--danger); }
+    .editor-status.saving { color: var(--accent); }
+    .editor-btn {
+      padding: 0.4rem 1rem; border-radius: var(--radius); border: none;
+      font-weight: 600; font-size: 0.8rem; cursor: pointer;
+    }
+    .editor-btn.save { background: var(--accent); color: var(--bg); }
+    .editor-btn.save:disabled { opacity: 0.5; cursor: not-allowed; }
+    .editor-btn.cancel { background: var(--border); color: var(--text); }
+    .editor-container { flex: 1; overflow: hidden; }
   </style>
 </head>
 <body>
@@ -171,32 +202,66 @@
     </div>
   </div>
 
+  <!-- Editor overlay -->
+  <div class="editor-overlay" id="editorOverlay">
+    <div class="editor-toolbar">
+      <div class="editor-title" id="editorTitle"></div>
+      <div class="editor-status" id="editorStatus"></div>
+      <button class="editor-btn cancel" id="editorCancelBtn">Cancel</button>
+      <button class="editor-btn save" id="editorSaveBtn">Save</button>
+    </div>
+    <div class="editor-container" id="editorContainer"></div>
+  </div>
+
+  <!-- Monaco Editor from CDN — version must match MONACO_CDN variable in script below -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.min.js"></script>
+
   <script>
     let apiKey = '';
     let pendingDeleteId = null;
 
+    // --- Editor state ---
+    let monacoEditor = null;
+    let editorStoryId = null;
+    let editorOriginalContent = '';
+    let monacoReady = false;
+    let editorSaving = false;
+    let statusDebounceTimer = null;
+
+    // Load Monaco — version must match the <script> tag above
+    var MONACO_CDN = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs';
+    require.config({ paths: { vs: MONACO_CDN } });
+    require(['vs/editor/editor.main'], function () {
+      monaco.editor.defineTheme('tree-story-dark', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [],
+        colors: {
+          'editor.background': '#0f1117',
+          'editor.lineHighlightBackground': '#1a1d27',
+          'editorLineNumber.foreground': '#71717a',
+          'editorLineNumber.activeForeground': '#e4e4e7',
+        },
+      });
+      monacoReady = true;
+    });
+
+    // --- Auth ---
+
     async function connect() {
       const input = document.getElementById('apiKey');
       const btn = document.getElementById('connectBtn');
-      const authError = document.getElementById('authError');
       apiKey = input.value.trim();
       if (!apiKey) return;
 
-      authError.style.display = 'none';
+      document.getElementById('authError').style.display = 'none';
       btn.textContent = 'Connecting...';
       btn.disabled = true;
 
-      // Validate the key by making an authenticated request
       try {
-        const res = await fetch('/api/stories', {
-          headers: { 'Authorization': 'Bearer ' + apiKey },
-        });
-        // The GET /api/stories endpoint doesn't require auth, so we verify
-        // the key by attempting a POST to a dummy check — instead, just accept
-        // if the key is non-empty and let actual operations fail if wrong.
-        // A lightweight validation: try a HEAD-like probe.
+        await fetch('/api/stories');
       } catch {
-        // Network error — proceed anyway, operations will fail individually
+        // Network error — proceed, operations will fail individually
       }
 
       document.getElementById('uploadSection').style.display = 'block';
@@ -247,7 +312,6 @@
         return;
       }
 
-      // Basic client-side validation
       if (!json.id || typeof json.id !== 'string') {
         showFeedback('Missing or invalid "id" field in JSON root.', 'error');
         return;
@@ -327,6 +391,16 @@
           const tdActions = document.createElement('td');
           const actionsDiv = document.createElement('div');
           actionsDiv.className = 'actions';
+
+          const editBtn = document.createElement('button');
+          editBtn.className = 'btn-sm';
+          editBtn.textContent = 'Edit';
+          editBtn.dataset.storyId = s.id;
+          editBtn.dataset.storyTitle = s.title;
+          editBtn.addEventListener('click', function() {
+            openEditor(this.dataset.storyId, this.dataset.storyTitle);
+          });
+          actionsDiv.appendChild(editBtn);
 
           const dlBtn = document.createElement('button');
           dlBtn.className = 'btn-sm';
@@ -409,6 +483,206 @@
         showFeedback('Network error: ' + e.message, 'error');
       }
     }
+
+    // --- JSON Editor ---
+
+    async function openEditor(storyId, storyTitle) {
+      if (!monacoReady) {
+        showFeedback('Editor is still loading. Try again in a moment.', 'error');
+        return;
+      }
+
+      const overlay = document.getElementById('editorOverlay');
+      const container = document.getElementById('editorContainer');
+      const titleEl = document.getElementById('editorTitle');
+      const statusEl = document.getElementById('editorStatus');
+      const saveBtn = document.getElementById('editorSaveBtn');
+
+      titleEl.textContent = storyTitle + ' (' + storyId + ')';
+      statusEl.textContent = 'Loading...';
+      statusEl.className = 'editor-status';
+      saveBtn.disabled = true;
+      overlay.classList.add('active');
+
+      // Fetch story JSON — use raw text and re-format to get consistent
+      // key ordering, avoiding phantom "unsaved changes" from jsonb reordering
+      try {
+        const res = await fetch('/api/stories/' + encodeURIComponent(storyId));
+        if (!res.ok) throw new Error('Failed to load story');
+        const raw = await res.text();
+        const content = JSON.stringify(JSON.parse(raw), null, 2);
+
+        editorStoryId = storyId;
+        editorOriginalContent = content;
+
+        // Create or reconfigure editor
+        if (monacoEditor) {
+          monacoEditor.setValue(content);
+        } else {
+          monacoEditor = monaco.editor.create(container, {
+            value: content,
+            language: 'json',
+            theme: 'tree-story-dark',
+            minimap: { enabled: false },
+            wordWrap: 'on',
+            fontSize: 13,
+            lineNumbers: 'on',
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            tabSize: 2,
+            renderWhitespace: 'none',
+            bracketPairColorization: { enabled: true },
+          });
+
+          // Track changes for status indicator (debounced to avoid per-keystroke JSON.parse)
+          monacoEditor.onDidChangeModelContent(() => {
+            clearTimeout(statusDebounceTimer);
+            statusDebounceTimer = setTimeout(updateEditorStatus, 400);
+          });
+        }
+
+        updateEditorStatus();
+        statusEl.textContent = '';
+      } catch (e) {
+        statusEl.textContent = 'Error: ' + e.message;
+        statusEl.className = 'editor-status error';
+      }
+    }
+
+    function updateEditorStatus() {
+      if (!monacoEditor) return;
+      const statusEl = document.getElementById('editorStatus');
+      const saveBtn = document.getElementById('editorSaveBtn');
+      const current = monacoEditor.getValue();
+      const hasChanges = current !== editorOriginalContent;
+
+      // Check JSON validity
+      let parseError = null;
+      try {
+        JSON.parse(current);
+      } catch (e) {
+        parseError = e.message;
+      }
+
+      if (parseError) {
+        statusEl.textContent = 'Invalid JSON';
+        statusEl.className = 'editor-status error';
+        saveBtn.disabled = true;
+      } else if (hasChanges) {
+        statusEl.textContent = 'Unsaved changes';
+        statusEl.className = 'editor-status';
+        saveBtn.disabled = false;
+      } else {
+        statusEl.textContent = '';
+        statusEl.className = 'editor-status';
+        saveBtn.disabled = true;
+      }
+    }
+
+    function closeEditor(force) {
+      if (!force && monacoEditor) {
+        const current = monacoEditor.getValue();
+        if (current !== editorOriginalContent) {
+          if (!confirm('You have unsaved changes. Discard them?')) return;
+        }
+      }
+
+      document.getElementById('editorOverlay').classList.remove('active');
+      editorStoryId = null;
+      editorOriginalContent = '';
+    }
+
+    async function saveEditor() {
+      if (!monacoEditor || !editorStoryId || editorSaving) return;
+
+      const statusEl = document.getElementById('editorStatus');
+      const saveBtn = document.getElementById('editorSaveBtn');
+      const content = monacoEditor.getValue();
+
+      let json;
+      try {
+        json = JSON.parse(content);
+      } catch {
+        statusEl.textContent = 'Invalid JSON \u2014 cannot save';
+        statusEl.className = 'editor-status error';
+        return;
+      }
+
+      // Basic structure check
+      if (!json.id || !json.meta?.title || !json.paragraphs) {
+        statusEl.textContent = 'Missing required fields (id, meta.title, paragraphs)';
+        statusEl.className = 'editor-status error';
+        return;
+      }
+
+      // ID mismatch check
+      if (json.id !== editorStoryId) {
+        statusEl.textContent = 'Cannot change story ID (expected "' + editorStoryId + '")';
+        statusEl.className = 'editor-status error';
+        return;
+      }
+
+      editorSaving = true;
+      statusEl.textContent = 'Saving...';
+      statusEl.className = 'editor-status saving';
+      saveBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/stories/' + encodeURIComponent(editorStoryId), {
+          method: 'POST',
+          headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+          body: content,
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          statusEl.textContent = 'Save failed: ' + (err.error || res.statusText);
+          statusEl.className = 'editor-status error';
+          saveBtn.disabled = false;
+          return;
+        }
+
+        editorOriginalContent = content;
+        statusEl.textContent = 'Saved';
+        statusEl.className = 'editor-status saving';
+        setTimeout(() => updateEditorStatus(), 2000);
+        loadStories();
+      } catch (e) {
+        statusEl.textContent = 'Network error: ' + e.message;
+        statusEl.className = 'editor-status error';
+        saveBtn.disabled = false;
+      } finally {
+        editorSaving = false;
+      }
+    }
+
+    // Wire editor buttons
+    document.getElementById('editorCancelBtn').addEventListener('click', () => closeEditor(false));
+    document.getElementById('editorSaveBtn').addEventListener('click', saveEditor);
+
+    // Keyboard shortcuts for editor
+    document.addEventListener('keydown', e => {
+      if (!editorStoryId) return;
+      // Ctrl+S / Cmd+S to save
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (!editorSaving && !document.getElementById('editorSaveBtn').disabled) {
+          saveEditor();
+        }
+      }
+      // Escape to close editor
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeEditor(false);
+      }
+    });
+
+    // Warn on browser tab close with unsaved changes
+    window.addEventListener('beforeunload', e => {
+      if (monacoEditor && editorStoryId && monacoEditor.getValue() !== editorOriginalContent) {
+        e.preventDefault();
+      }
+    });
   </script>
 </body>
 </html>
