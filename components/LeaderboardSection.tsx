@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import LeaderboardEntry from './LeaderboardEntry'
 
 interface LeaderboardEntryData {
@@ -19,8 +19,10 @@ interface LeaderboardSectionProps {
 }
 
 export default function LeaderboardSection({ storyId, playerName, playerScore }: LeaderboardSectionProps) {
-  const [visible, setVisible] = useState(false)
   const [entries, setEntries] = useState<LeaderboardEntryData[] | null>(null)
+  const [failed, setFailed] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const listRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -35,10 +37,11 @@ export default function LeaderboardSection({ storyId, playerName, playerScore }:
       .then(data => {
         if (data) {
           setEntries(data)
-          requestAnimationFrame(() => setVisible(true))
+        } else {
+          setFailed(true)
         }
       })
-      .catch(() => {})
+      .catch(() => setFailed(true))
 
     return () => {
       clearTimeout(timeoutId)
@@ -46,13 +49,21 @@ export default function LeaderboardSection({ storyId, playerName, playerScore }:
     }
   }, [storyId])
 
-  if (!entries) return null
+  // Trigger fade-in after the list mounts into the DOM
+  useEffect(() => {
+    if (entries && listRef.current) {
+      requestAnimationFrame(() => setVisible(true))
+    }
+  }, [entries])
+
+  const loading = !entries && !failed
 
   let currentPlayerFound = false
 
   return (
     <section
       aria-label="Classement des joueurs"
+      aria-busy={loading}
       style={{
         flex: 1,
         minHeight: 0,
@@ -63,8 +74,6 @@ export default function LeaderboardSection({ storyId, playerName, playerScore }:
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        opacity: visible ? 1 : 0,
-        transition: 'opacity 300ms ease',
       }}
     >
       {/* Card Header */}
@@ -83,32 +92,106 @@ export default function LeaderboardSection({ storyId, playerName, playerScore }:
         Ceux qui ont fini
       </div>
 
-      {/* Scrollable List */}
-      <div
-        role="list"
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
-        {entries.map((entry, index) => {
-          const isCurrentPlayer = !currentPlayerFound
-            && entry.playerName === playerName
-            && entry.score === Math.round(playerScore)
-          if (isCurrentPlayer) currentPlayerFound = true
-          return (
-            <LeaderboardEntry
-              key={entry.id}
-              rank={index + 1}
-              playerName={entry.playerName}
-              score={entry.score}
-              isCurrentPlayer={isCurrentPlayer}
-              isLast={index === entries.length - 1}
-            />
-          )
-        })}
-      </div>
+      {/* Loading */}
+      {loading && (
+        <div
+          role="status"
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--font-ui)',
+              fontSize: '0.85rem',
+              color: 'var(--color-text-muted)',
+              animation: 'ts-loading-pulse 1.5s ease-in-out infinite',
+            }}
+          >
+            Chargement…
+          </span>
+        </div>
+      )}
+
+      {/* Error */}
+      {failed && (
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--font-ui)',
+              fontSize: '0.85rem',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            Classement indisponible
+          </span>
+        </div>
+      )}
+
+      {/* Entries list */}
+      {entries && entries.length === 0 && (
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--font-ui)',
+              fontSize: '0.85rem',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            Aucun joueur pour l'instant
+          </span>
+        </div>
+      )}
+
+      {entries && entries.length > 0 && (
+        <div
+          ref={listRef}
+          role="list"
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 300ms ease',
+          }}
+        >
+          {entries.map((entry, index) => {
+            const isCurrentPlayer = !currentPlayerFound
+              && entry.playerName === playerName
+              && entry.score === Math.round(playerScore)
+            if (isCurrentPlayer) currentPlayerFound = true
+            return (
+              <LeaderboardEntry
+                key={entry.id}
+                rank={index + 1}
+                playerName={entry.playerName}
+                score={entry.score}
+                isCurrentPlayer={isCurrentPlayer}
+                isLast={index === entries.length - 1}
+              />
+            )
+          })}
+        </div>
+      )}
     </section>
   )
 }
