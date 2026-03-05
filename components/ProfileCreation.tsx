@@ -5,11 +5,13 @@ import type { StoryConfig } from '@/engine/types'
 
 interface ProfileCreationProps {
   config: StoryConfig
-  onStart: (stats: Record<string, number>) => void
+  onStart: (stats: Record<string, number>, playerName: string) => void
 }
 
 export default function ProfileCreation({ config, onStart }: ProfileCreationProps) {
   const [mode, setMode] = useState<'choose' | 'custom'>('choose')
+  const [playerName, setPlayerName] = useState('')
+  const [nameFocused, setNameFocused] = useState(false)
   const [stats, setStats] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {}
     for (const stat of config.stats) {
@@ -42,7 +44,7 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
   }
 
   function selectProfile(profileStats: Record<string, number>) {
-    onStart(sanitizeProfile(profileStats))
+    onStart(sanitizeProfile(profileStats), playerName.trim())
   }
 
   function enterCustomMode() {
@@ -63,10 +65,55 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
     transition: 'border-color 150ms ease',
   }
 
+  const nameEmpty = playerName.trim() === ''
+
+  const nameInputBlock = (
+    <div style={{ marginBottom: '1.5rem' }}>
+      <label
+        htmlFor="player-name"
+        style={{
+          display: 'block',
+          fontFamily: 'var(--font-ui)',
+          color: 'var(--color-text-primary)',
+          marginBottom: '0.5rem',
+        }}
+      >
+        Comment tu t&apos;appelles ?
+      </label>
+      <input
+        id="player-name"
+        type="text"
+        required
+        autoComplete="given-name"
+        placeholder="Ton prénom"
+        value={playerName}
+        onChange={e => setPlayerName(e.target.value)}
+        onFocus={() => setNameFocused(true)}
+        onBlur={() => setNameFocused(false)}
+        style={{
+          width: '100%',
+          height: '44px',
+          padding: '0 1rem',
+          background: 'var(--color-surface)',
+          border: nameFocused
+            ? '1px solid var(--color-accent)'
+            : '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '8px',
+          fontFamily: 'var(--font-ui)',
+          fontSize: '16px',
+          color: 'var(--color-text-primary)',
+          outline: 'none',
+        }}
+      />
+    </div>
+  )
+
   // --- Profile selection screen ---
   if (mode === 'choose') {
     return (
       <div className="reading-column" style={{ paddingTop: '3rem', paddingBottom: '3rem' }}>
+        {nameInputBlock}
+
         <h2
           style={{
             fontFamily: 'var(--font-ui)',
@@ -85,7 +132,12 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
               key={profile.name}
               type="button"
               onClick={() => selectProfile(profile.stats)}
-              style={cardStyle}
+              disabled={nameEmpty}
+              style={{
+                ...cardStyle,
+                opacity: nameEmpty ? 0.4 : 1,
+                pointerEvents: nameEmpty ? 'none' : 'auto',
+              }}
             >
               <div style={{ fontWeight: 600, marginBottom: '4px' }}>{profile.name}</div>
               <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
@@ -97,7 +149,12 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
           <button
             type="button"
             onClick={enterCustomMode}
-            style={cardStyle}
+            disabled={nameEmpty}
+            style={{
+              ...cardStyle,
+              opacity: nameEmpty ? 0.4 : 1,
+              pointerEvents: nameEmpty ? 'none' : 'auto',
+            }}
           >
             <div style={{ fontWeight: 600, marginBottom: '4px' }}>Personnaliser</div>
             <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
@@ -128,6 +185,8 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
       >
         ← Retour aux profils
       </button>
+
+      {nameInputBlock}
 
       <h2
         style={{
@@ -255,20 +314,20 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
 
       <button
         type="button"
-        onClick={() => onStart(stats)}
-        disabled={remaining !== 0}
+        onClick={() => onStart(stats, playerName.trim())}
+        disabled={remaining !== 0 || nameEmpty}
         style={{
           width: '100%',
           minHeight: '48px',
           borderRadius: '8px',
           border: 'none',
-          background: remaining === 0 ? 'var(--color-accent)' : 'var(--color-surface)',
-          color: remaining === 0 ? 'var(--color-bg)' : 'var(--color-text-muted)',
+          background: remaining === 0 && !nameEmpty ? 'var(--color-accent)' : 'var(--color-surface)',
+          color: remaining === 0 && !nameEmpty ? 'var(--color-bg)' : 'var(--color-text-muted)',
           fontFamily: 'var(--font-ui)',
           fontSize: '1rem',
           fontWeight: 600,
-          cursor: remaining === 0 ? 'pointer' : 'not-allowed',
-          opacity: remaining === 0 ? 1 : 0.5,
+          cursor: remaining === 0 && !nameEmpty ? 'pointer' : 'not-allowed',
+          opacity: remaining === 0 && !nameEmpty ? 1 : 0.4,
           transition: 'background 150ms ease, opacity 150ms ease',
         }}
       >
