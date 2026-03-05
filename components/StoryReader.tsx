@@ -56,32 +56,19 @@ export default function StoryReader({ config, initialStats, playerName, onReplay
 
   const currentParagraph = config.paragraphs[engineState.paragraphId]
 
-  // Game over or story complete → show end screen
+  // Game over or story complete → show end screen (no gauge strip — full-viewport layout)
   if (engineState.isGameOver || engineState.isComplete) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <GaugeStrip
-          gauges={engineState.gauges}
-          config={config}
-          onOpenCharacterSheet={() => setSheetOpen(true)}
-          />
-        <EndScreen
-          engineState={engineState}
-          config={config}
-          storyId={config.id}
-          playerName={engineState.playerName}
-          onReplay={() => {
-            resetEngine()
-            onReplay()
-          }}
-        />
-        <CharacterSheet
-          open={sheetOpen}
-          onClose={() => setSheetOpen(false)}
-          engineState={engineState}
-          config={config}
-        />
-      </div>
+      <EndScreen
+        engineState={engineState}
+        config={config}
+        storyId={config.id}
+        playerName={engineState.playerName}
+        onReplay={() => {
+          resetEngine()
+          onReplay()
+        }}
+      />
     )
   }
 

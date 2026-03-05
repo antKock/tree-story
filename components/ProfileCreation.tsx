@@ -12,6 +12,7 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
   const [mode, setMode] = useState<'choose' | 'custom'>('choose')
   const [playerName, setPlayerName] = useState('')
   const [nameFocused, setNameFocused] = useState(false)
+  const [selectedProfile, setSelectedProfile] = useState<number | null>(null)
   const [stats, setStats] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {}
     for (const stat of config.stats) {
@@ -43,29 +44,19 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
     return sanitized
   }
 
-  function selectProfile(profileStats: Record<string, number>) {
-    onStart(sanitizeProfile(profileStats), playerName.trim())
+  function confirmSelection() {
+    if (selectedProfile === null || nameEmpty) return
+    if (selectedProfile < 0 || selectedProfile >= config.meta.exampleProfiles.length) return
+    const profile = config.meta.exampleProfiles[selectedProfile]
+    onStart(sanitizeProfile(profile.stats), playerName.trim())
   }
 
   function enterCustomMode() {
     setMode('custom')
   }
 
-  const cardStyle = {
-    width: '100%',
-    padding: '16px 20px',
-    borderRadius: '8px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'var(--color-surface)',
-    color: 'var(--color-text-primary)',
-    fontFamily: 'var(--font-ui)',
-    fontSize: '1rem',
-    cursor: 'pointer',
-    textAlign: 'left' as const,
-    transition: 'border-color 150ms ease',
-  }
-
   const nameEmpty = playerName.trim() === ''
+  const canStart = !nameEmpty && selectedProfile !== null
 
   const nameInputBlock = (
     <div style={{ marginBottom: '1.5rem' }}>
@@ -86,18 +77,18 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
         required
         autoComplete="given-name"
         placeholder="Ton prénom"
+        maxLength={20}
         value={playerName}
         onChange={e => setPlayerName(e.target.value)}
         onFocus={() => setNameFocused(true)}
         onBlur={() => setNameFocused(false)}
         style={{
           width: '100%',
-          height: '44px',
-          padding: '0 1rem',
-          background: 'var(--color-surface)',
+          padding: '14px 16px',
+          background: 'transparent',
           border: nameFocused
             ? '1px solid var(--color-accent)'
-            : '1px solid rgba(255,255,255,0.08)',
+            : '1px solid rgba(255,255,255,0.12)',
           borderRadius: '8px',
           fontFamily: 'var(--font-ui)',
           fontSize: '16px',
@@ -114,29 +105,41 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
       <div className="reading-column" style={{ paddingTop: '3rem', paddingBottom: '3rem' }}>
         {nameInputBlock}
 
-        <h2
+        <div
           style={{
             fontFamily: 'var(--font-ui)',
-            fontSize: '1.1rem',
-            fontWeight: 600,
+            fontSize: '0.7rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
             marginBottom: '1.5rem',
-            color: 'var(--color-text-primary)',
+            color: 'var(--color-text-muted)',
           }}
         >
           Choisis ton profil
-        </h2>
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {config.meta.exampleProfiles.map(profile => (
+          {config.meta.exampleProfiles.map((profile, index) => (
             <button
               key={profile.name}
               type="button"
-              onClick={() => selectProfile(profile.stats)}
-              disabled={nameEmpty}
+              onClick={() => setSelectedProfile(index)}
               style={{
-                ...cardStyle,
-                opacity: nameEmpty ? 0.4 : 1,
-                pointerEvents: nameEmpty ? 'none' : 'auto',
+                width: '100%',
+                padding: '16px 20px',
+                borderRadius: '8px',
+                border: selectedProfile === index
+                  ? '1px solid var(--color-accent)'
+                  : '1px solid rgba(255,255,255,0.08)',
+                background: selectedProfile === index
+                  ? 'color-mix(in srgb, var(--color-accent) 6%, transparent)'
+                  : 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                fontFamily: 'var(--font-ui)',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                textAlign: 'left' as const,
+                transition: 'border-color 150ms ease, background 150ms ease',
               }}
             >
               <div style={{ fontWeight: 600, marginBottom: '4px' }}>{profile.name}</div>
@@ -149,19 +152,44 @@ export default function ProfileCreation({ config, onStart }: ProfileCreationProp
           <button
             type="button"
             onClick={enterCustomMode}
-            disabled={nameEmpty}
             style={{
-              ...cardStyle,
-              opacity: nameEmpty ? 0.4 : 1,
-              pointerEvents: nameEmpty ? 'none' : 'auto',
+              background: 'none',
+              border: 'none',
+              padding: '0.5rem 0',
+              fontFamily: 'var(--font-ui)',
+              fontSize: '0.85rem',
+              color: 'var(--color-text-muted)',
+              textDecoration: 'underline',
+              cursor: 'pointer',
+              textAlign: 'left' as const,
             }}
           >
-            <div style={{ fontWeight: 600, marginBottom: '4px' }}>Personnaliser</div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-              Répartis tes points toi-même
-            </div>
+            Personnaliser les stats →
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={confirmSelection}
+          disabled={!canStart}
+          style={{
+            width: '100%',
+            minHeight: '48px',
+            marginTop: '1.5rem',
+            borderRadius: '8px',
+            border: 'none',
+            background: canStart ? 'var(--color-accent)' : 'var(--color-surface)',
+            color: canStart ? 'var(--color-bg)' : 'var(--color-text-muted)',
+            fontFamily: 'var(--font-ui)',
+            fontSize: '1rem',
+            fontWeight: 600,
+            cursor: canStart ? 'pointer' : 'not-allowed',
+            opacity: canStart ? 1 : 0.4,
+            transition: 'background 150ms ease, opacity 150ms ease',
+          }}
+        >
+          Commencer
+        </button>
       </div>
     )
   }

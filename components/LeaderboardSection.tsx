@@ -18,68 +18,96 @@ interface LeaderboardSectionProps {
   playerScore: number
 }
 
-async function fetchLeaderboard(storyId: string): Promise<LeaderboardEntryData[] | null> {
-  try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000)
-    const res = await fetch(`/api/stories/${storyId}/leaderboard`, {
-      signal: controller.signal,
-    })
-    clearTimeout(timeoutId)
-    if (!res.ok) return null
-    return res.json()
-  } catch {
-    return null
-  }
-}
-
 export default function LeaderboardSection({ storyId, playerName, playerScore }: LeaderboardSectionProps) {
   const [visible, setVisible] = useState(false)
   const [entries, setEntries] = useState<LeaderboardEntryData[] | null>(null)
 
   useEffect(() => {
-    // Brief delay so the fire-and-forget score POST has time to land before we fetch
-    const delayId = setTimeout(() => {
-      fetchLeaderboard(storyId).then(data => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+    fetch(`/api/stories/${storyId}/leaderboard`, { signal: controller.signal })
+      .then(res => {
+        clearTimeout(timeoutId)
+        if (!res.ok) return null
+        return res.json()
+      })
+      .then(data => {
         if (data) {
           setEntries(data)
           requestAnimationFrame(() => setVisible(true))
         }
       })
-    }, 800)
-    return () => clearTimeout(delayId)
+      .catch(() => {})
+
+    return () => {
+      clearTimeout(timeoutId)
+      controller.abort()
+    }
   }, [storyId])
 
   if (!entries) return null
+
+  let currentPlayerFound = false
 
   return (
     <section
       aria-label="Classement des joueurs"
       style={{
+        flex: 1,
+        minHeight: 0,
+        margin: '0 1.5rem',
+        background: 'var(--color-surface)',
+        borderRadius: '12px',
+        border: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
         opacity: visible ? 1 : 0,
         transition: 'opacity 300ms ease',
-        marginTop: '2rem',
       }}
     >
+      {/* Card Header */}
       <div
         style={{
+          flexShrink: 0,
+          padding: '0.85rem 1rem 0.6rem',
           fontFamily: 'var(--font-ui)',
-          fontSize: '0.85rem',
+          fontSize: '0.7rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
           color: 'var(--color-text-muted)',
-          marginBottom: '0.75rem',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
-        Classement
+        Ceux qui ont fini
       </div>
-      <div role="list">
-        {entries.map(entry => (
-          <LeaderboardEntry
-            key={entry.id}
-            playerName={entry.playerName}
-            score={entry.score}
-            isCurrentPlayer={entry.playerName === playerName && entry.score === Math.round(playerScore)}
-          />
-        ))}
+
+      {/* Scrollable List */}
+      <div
+        role="list"
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {entries.map((entry, index) => {
+          const isCurrentPlayer = !currentPlayerFound
+            && entry.playerName === playerName
+            && entry.score === Math.round(playerScore)
+          if (isCurrentPlayer) currentPlayerFound = true
+          return (
+            <LeaderboardEntry
+              key={entry.id}
+              rank={index + 1}
+              playerName={entry.playerName}
+              score={entry.score}
+              isCurrentPlayer={isCurrentPlayer}
+              isLast={index === entries.length - 1}
+            />
+          )
+        })}
       </div>
     </section>
   )

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variation B — Card Leaderboard + Sticky Button (Generic)</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg: #0f0f0f;
+    --color-surface: #1a1a1a;
+    --color-text-primary: #f0ece4;
+    --color-text-muted: #7a7672;
+    --color-accent: #d4935a;
+    --font-prose: 'Lora', serif;
+    --font-ui: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-ui);
+    max-width: 420px;
+    margin: 0 auto;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* =============================================
+     VARIATION B — FINAL
+     Card Leaderboard + Sticky Button
+     Generic score recap (no story-specific icons)
+     Gradient background from design directions
+     ============================================= */
+
+  .screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* Atmospheric gradient from design spec — subtle accent wash at top */
+    background: linear-gradient(180deg, rgba(212,147,90,0.06) 0%, transparent 40%);
+  }
+
+  /* --- Score Recap: generous, centered, celebratory --- */
+  .score-recap {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 2.5rem 1.5rem 1.5rem;
+  }
+
+  .score-recap .score-heading {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .score-recap .score-value {
+    font-family: var(--font-ui);
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .score-recap .score-tagline {
+    font-family: var(--font-prose);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--color-text-muted);
+    max-width: 260px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* --- Gradient Divider (from design spec) --- */
+  .divider {
+    flex-shrink: 0;
+    height: 1px;
+    margin: 0 1.5rem 1rem;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  }
+
+  /* --- Leaderboard Card (scrollable interior) --- */
+  .leaderboard-card {
+    flex: 1;
+    min-height: 0;
+    margin: 0 1.5rem;
+    background: var(--color-surface);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .leaderboard-card-header {
+    flex-shrink: 0;
+    padding: 0.85rem 1rem 0.6rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .leaderboard-card-list {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .entry:last-child { border-bottom: none; }
+
+  .entry .rank {
+    width: 24px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+
+  .entry .name {
+    flex: 1;
+    color: var(--color-text-muted);
+  }
+
+  .entry .score {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+
+  .entry.current {
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+
+  .entry.current .rank {
+    color: var(--color-accent);
+  }
+
+  .entry.current .name {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+
+  .entry.current .score {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  /* --- Footer: always-visible replay button --- */
+  .footer {
+    flex-shrink: 0;
+    padding: 1rem 1.5rem 2rem;
+    position: relative;
+  }
+
+  /* Gradient fade above button so list doesn't end abruptly */
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(to top, var(--color-bg), transparent);
+    pointer-events: none;
+  }
+
+  .replay-btn {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-accent);
+    color: var(--color-bg);
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .replay-btn:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <!-- Score Recap: generic, no story-specific icon or label -->
+  <div class="score-recap">
+    <div class="score-heading">Ton score</div>
+    <div class="score-value">87</div>
+    <div class="score-tagline">Bravo, tu as terminé l'histoire !</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Leaderboard inside a card -->
+  <div class="leaderboard-card">
+    <div class="leaderboard-card-header">Ceux qui ont fini</div>
+    <div class="leaderboard-card-list">
+      <div class="entry">
+        <span class="rank">1</span>
+        <span class="name">Marc</span>
+        <span class="score">95</span>
+      </div>
+      <div class="entry">
+        <span class="rank">2</span>
+        <span class="name">Julie</span>
+        <span class="score">92</span>
+      </div>
+      <div class="entry current">
+        <span class="rank">3</span>
+        <span class="name">Anthony</span>
+        <span class="score">87</span>
+      </div>
+      <div class="entry">
+        <span class="rank">4</span>
+        <span class="name">Léa</span>
+        <span class="score">81</span>
+      </div>
+      <div class="entry">
+        <span class="rank">5</span>
+        <span class="name">Thomas</span>
+        <span class="score">78</span>
+      </div>
+      <div class="entry">
+        <span class="rank">6</span>
+        <span class="name">Camille</span>
+        <span class="score">74</span>
+      </div>
+      <div class="entry">
+        <span class="rank">7</span>
+        <span class="name">Hugo</span>
+        <span class="score">71</span>
+      </div>
+      <div class="entry">
+        <span class="rank">8</span>
+        <span class="name">Emma</span>
+        <span class="score">68</span>
+      </div>
+      <div class="entry">
+        <span class="rank">9</span>
+        <span class="name">Lucas</span>
+        <span class="score">65</span>
+      </div>
+      <div class="entry">
+        <span class="rank">10</span>
+        <span class="name">Chloé</span>
+        <span class="score">61</span>
+      </div>
+      <div class="entry">
+        <span class="rank">11</span>
+        <span class="name">Nathan</span>
+        <span class="score">58</span>
+      </div>
+      <div class="entry">
+        <span class="rank">12</span>
+        <span class="name">Inès</span>
+        <span class="score">54</span>
+      </div>
+      <div class="entry">
+        <span class="rank">13</span>
+        <span class="name">Raphaël</span>
+        <span class="score">49</span>
+      </div>
+      <div class="entry">
+        <span class="rank">14</span>
+        <span class="name">Manon</span>
+        <span class="score">43</span>
+      </div>
+      <div class="entry">
+        <span class="rank">15</span>
+        <span class="name">Théo</span>
+        <span class="score">38</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Always-visible replay -->
+  <div class="footer">
+    <button class="replay-btn">Rejouer</button>
+  </div>
+
+</div>
+</body>
+</html>
