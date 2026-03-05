@@ -1,7 +1,21 @@
 // Pure engine module — zero imports from components/, hooks/, or app/
 import type { EngineState, SaveState } from './types'
 
-export const SAVE_KEY = 'tree-story:save'
+const LEGACY_SAVE_KEY = 'tree-story:save'
+
+function getSaveKey(storyId: string): string {
+  return `tree-story:save:${storyId}`
+}
+
+export function migrateToPerStoryKey(storyId: string): void {
+  if (typeof globalThis.localStorage === 'undefined') return
+  const legacyData = localStorage.getItem(LEGACY_SAVE_KEY)
+  const newKey = getSaveKey(storyId)
+  if (legacyData && !localStorage.getItem(newKey)) {
+    localStorage.setItem(newKey, legacyData)
+    localStorage.removeItem(LEGACY_SAVE_KEY)
+  }
+}
 
 export function save(engineState: EngineState, storyId: string): void {
   if (typeof globalThis.localStorage === 'undefined') return
@@ -13,14 +27,14 @@ export function save(engineState: EngineState, storyId: string): void {
     engineState,
   }
 
-  localStorage.setItem(SAVE_KEY, JSON.stringify(saveState))
+  localStorage.setItem(getSaveKey(storyId), JSON.stringify(saveState))
 }
 
-export function load(): SaveState | null {
+export function load(storyId: string): SaveState | null {
   if (typeof globalThis.localStorage === 'undefined') return null
 
   try {
-    const item = localStorage.getItem(SAVE_KEY)
+    const item = localStorage.getItem(getSaveKey(storyId))
     if (item === null) return null
 
     const parsed = JSON.parse(item)
@@ -47,7 +61,7 @@ export function load(): SaveState | null {
   }
 }
 
-export function clear(): void {
+export function clear(storyId: string): void {
   if (typeof globalThis.localStorage === 'undefined') return
-  localStorage.removeItem(SAVE_KEY)
+  localStorage.removeItem(getSaveKey(storyId))
 }

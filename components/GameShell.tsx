@@ -65,14 +65,14 @@ function LandingScreen({ config, onBegin }: { config: StoryConfig; onBegin: () =
 }
 
 function hasActiveGame(config: StoryConfig): boolean {
-  const saved = persistence.load()
+  const saved = persistence.load(config.id)
   if (!saved) return false
   if (saved.storyId !== config.id) return false
   const es = saved.engineState
   if (es.isGameOver || es.isComplete) {
     // Clear stale completed/game-over saves so they don't get restored
     // when the player starts a new game
-    persistence.clear()
+    persistence.clear(config.id)
     return false
   }
   return true
@@ -84,6 +84,7 @@ export default function GameShell({ config }: GameShellProps) {
   const [pendingPlayerName, setPendingPlayerName] = useState<string | null>(null)
 
   useEffect(() => {
+    persistence.migrateToPerStoryKey(config.id)
     const active = hasActiveGame(config)
     if (!active) {
       themeManager.apply(config.acts[0].id, config)

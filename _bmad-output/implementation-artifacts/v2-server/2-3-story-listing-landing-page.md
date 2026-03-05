@@ -1,6 +1,6 @@
 # Story 2.3: Story Listing Landing Page
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -23,33 +23,33 @@ So that I can discover new stories and return to ones I've already played.
 
 ## Tasks / Subtasks
 
-- [ ] Create `components/LandingHero.tsx` (AC: #1, #8, #10)
-  - [ ] Centered column layout matching reading-column pattern
-  - [ ] Headline: Lora, `--color-text-primary`, "Des histoires dont tu choisis la suite"
-  - [ ] Sub-headline: Inter, `--color-text-muted`, "Chaque choix compte. Chaque partie est différente."
-  - [ ] CTA button: "Découvrir les histoires ↓", `--color-accent` bg, `--color-bg` text, smooth-scrolls to `#stories`
-  - [ ] Focus indicator: `outline: 2px solid var(--color-accent)`, `outline-offset: 2px`
-- [ ] Create `components/StoryCard.tsx` (AC: #3, #4, #5, #8, #9)
-  - [ ] Props: `id`, `title`, `description`, `updatedAt`, `playerCount`, `isCompleted`
-  - [ ] Full card wrapped in `<Link href={/${id}}>` — entire card is tap target
-  - [ ] Title: Lora, `--color-text-primary`
-  - [ ] Description: Inter, `--color-text-muted`, one sentence
-  - [ ] Metadata row: soft player count + last update date (Inter, muted)
-  - [ ] "Terminé" badge: conditional, `--color-text-muted` pill, top-right, `aria-label="Histoire terminée"`
-  - [ ] Card styling: `--color-surface` bg, `border: 1px solid rgba(255,255,255,0.08)`, `border-radius: 8px`, `padding: 1.25rem`
-  - [ ] Card `aria-label`: combine title + completion state
-  - [ ] Focus indicator on the Link element
-- [ ] Create `components/StoryListClient.tsx` — client component for localStorage access (AC: #5, #6)
-  - [ ] Receives stories array from server as props
-  - [ ] On mount: read all `tree-story:save:<storyId>` keys to determine completion state for each story
-  - [ ] On mount: read last story's theme from localStorage and apply to `:root` via CSS custom properties
-  - [ ] Render `<StoryCard>` for each story with `isCompleted` derived from localStorage
-- [ ] Replace `app/page.tsx` — landing page server component (AC: #2, #7)
-  - [ ] Server component fetches story list from Supabase directly (no API hop)
-  - [ ] Query: `select('id, title, description, updated_at')` + count scores per story for player counts
-  - [ ] On success: render `<LandingHero />` + `<StoryListClient stories={stories} />`
-  - [ ] On Supabase failure: render a static fallback message
-  - [ ] Remove the old `dub-camp.json` filesystem loading code entirely
+- [x] Create `components/LandingHero.tsx` (AC: #1, #8, #10)
+  - [x] Centered column layout matching reading-column pattern
+  - [x] Headline: Lora, `--color-text-primary`, "Des histoires dont tu choisis la suite"
+  - [x] Sub-headline: Inter, `--color-text-muted`, "Chaque choix compte. Chaque partie est différente."
+  - [x] CTA button: "Découvrir les histoires ↓", `--color-accent` bg, `--color-bg` text, smooth-scrolls to `#stories`
+  - [x] Focus indicator: `outline: 2px solid var(--color-accent)`, `outline-offset: 2px`
+- [x] Create `components/StoryCard.tsx` (AC: #3, #4, #5, #8, #9)
+  - [x] Props: `id`, `title`, `description`, `updatedAt`, `playerCount`, `isCompleted`
+  - [x] Full card wrapped in `<Link href={/${id}}>` — entire card is tap target
+  - [x] Title: Lora, `--color-text-primary`
+  - [x] Description: Inter, `--color-text-muted`, one sentence
+  - [x] Metadata row: soft player count + last update date (Inter, muted)
+  - [x] "Terminé" badge: conditional, `--color-text-muted` pill, top-right, `aria-label="Histoire terminée"`
+  - [x] Card styling: `--color-surface` bg, `border: 1px solid rgba(255,255,255,0.08)`, `border-radius: 8px`, `padding: 1.25rem`
+  - [x] Card `aria-label`: combine title + completion state
+  - [x] Focus indicator on the Link element
+- [x] Create `components/StoryListClient.tsx` — client component for localStorage access (AC: #5, #6)
+  - [x] Receives stories array from server as props
+  - [x] On mount: read all `tree-story:save:<storyId>` keys to determine completion state for each story
+  - [x] On mount: read last story's theme from localStorage and apply to `:root` via CSS custom properties
+  - [x] Render `<StoryCard>` for each story with `isCompleted` derived from localStorage
+- [x] Replace `app/page.tsx` — landing page server component (AC: #2, #7)
+  - [x] Server component fetches story list from Supabase directly (no API hop)
+  - [x] Query: `select('id, title, description, updated_at')` + count scores per story for player counts
+  - [x] On success: render `<LandingHero />` + `<StoryListClient stories={stories} />`
+  - [x] On Supabase failure: render a static fallback message
+  - [x] Remove the old `dub-camp.json` filesystem loading code entirely
 
 ## Dev Notes
 
@@ -544,9 +544,29 @@ Files modified:
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
+None — straightforward implementation.
 
 ### Completion Notes List
+- Created `LandingHero.tsx` — server component with Lora headline, Inter sub-headline, and CTA button linking to `#stories` for smooth scroll
+- Created `StoryCard.tsx` — full-card `<Link>` tap target with title (Lora), description (Inter), soft player count (French locale: "Quelques joueurs" / "Une dizaine" / "Des dizaines"), French-formatted date, and conditional "Terminé" badge with `aria-label`
+- Created `StoryListClient.tsx` — client wrapper that reads per-story `tree-story:save:<storyId>` keys from localStorage to determine completion state, and calls `themeManager.restoreFromStorage()` to apply last story's theme
+- Added `restoreFromStorage()` to `engine/themeManager.ts` — reads `tree-story:theme` key and applies CSS custom properties to `:root`
+- Updated `apply()` in themeManager to persist theme tokens to `tree-story:theme` localStorage key
+- Replaced `app/page.tsx` — removed filesystem story loading, now fetches story list from Supabase directly with player count query, renders hero + story list, graceful fallback on error
+- Added `scroll-behavior: smooth` to `html` and focus indicators (`outline: 2px solid var(--color-accent)`, `outline-offset: 2px`) to `a:focus-visible, button:focus-visible` in globals.css
+- OG metadata on landing page: "Tree Story — Des histoires dont tu choisis la suite"
+- All 157 tests pass, no new lint errors
+
+### Change Log
+- 2026-03-05: Implemented Story 2.3 — Story listing landing page with hero, story cards, completion badges, theme persistence, and accessibility
 
 ### File List
+- components/LandingHero.tsx (new)
+- components/StoryCard.tsx (new)
+- components/StoryListClient.tsx (new)
+- app/page.tsx (replaced — landing page server component)
+- engine/themeManager.ts (modified — theme persistence + restoreFromStorage)
+- app/globals.css (modified — smooth scroll + focus indicators)

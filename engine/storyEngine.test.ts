@@ -1094,7 +1094,7 @@ describe('Persistence', () => {
       const engineState = engine.getState()
       persistence.save(engineState, config.id)
 
-      const loaded = persistence.load()
+      const loaded = persistence.load(config.id)
       expect(loaded).not.toBeNull()
       expect(loaded!.version).toBe(1)
       expect(loaded!.storyId).toBe('dub-camp-test')
@@ -1111,7 +1111,7 @@ describe('Persistence', () => {
       const saveData = engine.serialize()
 
       persistence.save(saveData.engineState, saveData.storyId)
-      const loaded = persistence.load()
+      const loaded = persistence.load(saveData.storyId)
       expect(loaded).not.toBeNull()
 
       const restoredEngine = createEngine(config, loaded!)
@@ -1130,35 +1130,35 @@ describe('Persistence', () => {
 
   describe('corrupt save handling', () => {
     it('returns null for invalid JSON', () => {
-      localStorageMock.setItem('tree-story:save', 'not json{{{')
-      expect(persistence.load()).toBeNull()
+      localStorageMock.setItem('tree-story:save:test', 'not json{{{')
+      expect(persistence.load('test')).toBeNull()
     })
 
     it('returns null for wrong version', () => {
-      localStorageMock.setItem('tree-story:save', JSON.stringify({
+      localStorageMock.setItem('tree-story:save:test', JSON.stringify({
         storyId: 'test',
         version: 2,
         savedAt: Date.now(),
         engineState: {},
       }))
-      expect(persistence.load()).toBeNull()
+      expect(persistence.load('test')).toBeNull()
     })
 
     it('returns null when key does not exist', () => {
-      expect(persistence.load()).toBeNull()
+      expect(persistence.load('test')).toBeNull()
     })
 
     it('returns null when engineState is missing', () => {
-      localStorageMock.setItem('tree-story:save', JSON.stringify({
+      localStorageMock.setItem('tree-story:save:test', JSON.stringify({
         storyId: 'test',
         version: 1,
         savedAt: Date.now(),
       }))
-      expect(persistence.load()).toBeNull()
+      expect(persistence.load('test')).toBeNull()
     })
 
     it('returns null when required EngineState field is missing', () => {
-      localStorageMock.setItem('tree-story:save', JSON.stringify({
+      localStorageMock.setItem('tree-story:save:test', JSON.stringify({
         storyId: 'test',
         version: 1,
         savedAt: Date.now(),
@@ -1168,7 +1168,7 @@ describe('Persistence', () => {
           // missing: gauges, stats, act, inventory, score, isGameOver, isComplete
         },
       }))
-      expect(persistence.load()).toBeNull()
+      expect(persistence.load('test')).toBeNull()
     })
   })
 
@@ -1189,9 +1189,9 @@ describe('Persistence', () => {
         lastGaugeDeltas: null,
       }, 'test')
 
-      expect(persistence.load()).not.toBeNull()
-      persistence.clear()
-      expect(persistence.load()).toBeNull()
+      expect(persistence.load('test')).not.toBeNull()
+      persistence.clear('test')
+      expect(persistence.load('test')).toBeNull()
     })
   })
 })
@@ -1451,5 +1451,39 @@ describe('Paragraph-level gaugeEffects', () => {
     expect(state.paragraphId).toBe('s20')
     // c10a has no kiff effect — kiff should remain 50
     expect(state.gauges.kiff).toBe(50)
+  })
+})
+
+describe('migrateToPerStoryKey', () => {
+  beforeEach(() => {
+    localStorageMock.clear()
+  })
+
+  it('migrates legacy key to per-story key', () => {
+    const saveData = JSON.stringify({ version: 1, storyId: 'dub-camp', savedAt: 1000, engineState: {} })
+    localStorage.setItem('tree-story:save', saveData)
+
+    persistence.migrateToPerStoryKey('dub-camp')
+
+    expect(localStorage.getItem('tree-story:save')).toBeNull()
+    expect(localStorage.getItem('tree-story:save:dub-camp')).toBe(saveData)
+  })
+
+  it('does not overwrite existing per-story key', () => {
+    const legacyData = JSON.stringify({ version: 1, storyId: 'old', savedAt: 1000, engineState: {} })
+    const existingData = JSON.stringify({ version: 1, storyId: 'dub-camp', savedAt: 2000, engineState: {} })
+    localStorage.setItem('tree-story:save', legacyData)
+    localStorage.setItem('tree-story:save:dub-camp', existingData)
+
+    persistence.migrateToPerStoryKey('dub-camp')
+
+    expect(localStorage.getItem('tree-story:save:dub-camp')).toBe(existingData)
+    expect(localStorage.getItem('tree-story:save')).toBe(legacyData)
+  })
+
+  it('does nothing when no legacy key exists', () => {
+    persistence.migrateToPerStoryKey('dub-camp')
+
+    expect(localStorage.getItem('tree-story:save:dub-camp')).toBeNull()
   })
 })

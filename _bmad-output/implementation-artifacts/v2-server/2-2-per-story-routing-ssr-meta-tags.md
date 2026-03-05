@@ -1,6 +1,6 @@
 # Story 2.2: Per-Story Routing with SSR Meta Tags
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -21,25 +21,25 @@ So that I can navigate directly to a specific story and friends see an informati
 
 ## Tasks / Subtasks
 
-- [ ] Create `app/[storyId]/page.tsx` — server component with SSR meta tags (AC: #1, #2, #3, #4, #5)
-  - [ ] Server component fetches story from Supabase by `storyId` param
-  - [ ] `generateMetadata()` returns `og:title`, `og:description` from story metadata
-  - [ ] On success: validate story JSON with `validateStoryConfig()` and render `<GameShell config={storyConfig} />`
-  - [ ] On failure (story not found): render a graceful fallback message — not `notFound()`, just a friendly message
-  - [ ] On Supabase error: render a graceful fallback — never a blank page
-- [ ] Update `engine/persistence.ts` — per-story localStorage keys with migration (AC: #6, #7, #8)
-  - [ ] Change `SAVE_KEY` from a constant to a function: `getSaveKey(storyId: string): string` returning `tree-story:save:${storyId}`
-  - [ ] Keep legacy key constant: `LEGACY_SAVE_KEY = 'tree-story:save'`
-  - [ ] Add `migrateToPerStoryKey(storyId: string): void` — if legacy key exists and per-story key does not, move data and remove legacy key
-  - [ ] Update `save(engineState, storyId)` to use `getSaveKey(storyId)`
-  - [ ] Update `load(storyId)` to accept `storyId` parameter and use `getSaveKey(storyId)` — add `storyId` as required parameter
-  - [ ] Update `clear(storyId)` to accept `storyId` parameter and use `getSaveKey(storyId)`
-- [ ] Update all callers of persistence functions to pass `storyId` (AC: #3)
-  - [ ] `hooks/useStoryEngine.ts` — update `persistence.save()`, `persistence.load()`, `persistence.clear()` calls
-  - [ ] `components/GameShell.tsx` — update `persistence.load()` and `persistence.clear()` calls in `hasActiveGame()`
-  - [ ] Call `persistence.migrateToPerStoryKey(config.id)` in `GameShell` `useEffect` before checking for active game
-- [ ] Update `app/page.tsx` — remove the current story-loading logic (AC: #1)
-  - [ ] The root page will be replaced by the landing page in Story 2.3 — for NOW, redirect to `/dub-camp` or render a simple placeholder until Story 2.3 is implemented
+- [x] Create `app/[storyId]/page.tsx` — server component with SSR meta tags (AC: #1, #2, #3, #4, #5)
+  - [x] Server component fetches story from Supabase by `storyId` param
+  - [x] `generateMetadata()` returns `og:title`, `og:description` from story metadata
+  - [x] On success: validate story JSON with `validateStoryConfig()` and render `<GameShell config={storyConfig} />`
+  - [x] On failure (story not found): render a graceful fallback message — not `notFound()`, just a friendly message
+  - [x] On Supabase error: render a graceful fallback — never a blank page
+- [x] Update `engine/persistence.ts` — per-story localStorage keys with migration (AC: #6, #7, #8)
+  - [x] Change `SAVE_KEY` from a constant to a function: `getSaveKey(storyId: string): string` returning `tree-story:save:${storyId}`
+  - [x] Keep legacy key constant: `LEGACY_SAVE_KEY = 'tree-story:save'`
+  - [x] Add `migrateToPerStoryKey(storyId: string): void` — if legacy key exists and per-story key does not, move data and remove legacy key
+  - [x] Update `save(engineState, storyId)` to use `getSaveKey(storyId)`
+  - [x] Update `load(storyId)` to accept `storyId` parameter and use `getSaveKey(storyId)` — add `storyId` as required parameter
+  - [x] Update `clear(storyId)` to accept `storyId` parameter and use `getSaveKey(storyId)`
+- [x] Update all callers of persistence functions to pass `storyId` (AC: #3)
+  - [x] `hooks/useStoryEngine.ts` — update `persistence.save()`, `persistence.load()`, `persistence.clear()` calls
+  - [x] `components/GameShell.tsx` — update `persistence.load()` and `persistence.clear()` calls in `hasActiveGame()`
+  - [x] Call `persistence.migrateToPerStoryKey(config.id)` in `GameShell` `useEffect` before checking for active game
+- [x] Update `app/page.tsx` — remove the current story-loading logic (AC: #1)
+  - [x] The root page will be replaced by the landing page in Story 2.3 — for NOW, redirect to `/dub-camp` or render a simple placeholder until Story 2.3 is implemented
 
 ## Dev Notes
 
@@ -278,9 +278,27 @@ Files modified:
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
+None — straightforward implementation.
 
 ### Completion Notes List
+- Created `app/[storyId]/page.tsx` server component with `generateMetadata()` for OG tags and direct Supabase fetch. Uses discriminated union pattern to avoid JSX-in-try/catch lint issue.
+- Refactored `engine/persistence.ts`: replaced single `SAVE_KEY` with `getSaveKey(storyId)` function (`tree-story:save:<storyId>`), added `migrateToPerStoryKey()` for legacy key migration, updated `load()` and `clear()` to require `storyId` parameter.
+- Updated `components/GameShell.tsx`: calls `migrateToPerStoryKey(config.id)` before `hasActiveGame()` in useEffect, passes `config.id` to `persistence.load()` and `persistence.clear()`.
+- Updated `hooks/useStoryEngine.ts`: passes `config.id` to `persistence.load()` and `persistence.clear()`.
+- Updated existing persistence tests to use new per-story key format (`tree-story:save:storyId`).
+- `app/page.tsx` replaced with landing page (implemented together with Story 2.3).
+- All 157 tests pass, no new lint errors.
+
+### Change Log
+- 2026-03-05: Implemented Story 2.2 — Per-story routing with SSR meta tags and localStorage migration
 
 ### File List
+- app/[storyId]/page.tsx (new)
+- engine/persistence.ts (modified — per-story keys + migration)
+- components/GameShell.tsx (modified — migration call + storyId params)
+- hooks/useStoryEngine.ts (modified — storyId params to load/clear)
+- engine/storyEngine.test.ts (modified — updated persistence tests for new API)
+- app/page.tsx (modified — simplified; full landing page replacement done in Story 2.3)

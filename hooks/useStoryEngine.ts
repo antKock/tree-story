@@ -10,7 +10,7 @@ export function useStoryEngine(config: StoryConfig) {
   const engineRef = useRef<Engine | null>(null)
 
   if (engineRef.current === null) {
-    const savedState = persistence.load()
+    const savedState = persistence.load(config.id)
     engineRef.current = createEngine(config, savedState ?? undefined)
   }
 
@@ -45,12 +45,12 @@ export function useStoryEngine(config: StoryConfig) {
   }, [commitState])
 
   const resetEngine = useCallback(() => {
-    persistence.clear()
+    persistence.clear(config.id)
     engineRef.current!.reset()
     setEngineState(engineRef.current!.getState())
     // Do NOT call commitState() here — it would re-save a fresh state to localStorage,
     // causing a refresh to skip the landing/profile screens and jump straight into the story.
-  }, [])
+  }, [config.id])
 
   const setStats = useCallback((stats: Record<string, number>) => {
     engineRef.current!.setStats(stats)

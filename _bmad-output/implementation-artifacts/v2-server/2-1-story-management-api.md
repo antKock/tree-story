@@ -1,6 +1,6 @@
 # Story 2.1: Story Management API
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -21,18 +21,18 @@ So that story content is served from the server and can be updated live without 
 
 ## Tasks / Subtasks
 
-- [ ] Create `app/api/stories/route.ts` — GET list endpoint (AC: #1, #7, #8)
-  - [ ] Query `stories` table: `select('id, title, description, updated_at')`
-  - [ ] Map `snake_case` columns to `camelCase` response: `{ id, title, description, updatedAt }`
-  - [ ] Wrap in try/catch with `{ error: 'Internal server error' }` fallback
-- [ ] Create `app/api/stories/[id]/route.ts` — GET fetch + POST upload (AC: #2, #3, #4, #5, #6, #7, #8)
-  - [ ] GET handler: query `stories` table by `id`, return `data` column as response body
-  - [ ] GET handler: return `404` if story not found (`.single()` returns null/error)
-  - [ ] POST handler: check `Authorization` header FIRST — reject with `401` before any Supabase call
-  - [ ] POST handler: parse request body as JSON, extract `title` from `meta.title` and `description` from `meta.description`
-  - [ ] POST handler: upsert into `stories` table with `{ id, title, description, data: body, updated_at: new Date().toISOString() }`
-  - [ ] POST handler: return `201` with `{ id, title, description, updatedAt }`
-  - [ ] Both handlers wrapped in try/catch
+- [x] Create `app/api/stories/route.ts` — GET list endpoint (AC: #1, #7, #8)
+  - [x] Query `stories` table: `select('id, title, description, updated_at')`
+  - [x] Map `snake_case` columns to `camelCase` response: `{ id, title, description, updatedAt }`
+  - [x] Wrap in try/catch with `{ error: 'Internal server error' }` fallback
+- [x] Create `app/api/stories/[id]/route.ts` — GET fetch + POST upload (AC: #2, #3, #4, #5, #6, #7, #8)
+  - [x] GET handler: query `stories` table by `id`, return `data` column as response body
+  - [x] GET handler: return `404` if story not found (`.single()` returns null/error)
+  - [x] POST handler: check `Authorization` header FIRST — reject with `401` before any Supabase call
+  - [x] POST handler: parse request body as JSON, extract `title` from `meta.title` and `description` from `meta.description`
+  - [x] POST handler: upsert into `stories` table with `{ id, title, description, data: body, updated_at: new Date().toISOString() }`
+  - [x] POST handler: return `201` with `{ id, title, description, updatedAt }`
+  - [x] Both handlers wrapped in try/catch
 
 ## Dev Notes
 
@@ -229,9 +229,27 @@ No files modified — these are new Route Handlers alongside the existing `score
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
+None — implementation was straightforward with no issues.
 
 ### Completion Notes List
+- Implemented GET /api/stories list endpoint returning camelCase metadata (id, title, description, updatedAt) ordered by updated_at descending
+- Implemented GET /api/stories/[id] returning raw story data from `data` jsonb column, with 404 for missing stories
+- Implemented POST /api/stories/[id] with Bearer token auth check BEFORE any Supabase call, upsert with title/description extraction from meta, returns 201
+- All handlers wrapped in try/catch returning 500 on any unhandled error
+- Matched existing Route Handler patterns from scores/route.ts and leaderboard/route.ts exactly (await params, same import style)
+- Added 13 unit tests covering all success paths, error paths, auth rejection, and edge cases (missing meta fallbacks)
+- Updated vitest.config.ts to include `app/**/*.test.ts` and added `@` path alias resolution
+- All 157 tests pass (including 13 new), no regressions. Lint errors are all pre-existing.
+
+### Change Log
+- 2026-03-05: Implemented Story 2.1 — Story Management API (GET list, GET fetch, POST upload) with full test coverage
 
 ### File List
+- app/api/stories/route.ts (new)
+- app/api/stories/route.test.ts (new)
+- app/api/stories/[id]/route.ts (new)
+- app/api/stories/[id]/route.test.ts (new)
+- vitest.config.ts (modified — added app test include pattern and @ path alias)
